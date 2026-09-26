@@ -1,0 +1,20 @@
+{
+  "name": "ports-of-plague",
+  "version": "1.0.0",
+  "description": "Ports of Plague \u2014 an educational hot-seat board game about the Black Death, 1347\u20131353",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node tools/serve.js",
+    "build": "node tools/build.js",
+    "test": "node --test tests/*.test.js",
+    "simulate": "node tools/simulate.js",
+    "docs": "node tools/build-docs.js",
+    "audit": "node tools/audit.js",
+    "all": "npm run audit && npm run build && npm run docs && npm test",
+    "map": "node tools/make-map.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}
