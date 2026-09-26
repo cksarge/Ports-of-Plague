@@ -1,0 +1,176 @@
+// Title screen (with a living map behind it) and the setup screen.
+import { DATA, CITIES, HOME_CITIES } from '../data.js';
+import { C, PLAYER_STYLES, validateSetup, createGame } from '../engine/state.js';
+import { esc, crestSvg, $, $$ } from './dom.js';
+import { showRules, showCredits } from './panels.js';
+import { loadGame } from './save.js';
+import { createMap, updateMap, startAmbient, redrawStains, animateStrike, POS } from './map.js';
+import { music } from './music.js';
+import { isMuted, setMuted, isMusicOn, setMusicOn } from './sound.js';
+
+let stopTitle = null;
+export function stopTitleAnimation() { stopTitle?.(); stopTitle = null; }
+
+// A decorative game state for the title map: the plague spreads across
+// Europe, one historical half-year every few seconds.
+function titleBackdrop(el) {
+  const svg = createMap(el, { decorative: true });
+  const demo = createGame({ players: [{ name: 'A', home: 'venice' }, { name: 'B', home: 'genoa' }], seed: 'title' });
+  demo.players.forEach((p) => { p.posts = []; p.family = {}; });
+  let half = 0;
+  let timers = [];
+  const reset = () => {
+    half = 0;
+    for (const c of DATA.cities) Object.assign(demo.cities[c.id], { state: c.arrival.round === 0 ? 'stricken' : 'safe', severity: 3 });
+    updateMap(svg, demo);
+    redrawStains(svg, demo);
+  };
+  const tick = () => {
+    if (half >= C.rounds) {
+      // End of 1353: hold, fade out, reset while invisible, fade back in.
+      el.classList.add('fading');
+      timers.push(setTimeout(() => { reset(); el.classList.remove('fading'); }, 1500));
+      return;
+    }
+    half++;
+    for (const c of DATA.cities) {
+      const r = c.arrival.round;
+      const st = demo.cities[c.id];
+      if (r === half) {
+        Object.assign(st, { state: 'stricken', severity: 1 + ((c.lat * 7) | 0) % 3 });
+        animateStrike(svg, c.id); // the stain spreads smoothly
+      } else if (st.state === 'stricken' && r <= half - 2) st.state = 'aftermath';
+    }
+    // Remove stains of cities that have passed into Aftermath.
+    svg.querySelectorAll('#stains .stain').forEach((s) => {
+      const id = DATA.cities.find((c) => Math.abs(POS[c.id][0] - Number(s.getAttribute('cx'))) < 0.5 && Math.abs(POS[c.id][1] - Number(s.getAttribute('cy'))) < 0.5)?.id;
+      if (id && demo.cities[id].state !== 'stricken') s.classList.add('fade-out');
+    });
+    updateMap(svg, demo);
+  };
+  reset();
+  const interval = setInterval(tick, 2600);
+  const stopAmbient = startAmbient(svg, { ships: 9, carts: 4, stateRef: () => demo });
+  return () => { clearInterval(interval); timers.forEach(clearTimeout); stopAmbient(); };
+}
+
+export function renderMenu(app, { onNew, onContinue }) {
+  stopTitleAnimation();
+  const saved = loadGame();
+  app.innerHTML = `<section class="screen title-screen">
+    <div class="title-map" id="title-map" aria-hidden="true"></div>
+    <div class="menu frame">
+      <h1 class="title">${esc(C.title)}</h1>
+      <p class="subtitle">Trade, survival and conscience in the years of the Black Death, 1347–1353</p>
+      <p class="drop-cap" style="text-align:left">In 1347 Italian merchant ships carried a deadly plague from the Black Sea into the ports of Europe. You lead a merchant house in one of the great trading cities. Grow rich from trade, but every ship may carry the plague. Protect your family, keep your good name, and face the same hard choices people faced six and a half centuries ago.</p>
+      <div class="menu-buttons">
+        ${saved ? `<button class="btn primary" id="continue">Continue saved game<br><small style="font-family:var(--serif);font-weight:400">${esc(DATA.timeline.rounds[Math.max(0, saved.state.round - 1)]?.label ?? 'Start')} · ${saved.state.players.map((p) => esc(p.name)).join(', ')}</small></button>` : ''}
+        <button class="btn ${saved ? '' : 'primary'}" id="new">New game</button>
+        <button class="btn" id="rules">Rules <span class="key">R</span></button>
+        <button class="btn ghost" id="about">About &amp; credits</button>
+        <div style="display:flex;gap:0.6rem;justify-content:center">
+          <button class="btn small" id="menu-sound" aria-pressed="${!isMuted()}">${isMuted() ? '🔇 Sound off' : '🔊 Sound on'}</button>
+          <button class="btn small" id="menu-music" aria-pressed="${isMusicOn()}">${isMusicOn() ? '🎵 Music on' : '🎵 Music off'}</button>
+        </div>
+      </div>
+      <p class="menu-foot">${C.players.min}–${C.players.max} players on one computer · about ${C.timeEstimates.quick['2']}–60 minutes · mouse or keyboard</p>
+    </div></section>`;
+  stopTitle = titleBackdrop($('#title-map', app));
+  music.setMood('menu');
+  const sb = $('#menu-sound', app), mb = $('#menu-music', app);
+  sb.onclick = () => { setMuted(!isMuted()); sb.setAttribute('aria-pressed', !isMuted()); sb.textContent = isMuted() ? '🔇 Sound off' : '🔊 Sound on'; };
+  mb.onclick = () => { setMusicOn(!isMusicOn()); mb.setAttribute('aria-pressed', isMusicOn()); mb.textContent = isMusicOn() ? '🎵 Music on' : '🎵 Music off'; };
+  $('#new', app).onclick = () => { stopTitleAnimation(); onNew(); };
+  $('#rules', app).onclick = showRules;
+  $('#about', app).onclick = showCredits;
+  if (saved) $('#continue', app).onclick = () => { stopTitleAnimation(); onContinue(saved); };
+  $('#continue, #new', app)?.focus();
+  app.onkeydown = (e) => { if (e.key.toLowerCase() === 'r' && !document.querySelector('dialog')) showRules(); };
+}
+
+const DEFAULT_NAMES = ['House of the Anchor', 'House of the Lion', 'House of the Rose', 'House of the Star', 'House of the Ship', 'House of the Sun'];
+const DEFAULT_HOMES = ['genoa', 'bruges', 'venice', 'london', 'florence', 'lubeck'];
+
+export function renderSetup(app, { onStart, onBack }) {
+  app.onkeydown = null;
+  const setup = {
+    count: 2,
+    difficulty: 'chronicler',
+    mode: 'standard',
+    hints: true,
+    players: PLAYER_STYLES.map((s, i) => ({ name: DEFAULT_NAMES[i], home: DEFAULT_HOMES[i], ...s })),
+  };
+  const homeInfo = (id) => {
+    const c = CITIES[id];
+    const h = c.home;
+    const bonus = setup.mode === 'quick' ? h.quickStartFlorins ?? h.startFlorins : h.startFlorins;
+    return `Plague arrives: ${esc(c.arrival.dateText)}. Starts with ${C.start.florins + bonus}ƒ and ${C.start.reputation + (h.startReputation ?? 0)} reputation.`;
+  };
+  const diffText = {
+    apprentice: 'Apprentice: the plague is gentler (severity rolls 1 lower) and hints stay on all game.',
+    chronicler: 'Chronicler: the standard game.',
+    mortality: 'Great Mortality: severity rolls are 1 higher and every shipment has +1 contagion risk. For experienced merchants.',
+  };
+  const draw = () => {
+    const est = C.timeEstimates[setup.mode][String(setup.count)];
+    app.innerHTML = `<section class="screen"><div class="setup frame">
+      <h1>New Game</h1>
+      <div class="field"><span class="label" id="count-label">Number of players</span>
+        <div class="seg" role="group" aria-labelledby="count-label">${Array.from({ length: C.players.max - C.players.min + 1 }, (_, i) => i + C.players.min).map((n) => `<button class="btn small" data-count="${n}" aria-pressed="${setup.count === n}">${n} players</button>`).join('')}</div></div>
+      <div class="setup-grid">${setup.players.slice(0, setup.count).map((p, i) => `
+        <div class="house-card" style="--house:${p.color}">
+          <h3>${crestSvg(p, 26)} Player ${i + 1} <small style="font-family:var(--serif);font-weight:400">(${esc(p.colorName)}, ${p.crest})</small></h3>
+          <div class="field"><label for="name-${i}">House name</label><input id="name-${i}" data-name="${i}" value="${esc(p.name)}" maxlength="24" autocomplete="off"></div>
+          <div class="field"><label for="home-${i}">Home city</label>
+            <select id="home-${i}" data-home="${i}">${HOME_CITIES.map((h) => `<option value="${h}" ${p.home === h ? 'selected' : ''}>${esc(CITIES[h].name)}</option>`).join('')}</select></div>
+          <div class="home-info" id="info-${i}">${homeInfo(p.home)}</div>
+        </div>`).join('')}</div>
+      <div class="option-grid">
+        <div class="field"><span class="label" id="mode-label">Game length</span>
+          <div class="seg" role="group" aria-labelledby="mode-label">
+            ${Object.entries(C.modes).map(([k, m]) => `<button class="btn small" data-mode="${k}" aria-pressed="${setup.mode === k}">${esc(m.label)}</button>`).join('')}
+          </div>
+          <span class="home-info">${esc(C.modes[setup.mode].description)} ${C.modes[setup.mode].actionPoints} action points per turn.<br><span class="time-est">About ${est} minutes for ${setup.count} players</span>${est > 60 && setup.mode === 'standard' ? ' · Quick Play is recommended for this many players.' : ''}</span>
+        </div>
+        <div class="field"><span class="label" id="diff-label">Difficulty</span>
+          <div class="seg" role="group" aria-labelledby="diff-label">
+            ${Object.entries(C.difficulty).map(([k, d]) => `<button class="btn small" data-diff="${k}" aria-pressed="${setup.difficulty === k}">${esc(d.label)}</button>`).join('')}
+          </div>
+          <span class="home-info">${diffText[setup.difficulty]}</span>
+        </div>
+      </div>
+      <label class="field" style="display:flex;align-items:center;gap:0.5rem"><input type="checkbox" id="hints" ${setup.hints ? 'checked' : ''} style="width:24px;height:24px"> Show guided hints during the first round</label>
+      <p class="error" id="setup-error" role="alert"></p>
+      <div class="setup-actions">
+        <button class="btn ghost" id="back">← Back</button>
+        <button class="btn primary" id="start">Roll for turn order →</button>
+      </div>
+    </div></section>`;
+    $$('[data-count]', app).forEach((b) => (b.onclick = () => { setup.count = Number(b.dataset.count); fixHomes(); draw(); }));
+    $$('[data-diff]', app).forEach((b) => (b.onclick = () => { setup.difficulty = b.dataset.diff; draw(); }));
+    $$('[data-mode]', app).forEach((b) => (b.onclick = () => { setup.mode = b.dataset.mode; draw(); }));
+    $$('[data-name]', app).forEach((inp) => (inp.oninput = () => { setup.players[inp.dataset.name].name = inp.value; }));
+    $$('[data-home]', app).forEach((sel) => (sel.onchange = () => {
+      const i = Number(sel.dataset.home);
+      setup.players[i].home = sel.value;
+      $(`#info-${i}`, app).innerHTML = homeInfo(sel.value);
+    }));
+    $('#hints', app).onchange = (e) => { setup.hints = e.target.checked; };
+    $('#back', app).onclick = onBack;
+    $('#start', app).onclick = () => {
+      const players = setup.players.slice(0, setup.count).map((p) => ({ ...p, name: p.name.trim() }));
+      const problem = validateSetup({ players });
+      if (problem) { $('#setup-error', app).textContent = problem; return; }
+      onStart({ players, difficulty: setup.difficulty, mode: setup.mode, hints: setup.hints || setup.difficulty === 'apprentice' });
+    };
+  };
+  const fixHomes = () => {
+    const used = new Set();
+    for (const p of setup.players.slice(0, setup.count)) {
+      if (used.has(p.home)) p.home = HOME_CITIES.find((h) => !used.has(h));
+      used.add(p.home);
+    }
+  };
+  draw();
+  $('#name-0', app)?.focus();
+}

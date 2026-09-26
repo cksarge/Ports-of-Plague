@@ -1,0 +1,187 @@
+// Background music, composed for this game and played live by the Web
+// Audio API (no recordings): a lute-like melody in the medieval Dorian
+// mode over a drone, with a soft frame drum. During plague phases the music
+// slows and darkens.
+import { audioContext, isMusicOn, onAudioSettings } from './sound.js';
+
+const midi = (n) => 440 * Math.pow(2, (n - 69) / 12);
+
+// Original melodic phrases, [MIDI note, beats]. Each phrase is 8 beats.
+const PHRASES = [
+  [[69, 1], [67, 0.5], [65, 0.5], [64, 1], [62, 1], [64, 1], [65, 1], [67, 2]],
+  [[69, 1], [72, 1], [71, 0.5], [69, 0.5], [67, 1], [69, 2], [65, 1], [64, 1]],
+  [[62, 1], [65, 1], [64, 1], [62, 1], [60, 1], [62, 1], [57, 2]],
+  [[65, 0.5], [67, 0.5], [69, 1], [67, 1], [65, 1], [64, 1.5], [62, 0.5], [62, 2]],
+  [[74, 1.5], [72, 0.5], [71, 1], [69, 1], [67, 0.5], [69, 0.5], [71, 1], [69, 2]],
+  [[62, 0.5], [64, 0.5], [65, 0.5], [67, 0.5], [69, 1], [0, 1], [67, 0.5], [65, 0.5], [64, 1], [62, 2]],
+];
+// Bass roots for each half of a phrase.
+const ROOTS = [[50, 45], [53, 48], [50, 45], [48, 50], [55, 50], [50, 50]];
+
+const MOODS = {
+  menu: { tempo: 76, transpose: 0, drum: 0.5, melody: 0.11, dark: false },
+  calm: { tempo: 84, transpose: 0, drum: 0.7, melody: 0.1, dark: false },
+  plague: { tempo: 62, transpose: -12, drum: 0.35, melody: 0.09, dark: true },
+};
+
+let state = null; // running sequencer
+let mood = 'menu';
+
+function darken(n) {
+  // Phrygian colour: lower the 2nd and 6th degrees (E→E♭, B→B♭).
+  const pc = ((n % 12) + 12) % 12;
+  return pc === 4 || pc === 11 ? n - 1 : n;
+}
+
+function pluck(a, out, t, freq, dur, gain) {
+  const o1 = a.createOscillator(), o2 = a.createOscillator();
+  o1.type = 'triangle'; o1.frequency.value = freq;
+  o2.type = 'sine'; o2.frequency.value = freq * 2.003;
+  const f = a.createBiquadFilter();
+  f.type = 'lowpass';
+  f.frequency.setValueAtTime(3200, t);
+  f.frequency.exponentialRampToValueAtTime(700, t + dur);
+  const g = a.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(gain, t + 0.006);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur * 1.6 + 0.2);
+  const g2 = a.createGain();
+  g2.gain.value = 0.3;
+  o1.connect(f); o2.connect(g2).connect(f);
+  f.connect(g).connect(out);
+  o1.start(t); o2.start(t);
+  o1.stop(t + dur * 1.6 + 0.3); o2.stop(t + dur * 1.6 + 0.3);
+}
+
+function drum(a, out, t, gain, low = true) {
+  const len = Math.floor(a.sampleRate * 0.25);
+  const buf = a.createBuffer(1, len, a.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 4);
+  const src = a.createBufferSource();
+  src.buffer = buf;
+  const f = a.createBiquadFilter();
+  f.type = 'lowpass';
+  f.frequency.value = low ? 180 : 420;
+  const g = a.createGain();
+  g.gain.value = gain;
+  src.connect(f).connect(g).connect(out);
+  src.start(t);
+  const o = a.createOscillator();
+  o.frequency.setValueAtTime(low ? 95 : 150, t);
+  o.frequency.exponentialRampToValueAtTime(low ? 55 : 90, t + 0.15);
+  const og = a.createGain();
+  og.gain.setValueAtTime(gain * 0.8, t);
+  og.gain.exponentialRampToValueAtTime(0.0001, t + 0.22);
+  o.connect(og).connect(out);
+  o.start(t);
+  o.stop(t + 0.25);
+}
+
+function startDrone(a, out) {
+  const g = a.createGain();
+  g.gain.setValueAtTime(0.0001, a.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.05, a.currentTime + 3);
+  const f = a.createBiquadFilter();
+  f.type = 'lowpass';
+  f.frequency.value = 420;
+  const lfo = a.createOscillator();
+  const lfoGain = a.createGain();
+  lfo.frequency.value = 0.08;
+  lfoGain.gain.value = 120;
+  lfo.connect(lfoGain).connect(f.frequency);
+  const oscs = [38, 45, 38.07].map((n) => {
+    const o = a.createOscillator();
+    o.type = 'sawtooth';
+    o.frequency.value = midi(n);
+    o.connect(f);
+    o.start();
+    return o;
+  });
+  f.connect(g).connect(out);
+  lfo.start();
+  return { g, oscs, lfo };
+}
+
+function start() {
+  if (state || !isMusicOn()) return;
+  const au = audioContext();
+  if (!au) return;
+  const a = au.ctx;
+  const out = a.createGain();
+  out.gain.setValueAtTime(0.0001, a.currentTime);
+  out.gain.exponentialRampToValueAtTime(1, a.currentTime + 2);
+  out.connect(au.buses.music);
+  const drone = startDrone(a, out);
+  state = { a, out, drone, next: a.currentTime + 0.3, phrase: 0, note: 0, beat: 0, timer: null, order: [0, 1, 0, 2, 3, 1, 4, 5] };
+  state.timer = setInterval(schedule, 60);
+}
+
+function stop() {
+  if (!state) return;
+  const s = state;
+  state = null;
+  clearInterval(s.timer);
+  const t = s.a.currentTime;
+  s.out.gain.cancelScheduledValues(t);
+  s.out.gain.setValueAtTime(s.out.gain.value || 0.5, t);
+  s.out.gain.exponentialRampToValueAtTime(0.0001, t + 1.2);
+  setTimeout(() => { s.drone.oscs.forEach((o) => o.stop()); s.drone.lfo.stop(); s.out.disconnect(); }, 1400);
+}
+
+// Schedules notes a little ahead of time so playback stays smooth.
+function schedule() {
+  const s = state;
+  if (!s) return;
+  const m = MOODS[mood];
+  const beatLen = 60 / m.tempo;
+  while (s.next < s.a.currentTime + 0.35) {
+    const phraseIdx = s.order[s.phrase % s.order.length];
+    const phrase = PHRASES[phraseIdx];
+    const [n, beats] = phrase[s.note];
+    if (s.note === 0) {
+      // Bass notes on the phrase's two halves, and the drum pattern.
+      const [r1, r2] = ROOTS[phraseIdx];
+      pluck(s.a, s.out, s.next, midi(m.transpose + r1 - 12), beatLen * 3.5, 0.08);
+      pluck(s.a, s.out, s.next + beatLen * 4, midi(m.transpose + r2 - 12), beatLen * 3.5, 0.07);
+      for (let b = 0; b < 8; b++) {
+        if (b % 4 === 0) drum(s.a, s.out, s.next + b * beatLen, 0.18 * m.drum, true);
+        else if (b % 4 === 2 && Math.random() < 0.8) drum(s.a, s.out, s.next + b * beatLen, 0.08 * m.drum, false);
+        else if (b % 4 === 3 && Math.random() < 0.35) drum(s.a, s.out, s.next + (b + 0.5) * beatLen, 0.06 * m.drum, false);
+      }
+    }
+    if (n > 0) {
+      const note = m.dark ? darken(n + m.transpose) : n + m.transpose;
+      // A little human timing and occasional ornament (a quick upper neighbour).
+      const t = s.next + (Math.random() - 0.5) * 0.012;
+      if (beats >= 1 && Math.random() < 0.12) {
+        pluck(s.a, s.out, t, midi(note + 2), beatLen * 0.2, m.melody * 0.6);
+        pluck(s.a, s.out, t + beatLen * 0.12, midi(note), beatLen * beats, m.melody);
+      } else {
+        pluck(s.a, s.out, t, midi(note), beatLen * beats, m.melody);
+      }
+    }
+    s.next += beats * beatLen;
+    s.note++;
+    if (s.note >= phrase.length) {
+      s.note = 0;
+      s.phrase++;
+      // After a full pass, shuffle the phrase order for variety.
+      if (s.phrase % s.order.length === 0) s.order = s.order.map((x) => ({ x, r: Math.random() })).sort((p, q) => p.r - q.r).map((p) => p.x);
+      // A breath between phrases, longer in dark moods.
+      s.next += beatLen * (m.dark ? 1 : 0.5);
+    }
+  }
+}
+
+export const music = {
+  setMood(m) { if (MOODS[m]) mood = m; },
+  // Browsers only allow sound after the player interacts with the page.
+  enableOnFirstGesture() {
+    const go = () => { if (isMusicOn()) start(); };
+    window.addEventListener('pointerdown', go, { once: true });
+    window.addEventListener('keydown', go, { once: true });
+  },
+  sync() { if (isMusicOn()) start(); else stop(); },
+};
+onAudioSettings(() => music.sync());

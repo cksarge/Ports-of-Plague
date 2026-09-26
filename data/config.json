@@ -1,0 +1,166 @@
+{
+  "title": "Ports of Plague",
+  "players": {
+    "min": 2,
+    "max": 6
+  },
+  "rounds": 12,
+  "start": {
+    "florins": 12,
+    "family": 5,
+    "reputation": 7,
+    "posts": 1
+  },
+  "limits": {
+    "maxPosts": 6,
+    "maxReputation": 20,
+    "minReputation": 0,
+    "moveFamilyMax": 2,
+    "charityPerTurn": 1
+  },
+  "costs": {
+    "openPost": 8,
+    "prepareHousehold": 2,
+    "physician": 2,
+    "charity": 4,
+    "charityDiscountLastPlace": 1,
+    "protectCommunity": 3,
+    "wageAftermath": 1
+  },
+  "gains": {
+    "charityReputation": 1,
+    "protectReputation": 3,
+    "inheritance": 3,
+    "familyAtPostBonus": 1,
+    "aftermathPriceBonus": 2
+  },
+  "penalties": {
+    "fleeReputation": 1,
+    "infectedCargoReputation": 1,
+    "unrestProfit": 1,
+    "unrestRounds": 2
+  },
+  "plague": {
+    "strickenRounds": 2,
+    "severityTable": {
+      "1": 1,
+      "2": 1,
+      "3": 2,
+      "4": 2,
+      "5": 3,
+      "6": 3
+    },
+    "severityNames": {
+      "1": "Light",
+      "2": "Heavy",
+      "3": "Devastating"
+    },
+    "severityMax": 3,
+    "prepareBonus": 1,
+    "physicianSaveOn": 6,
+    "earlyArrivalWindow": 1
+  },
+  "shipping": {
+    "profitDie": 6,
+    "infectedProfitFactor": 0.5,
+    "shipsPerPostPerRound": 1
+  },
+  "comeback": {
+    "guildFavorFromRound": 5,
+    "guildFavorAP": 1,
+    "guildFavorMinGap": 6
+  },
+  "scoring": {
+    "florinsPerPoint": 6,
+    "pointsPerPost": 1,
+    "pointsPerFamily": 3,
+    "reputationPoints": 1,
+    "reputationSoftCap": 10,
+    "reputationHighRate": 3,
+    "balanceBonus": "lowest"
+  },
+  "difficulty": {
+    "apprentice": {
+      "label": "Apprentice",
+      "severityMod": -1,
+      "contagionMod": 0,
+      "hints": true,
+      "eventsPerRound": 1
+    },
+    "chronicler": {
+      "label": "Chronicler",
+      "severityMod": 0,
+      "contagionMod": 0,
+      "hints": false,
+      "eventsPerRound": 1
+    },
+    "mortality": {
+      "label": "Great Mortality",
+      "severityMod": 1,
+      "contagionMod": 1,
+      "hints": false,
+      "eventsPerRound": 1
+    }
+  },
+  "timing": {
+    "secondsPerAction": 20,
+    "secondsPerEventCard": 20,
+    "secondsPerChronicleCard": 15,
+    "secondsPerPass": 8,
+    "secondsPerPlaguePhase": 20,
+    "secondsPerDecision": 10,
+    "secondsPerFortuneCard": 12
+  },
+  "keyboard": {
+    "ship": "1",
+    "post": "2",
+    "move": "3",
+    "prepare": "4",
+    "physician": "5",
+    "charity": "6",
+    "endTurn": "E",
+    "rules": "R",
+    "journal": "J",
+    "mute": "M"
+  },
+  "wageLaw": {
+    "obeyReputation": 1,
+    "fine": 3,
+    "fineMaxRoll": 2
+  },
+  "modes": {
+    "standard": {
+      "label": "Standard",
+      "span": 1,
+      "actionPoints": 2,
+      "description": "12 rounds of half a year each."
+    },
+    "quick": {
+      "label": "Quick Play",
+      "span": 2,
+      "actionPoints": 3,
+      "description": "6 rounds of a whole year each; the plague rolls twice per round."
+    }
+  },
+  "fortune": {
+    "drawOnProfitDie": 6,
+    "drawOnNewPost": true
+  },
+  "turnOrderDie": 6,
+  "timeEstimates": {
+    "standard": {
+      "2": 39,
+      "3": 51,
+      "4": 63,
+      "5": 74,
+      "6": 86
+    },
+    "quick": {
+      "2": 29,
+      "3": 38,
+      "4": 46,
+      "5": 55,
+      "6": 63
+    }
+  }
+}

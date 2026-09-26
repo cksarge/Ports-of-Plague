@@ -1,0 +1,283 @@
+{
+  "note": "Single source for BOTH the in-game Rules screen and the printable Rule Book. {{a.b}} inserts a value from config.json; {{fact:ID}} inserts a fact reference. Inline **bold** and *italic* are supported.",
+  "title": "Ports of Plague",
+  "subtitle": "A game of trade, survival and conscience during the Black Death, 1347–1353",
+  "sections": [
+    {
+      "id": "background",
+      "title": "Historical Background",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "In 1346 plague broke out among the Mongol army besieging the Genoese port of Caffa on the Black Sea {{fact:TR-02}}. Italian merchant ships carried it to Constantinople, then to Sicily in October 1347 {{fact:TR-06}}, and from there along the trade routes to almost every corner of Europe by 1353 {{fact:TL-02}} {{fact:TR-10}}. Somewhere between a third and 60 percent of Europeans died; historians still debate the number {{fact:DB-01}}."
+        },
+        {
+          "type": "p",
+          "text": "You lead a merchant family in one of Europe's great trading cities. Trade makes you rich, but every ship can carry the plague. The game follows the real timeline: the plague reaches each city in the half-year it really did. Along the way you will face the same choices real people faced: to flee or to stay, to trust physicians who could not cure the disease {{fact:ME-08}}, to answer the Church's call, to obey or ignore England's wage laws {{fact:EC-05}}, and whether to stand up for neighbors falsely blamed for the plague {{fact:SO-07}}."
+        }
+      ]
+    },
+    {
+      "id": "objective",
+      "title": "Objective",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "A standard game lasts **{{rounds}} rounds** of half a year each, from Late 1347 to Early 1353; **Quick Play** covers the same years in 6 rounds of a whole year. When it ends, the house with the highest **Legacy score** wins. Legacy combines **Wealth**, **Family** and **Reputation**, plus a **Balance bonus** equal to your weakest of the three. A balanced house usually beats a greedy one. No one is ever knocked out of the game."
+        }
+      ]
+    },
+    {
+      "id": "components",
+      "title": "Components (on screen)",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "**The map**: 25 real cities joined by sea routes (solid lines) and land routes (dashed lines). Each route shows its base value.",
+            "**City markers**: *Safe* (plain). *Safe* cities can also be *Threatened* (dashed orange ring: a neighbouring city is Stricken). *Stricken* cities have a red ring, a hatched centre and 1–3 severity pips; *Aftermath* cities have a grey ring and a ❦ mark.",
+            "**House crests**: each player has a color and a shape (circle, square, triangle, diamond, hexagon or star). A banner by a city is a trading post; the number on it shows how many family members live there.",
+            "**Dice**: turn-order, profit, contagion, severity and mortality dice, all rolled by the computer with animation.",
+            "**Cards**: dated *Chronicle* cards, a shuffled deck of 34 *Event* cards, and a personal deck of 22 *Fortune* cards.",
+            "**Tracks and Journal**: florins (ƒ), reputation (0–{{limits.maxReputation}}), family, a live Legacy score, and the Historian's Journal of every fact you meet, with its source."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "setup",
+      "title": "Setup",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "Choose {{players.min}}–{{players.max}} players. Each picks a house name and a different home city (Venice, Genoa, Florence, Marseille, Barcelona, London, Bruges or Lübeck). Colors and crests are assigned by seat.",
+            "Each house starts with **{{start.florins}} florins**, **{{start.family}} family members** in the home city, **{{start.reputation}} reputation** and **one trading post** in the home city. To balance their routes and plague dates, home cities start with slightly different amounts of money, shown on the setup screen.",
+            "Choose **Standard** or **Quick Play**, and a difficulty: **Apprentice** (gentler plague, hints all game), **Chronicler** (standard) or **Great Mortality** (severity rolls +1, contagion risk +1).",
+            "Caffa begins Stricken. Each house rolls a die: the highest goes first and tied houses roll again. **This turn order stays the same all game.**"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "round",
+      "title": "How a Round Works",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Every round has four phases:"
+        },
+        {
+          "type": "list",
+          "ordered": true,
+          "items": [
+            "**Chronicle.** The date advances. The plague reaches every city whose real arrival date falls in this round; each becomes Stricken and rolls severity. Then the round's dated Chronicle cards are read.",
+            "**Event.** One Event card is drawn. If it offers a choice, each player decides at the start of their own turn.",
+            "**Actions.** Players take turns in the fixed order, each with **{{modes.standard.actionPoints}} action points (AP)** ({{modes.quick.actionPoints}} in Quick Play). A pass-the-device screen appears between turns.",
+            "**Plague & upkeep.** Family members in Stricken cities roll for survival. Cities Stricken for {{plague.strickenRounds}} half-years move to Aftermath."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Quick Play: each round covers two half-years at once, so arrivals and Chronicle cards for both are read, and the plague phase happens twice (two survival rolls)."
+        }
+      ]
+    },
+    {
+      "id": "actions",
+      "title": "Actions",
+      "blocks": [
+        {
+          "type": "table",
+          "head": [
+            "Action (key)",
+            "Cost",
+            "What it does"
+          ],
+          "rows": [
+            [
+              "**Ship Goods** (1)",
+              "1 AP",
+              "Choose one of your trading posts that has not shipped this round and a route leaving it. Earn the route value + the profit die (1–{{shipping.profitDie}}) + {{gains.familyAtPostBonus}} if a family member lives at that post + {{gains.aftermathPriceBonus}} if the destination is in Aftermath, minus {{costs.wageAftermath}} wage if the origin is in Aftermath. If the origin is Stricken, the contagion die is rolled too (see *Plague*)."
+            ],
+            [
+              "**Open Trading Post** (2)",
+              "1 AP + {{costs.openPost}}ƒ",
+              "Open a post in a city connected by a route to one of your posts. It cannot be a Stricken city. You may own at most {{limits.maxPosts}} posts."
+            ],
+            [
+              "**Move Family** (3)",
+              "1 AP",
+              "Move up to {{limits.moveFamilyMax}} family members from one of your cities or your Country Estate to another. **Fleeing** (leaving a Stricken city) costs {{penalties.fleeReputation}} reputation. Family at the Estate is safe from the plague, but earns no family bonus."
+            ],
+            [
+              "**Prepare Household** (4)",
+              "1 AP + {{costs.prepareHousehold}}ƒ",
+              "Pick a city where your family lives. They shut themselves in and stockpile food, the way some families isolated themselves in 1348 {{fact:SO-05}}. This round their survival rolls there get +{{plague.prepareBonus}}."
+            ],
+            [
+              "**Consult Physician** (5)",
+              "1 AP + {{costs.physician}}ƒ",
+              "Pick a city where your family lives. You learn a real remedy of the time, and none of them worked {{fact:ME-06}}. Basic nursing gives a slim chance: this round, the first family member there who would die rolls again and survives on a {{plague.physicianSaveOn}}."
+            ],
+            [
+              "**Charity & Piety** (6)",
+              "1 AP + {{costs.charity}}ƒ",
+              "Fund a hospital, a confraternity or your parish church: +{{gains.charityReputation}} reputation. Once per turn. The house in last place pays {{costs.charityDiscountLastPlace}}ƒ less."
+            ],
+            [
+              "**End Turn** (E)",
+              "–",
+              "Unused action points are lost."
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "text": "The game blocks illegal moves and explains why, for example: \"Florence is Stricken: its gates are closed to new trading posts.\""
+        }
+      ]
+    },
+    {
+      "id": "plague",
+      "title": "The Plague",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "**Historical spread.** At the start of each round, the plague reaches the cities it really reached in that half-year. The date and its source are shown in a Historical Note.",
+            "**Severity.** Each newly Stricken city rolls the severity die: 1–2 **Light** (1 pip), 3–4 **Heavy** (2), 5–6 **Devastating** (3). Hard-hit Tuscany and Catalonia (Florence, Pisa, Barcelona) add 1; Flanders (Bruges) subtracts 1 {{fact:CI-06}}. On Apprentice difficulty, every roll is 1 lower (never below Light).",
+            "**Contagion.** When you ship from a Stricken city, the contagion die is rolled. If it is equal to or lower than that city's severity, the cargo is **infected**: you earn only half the profit (rounded down) and lose {{penalties.infectedCargoReputation}} reputation, as ports blamed plague ships {{fact:CI-11}}. If the destination is Safe and the plague really reached it in the *next* round, it becomes Stricken now, {{plague.earlyArrivalWindow}} round early. If the destination is already Stricken, its severity rises by 1 (maximum 3). Otherwise the infection dies out.",
+            "**Survival.** In the Plague phase, each family member in a Stricken city rolls the mortality die, adding +{{plague.prepareBonus}} if the household was prepared. If the result is equal to or lower than the severity, that family member dies.",
+            "**The last heir.** A house's last family member never dies; a distant cousin inherits. No one is eliminated.",
+            "**Inheritance.** For each family member lost, the house inherits {{gains.inheritance}}ƒ. Survivors really did inherit the property of the dead {{fact:EC-10}}.",
+            "**Aftermath.** After {{plague.strickenRounds}} rounds a Stricken city enters Aftermath. Workers are scarce and prices are high {{fact:EC-03}} {{fact:EC-04}}: shipping *from* it costs a wage, and shipping *to* it earns a bonus."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "events",
+      "title": "Chronicle and Event Cards",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "**Chronicle cards** are real, dated history and always appear in their round, for example the Ordinance of Labourers in Early 1349 {{fact:EC-05}} and the Jubilee of 1350 {{fact:CH-08}}.",
+            "**Event cards** are drawn one per round from a shuffled deck of 34, so each game is different. Some affect every house; some fall on one house chosen at random.",
+            "**Fortune cards** are personal. You draw one whenever you roll a {{fortune.drawOnProfitDie}} on the profit die or open a new trading post: spice cargoes, extra action points, free posts, warnings of where the plague goes next, but also demanding workers, illness and nervous creditors.",
+            "**Offers** (\"Buy a Book of Hours?\") are accepted or declined at the start of your turn (Fortune offers at once). Some offers are traps from history: the remedy seller's cure does nothing.",
+            "**Wage laws.** If you own a post in London or Melcombe Regis, choose: **Obey** (+{{wageLaw.obeyReputation}} reputation, but your English posts cannot ship this round, because workers refuse the old wages) or **Pay market wages** (roll a die: on 1–{{wageLaw.fineMaxRoll}} you are fined {{wageLaw.fine}}ƒ). The real laws failed to hold wages down {{fact:EC-07}}.",
+            "**Persecution.** The game shows the persecution of Jewish communities because it really happened, and because the accusations were **false** and the violence **unjust** {{fact:SO-07}} {{fact:SO-09}}. When it appears, any house may **Protect the Community** for {{costs.protectCommunity}}ƒ and 1 AP at the start of its turn, gaining {{gains.protectReputation}} reputation. No house can ever gain anything from persecution. Whatever players choose, the city suffers unrest: shipments to or from it earn {{penalties.unrestProfit}} less for {{penalties.unrestRounds}} rounds. Pope Clement VI condemned the accusations, but his words had little effect far from Avignon {{fact:SO-08}}."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scoring",
+      "title": "Scoring and Winning",
+      "blocks": [
+        {
+          "type": "table",
+          "head": [
+            "Category",
+            "Points"
+          ],
+          "rows": [
+            [
+              "**Wealth**",
+              "1 per {{scoring.florinsPerPoint}}ƒ (rounded down), plus {{scoring.pointsPerPost}} per trading post"
+            ],
+            [
+              "**Family**",
+              "{{scoring.pointsPerFamily}} per surviving family member"
+            ],
+            [
+              "**Reputation**",
+              "1 per reputation point up to {{scoring.reputationSoftCap}}, then 1 per {{scoring.reputationHighRate}} points above that (a spotless name matters, but only so much)"
+            ],
+            [
+              "**Balance bonus**",
+              "Add your *lowest* of Wealth, Family and Reputation again"
+            ]
+          ]
+        },
+        {
+          "type": "p",
+          "text": "Highest Legacy wins. Ties go to higher reputation, then more family; if still tied, the houses share the victory."
+        },
+        {
+          "type": "p",
+          "text": "**Comebacks.** From round {{comeback.guildFavorFromRound}} on (counted in half-years), a house in last place that trails the leader by {{comeback.guildFavorMinGap}} or more Legacy points receives **Guild's Favor**: +{{comeback.guildFavorAP}} AP. Inheritance, the Survivors Marry chronicle and cheaper charity also help houses that fall behind."
+        }
+      ]
+    },
+    {
+      "id": "reference",
+      "title": "Quick Reference",
+      "blocks": [
+        {
+          "type": "list",
+          "items": [
+            "**Round:** Chronicle → Event → Actions ({{modes.standard.actionPoints}} AP each; {{modes.quick.actionPoints}} in Quick Play) → Plague & upkeep. Turn order never changes.",
+            "**Ship:** route value + profit die + family {{gains.familyAtPostBonus}} + Aftermath destination {{gains.aftermathPriceBonus}} − Aftermath wage {{costs.wageAftermath}}. From a Stricken city: contagion die ≤ severity means infected (half profit, −{{penalties.infectedCargoReputation}} reputation, may spread). Profit die {{fortune.drawOnProfitDie}}: draw a Fortune card.",
+            "**Survival:** mortality die (+{{plague.prepareBonus}} if prepared) ≤ severity means the family member dies. The last heir always survives. Each loss inherits {{gains.inheritance}}ƒ.",
+            "**Costs:** Post {{costs.openPost}}ƒ · Prepare {{costs.prepareHousehold}}ƒ · Physician {{costs.physician}}ƒ · Charity {{costs.charity}}ƒ · Protect {{costs.protectCommunity}}ƒ + 1 AP.",
+            "**Keys:** 1–6 actions · E end turn · R rules · J journal · M sound · N music · Enter confirm · Esc cancel."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "glossary",
+      "title": "Glossary",
+      "blocks": [
+        {
+          "type": "defs",
+          "items": [
+            [
+              "Aftermath",
+              "A city the plague has passed through, now short of workers and with high prices. {{fact:EC-02}}"
+            ],
+            [
+              "Bull (papal)",
+              "An official document from the pope, named after the metal seal attached to it. {{fact:CH-09}}"
+            ],
+            [
+              "Cog / galley",
+              "Kinds of merchant ship: cogs sailed the northern seas, galleys the Mediterranean. {{fact:TR-04}} {{fact:TR-06}}"
+            ],
+            [
+              "Flagellants",
+              "Penitents who marched between towns whipping themselves to beg God's mercy. {{fact:SO-02}}"
+            ],
+            [
+              "Florin (ƒ)",
+              "A famous gold coin first minted in Florence in 1252. {{fact:EC-11}}"
+            ],
+            [
+              "Hanseatic League",
+              "A network of German trading cities and their ships in the North Sea and Baltic. {{fact:TR-04}}"
+            ],
+            [
+              "Humors",
+              "Body fluids that medieval doctors believed had to stay in balance. {{fact:ME-05}}"
+            ],
+            [
+              "Miasma",
+              "\"Bad air,\" wrongly believed to cause the plague. {{fact:ME-04}}"
+            ],
+            [
+              "Quarantine",
+              "Isolation of travelers, first made law in Ragusa in 1377, after this game ends. {{fact:ME-14}}"
+            ],
+            [
+              "Stricken",
+              "A city where the plague is raging. Severity: Light, Heavy or Devastating."
+            ]
+          ]
+        }
+      ]
+    }
+  ]
+}

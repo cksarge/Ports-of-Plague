@@ -1,0 +1,159 @@
+{
+  "note": "Each round is half a year. Which cities the plague reaches in each round is set by arrival.round in cities.json; the dated chronicle cards for each round are in events.json.",
+  "prologue": {
+    "label": "1346",
+    "text": "The plague breaks out at the siege of Caffa on the Black Sea.",
+    "factIds": [
+      "TL-01",
+      "TR-02"
+    ]
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "label": "Late 1347",
+      "months": "July–December 1347",
+      "season": "warm",
+      "headline": "The plague sails into the Mediterranean.",
+      "factIds": [
+        "TR-07",
+        "TL-03",
+        "TR-06"
+      ]
+    },
+    {
+      "round": 2,
+      "label": "Early 1348",
+      "months": "January–June 1348",
+      "season": "cold",
+      "headline": "Italy, southern France and Spain are struck.",
+      "factIds": [
+        "TL-04",
+        "TL-05",
+        "TL-06"
+      ]
+    },
+    {
+      "round": 3,
+      "label": "Late 1348",
+      "months": "July–December 1348",
+      "season": "warm",
+      "headline": "Paris and England fall to the pestilence.",
+      "factIds": [
+        "TL-07",
+        "TL-08",
+        "TR-08"
+      ]
+    },
+    {
+      "round": 4,
+      "label": "Early 1349",
+      "months": "January–June 1349",
+      "season": "cold",
+      "headline": "Germany, Austria and the Low Countries.",
+      "factIds": [
+        "TL-02"
+      ]
+    },
+    {
+      "round": 5,
+      "label": "Late 1349",
+      "months": "July–December 1349",
+      "season": "warm",
+      "headline": "North to Norway along the sea lanes.",
+      "factIds": [
+        "TR-09",
+        "CI-13"
+      ]
+    },
+    {
+      "round": 6,
+      "label": "Early 1350",
+      "months": "January–June 1350",
+      "season": "cold",
+      "headline": "The Baltic, and a Holy Year in Rome.",
+      "factIds": [
+        "TL-02",
+        "CH-08"
+      ]
+    },
+    {
+      "round": 7,
+      "label": "Late 1350",
+      "months": "July–December 1350",
+      "season": "warm",
+      "headline": "Survivors count the cost.",
+      "factIds": [
+        "SO-12",
+        "EC-04"
+      ]
+    },
+    {
+      "round": 8,
+      "label": "Early 1351",
+      "months": "January–June 1351",
+      "season": "cold",
+      "headline": "Laws try to hold back wages.",
+      "factIds": [
+        "EC-06"
+      ]
+    },
+    {
+      "round": 9,
+      "label": "Late 1351",
+      "months": "July–December 1351",
+      "season": "warm",
+      "headline": "The plague creeps toward Russia.",
+      "factIds": [
+        "TR-10"
+      ]
+    },
+    {
+      "round": 10,
+      "label": "Early 1352",
+      "months": "January–June 1352",
+      "season": "cold",
+      "headline": "Trade revives.",
+      "factIds": [
+        "TR-11"
+      ]
+    },
+    {
+      "round": 11,
+      "label": "Late 1352",
+      "months": "July–December 1352",
+      "season": "warm",
+      "headline": "Novgorod is struck; the pope dies.",
+      "factIds": [
+        "TR-10",
+        "CH-01"
+      ]
+    },
+    {
+      "round": 12,
+      "label": "Early 1353",
+      "months": "January–June 1353",
+      "season": "cold",
+      "headline": "Moscow is ravaged.",
+      "factIds": [
+        "TR-10",
+        "TL-10"
+      ]
+    }
+  ],
+  "epilogue": {
+    "title": "What Really Happened",
+    "factIds": [
+      "DB-01",
+      "ME-01",
+      "ME-10",
+      "TL-11",
+      "TL-12",
+      "TL-10",
+      "EC-08",
+      "EC-07",
+      "ME-14",
+      "ME-15"
+    ]
+  }
+}

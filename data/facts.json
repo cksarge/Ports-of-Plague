@@ -1,0 +1,1090 @@
+{
+  "categories": {
+    "trade": "Trade routes and how they spread the plague",
+    "timeline": "Timeline of the plague, 1347–1353",
+    "cities": "Major affected cities and regions",
+    "social": "Social responses",
+    "economic": "Economic consequences",
+    "medical": "Medical understanding and treatments",
+    "church": "The Catholic Church and religious practice"
+  },
+  "facts": [
+    {
+      "id": "TR-01",
+      "category": "trade",
+      "title": "Caffa, a Genoese port",
+      "text": "Caffa (today Feodosiya, in Crimea) was a trading port on the Black Sea founded by the Italian city of Genoa in 1266.",
+      "when": "1266",
+      "where": "Caffa",
+      "sources": [
+        "wheelis",
+        "brit-black-death"
+      ],
+      "evidence": "Wheelis: \"Caffa (now Feodosija, Ukraine) was established by Genoa in 1266.\""
+    },
+    {
+      "id": "TR-02",
+      "category": "trade",
+      "title": "The siege of Caffa",
+      "text": "A Mongol army of the Golden Horde under Khan Janibeg besieged Caffa. In autumn 1346 plague broke out among the besiegers and spread into the town. In spring the Italian merchants fled on their ships, and the disease sailed with them.",
+      "when": "1346–1347",
+      "where": "Caffa",
+      "sources": [
+        "benedictow",
+        "brit-black-death"
+      ],
+      "evidence": "Benedictow: \"In the autumn of 1346, plague broke out among the besiegers and from them penetrated into the town. When spring arrived, the Italians fled on their ships.\""
+    },
+    {
+      "id": "TR-03",
+      "category": "trade",
+      "title": "Corpses over the walls?",
+      "text": "The notary Gabriele de' Mussi wrote that the attackers catapulted plague corpses into Caffa. A modern scientist finds this plausible, but concludes the siege was probably only one of several ways the plague left the Black Sea region, since ships and caravans from other ports carried it too.",
+      "when": "1346",
+      "where": "Caffa",
+      "sources": [
+        "wheelis",
+        "brit-black-death"
+      ],
+      "evidence": "Wheelis: \"The siege of Caffa, for all of its dramatic appeal, probably had no more than anecdotal importance in the spread of plague\"; refugees \"would most likely have constituted only one of several streams of infected ships and caravans.\"",
+      "debate": "Historians disagree about how reliable de' Mussi's story is and how much the siege mattered."
+    },
+    {
+      "id": "TR-04",
+      "category": "trade",
+      "title": "The great trade network",
+      "text": "Large merchant ships linked Venice and Genoa with Constantinople, the Crimea, Alexandria, Tunis, London, and Bruges. At London and Bruges the Italian trade system connected to the ships (cogs) of the German Hanseatic League, which sailed the North Sea and the Baltic.",
+      "when": "14th century",
+      "where": "Mediterranean, North Sea, Baltic",
+      "sources": [
+        "benedictow"
+      ],
+      "evidence": "Benedictow: ships \"linked Venice and Genoa with Constantinople and the Crimea, Alexandria and Tunis, London and Bruges. In London and Bruges the Italian trading system was linked to the busy shipping lines of the German Hanseatic League.\""
+    },
+    {
+      "id": "TR-05",
+      "category": "trade",
+      "title": "Faster by sea",
+      "text": "Ships averaged about 40 km a day, so plague could jump 600 km by sea in two weeks. Over land it spread far more slowly: up to about 2 km a day on the busiest roads.",
+      "when": "1347–1353",
+      "where": "Europe",
+      "sources": [
+        "benedictow"
+      ],
+      "evidence": "Benedictow: \"the Black Death easily moved 600km in a fortnight by ship ... By land, the average spread was much slower: up to 2km per day along the busiest highways.\""
+    },
+    {
+      "id": "TR-06",
+      "category": "trade",
+      "title": "Twelve galleys at Messina",
+      "text": "In early October 1347, twelve Genoese galleys arriving from the east brought the plague into the harbor of Messina in Sicily.",
+      "when": "October 1347",
+      "where": "Messina",
+      "sources": [
+        "piazza",
+        "brit-italy"
+      ],
+      "evidence": "Michele da Piazza: \"At the beginning of October ... 1347, twelve Genoese galleys ... entered the harbour of Messina.\" Britannica: plague reached \"Messina in early October 1347.\""
+    },
+    {
+      "id": "TR-07",
+      "category": "trade",
+      "title": "Ships from Constantinople",
+      "text": "Italian ships from Caffa reached Constantinople in May 1347 with plague on board; the epidemic broke out there in early July. Ships from Constantinople then carried it to Alexandria and to Mediterranean ports.",
+      "when": "May–July 1347",
+      "where": "Constantinople",
+      "sources": [
+        "benedictow"
+      ],
+      "evidence": "Benedictow: \"Italian ships from Kaffa arrived in Constantinople in May 1347 with the Black Death on board. The epidemic broke loose in early July.\""
+    },
+    {
+      "id": "TR-08",
+      "category": "trade",
+      "title": "A ship to England",
+      "text": "A ship brought the plague to Melcombe Regis (part of Weymouth) in Dorset in 1348, and from there it spread across England. Sources disagree on the details: one historian says the ship came from Bordeaux and the outbreak began in June; Britannica says a ship from Calais arrived in August.",
+      "when": "1348",
+      "where": "Melcombe Regis",
+      "sources": [
+        "benedictow",
+        "brit-black-death"
+      ],
+      "evidence": "Benedictow: ship from Bordeaux arrived \"around May 8th\" and \"the epidemic broke out shortly before June 24th.\" Britannica: \"A ship from Calais carried the plague to Melcombe Regis, Dorset, in August 1348.\"",
+      "debate": "Sources give different months and different home ports for the ship."
+    },
+    {
+      "id": "TR-09",
+      "category": "trade",
+      "title": "Hanseatic ships carry it north",
+      "text": "Plague reached Bergen in Norway in early July 1349 on a ship from England. Hanseatic ships heading home from Norway then carried it to Baltic and North Sea trading cities in 1349–1350.",
+      "when": "1349–1350",
+      "where": "Bergen, Baltic",
+      "sources": [
+        "benedictow"
+      ],
+      "evidence": "Benedictow: \"early July 1349 in the town of Bergen; it arrived in a ship from England\"; \"Other ships that returned ... from the trading stations in Oslo or Bergen, brought the Black Death to a number of other Hanseatic cities.\""
+    },
+    {
+      "id": "TR-10",
+      "category": "trade",
+      "title": "Russia last, from the west",
+      "text": "The plague did not reach Russia directly from the east. It arrived from the west: it entered the lands of Novgorod in late 1351, broke out in Novgorod itself in August 1352, and ravaged Moscow in 1353.",
+      "when": "1351–1353",
+      "where": "Novgorod, Moscow",
+      "sources": [
+        "benedictow"
+      ],
+      "evidence": "Benedictow: \"It entered the territory of the city state of Novgorod in the late autumn of 1351 ... In Novgorod itself, the Black Death broke out in mid-August. In 1353, Moscow was ravaged.\""
+    },
+    {
+      "id": "TR-11",
+      "category": "trade",
+      "title": "Trade slumps, briefly",
+      "text": "Right after the Black Death, trade slumped suddenly, but the slump did not last long.",
+      "when": "1348–1350",
+      "where": "Europe",
+      "sources": [
+        "brit-black-death"
+      ],
+      "evidence": "Britannica: \"A cessation of wars and a sudden slump in trade immediately followed but were only of short duration.\""
+    },
+    {
+      "id": "TL-01",
+      "category": "timeline",
+      "title": "Where it began",
+      "text": "Ancient DNA from graves near Lake Issyk-Kul in Kyrgyzstan, whose tombstones mention a \"pestilence\" in 1338–1339, contains the plague bacterium. Scientists identified it as the ancestor of the strains behind the Black Death, pointing to a source in central Asia.",
+      "when": "1338–1339",
+      "where": "Central Asia",
+      "sources": [
+        "spyrou"
+      ],
+      "evidence": "Spyrou et al.: \"our data support an early fourteenth-century source of the second plague pandemic in central Eurasia.\""
+    },
+    {
+      "id": "TL-02",
+      "category": "timeline",
+      "title": "The march across Europe",
+      "text": "From the Black Sea, the plague reached Sicily in 1347; North Africa, mainland Italy, Spain, and France in 1348; Austria, Hungary, Switzerland, Germany, and the Low Countries in 1349; and Scandinavia and the Baltic in 1350.",
+      "when": "1347–1350",
+      "where": "Europe",
+      "sources": [
+        "brit-black-death"
+      ],
+      "evidence": "Britannica: \"affecting Sicily (1347); North Africa, mainland Italy, Spain, and France (1348); and Austria, Hungary, Switzerland, Germany, and the Low Countries (1349)\"; \"Scandinavia, and the Baltic countries in 1350.\""
+    },
+    {
+      "id": "TL-03",
+      "category": "timeline",
+      "title": "Autumn 1347 in the Mediterranean",
+      "text": "Plague reached Alexandria around 1 September 1347 and Marseille around the second week of September 1347, both on ships from Constantinople.",
+      "when": "September 1347",
+      "where": "Alexandria, Marseille",
+      "sources": [
+        "benedictow"
+      ],
+      "evidence": "Benedictow: Alexandria \"around September 1st\"; \"It reached Marseilles by about the second week of September.\""
+    },
+    {
+      "id": "TL-04",
+      "category": "timeline",
+      "title": "Genoa, Pisa and Venice",
+      "text": "Britannica dates the plague's arrival to January 1348 for Genoa and Pisa and February 1348 for Venice. Historian Ole Benedictow places Genoa and Venice slightly earlier, in November 1347.",
+      "when": "Nov. 1347 – Feb. 1348",
+      "where": "Genoa, Pisa, Venice",
+      "sources": [
+        "brit-italy",
+        "benedictow"
+      ],
+      "evidence": "Britannica (Wickham): \"By January 1348 it had reached Genoa and Pisa, by February Venice.\" Benedictow: Italian merchants \"arrived in their home towns of Genoa and Venice with plague on board, some time in November.\"",
+      "debate": "Exact arrival months differ by one to three months between sources."
+    },
+    {
+      "id": "TL-05",
+      "category": "timeline",
+      "title": "Avignon, January 1348",
+      "text": "The papal physician Guy de Chauliac wrote that the great mortality began in Avignon in January 1348 and lasted seven months.",
+      "when": "January–July 1348",
+      "where": "Avignon",
+      "sources": [
+        "chauliac"
+      ],
+      "evidence": "Chauliac: \"the said mortality began for us [in Avignon] in the month of January 1348, and lasted seven months.\""
+    },
+    {
+      "id": "TL-06",
+      "category": "timeline",
+      "title": "Spring 1348 in France and Spain",
+      "text": "From Marseille the plague moved up the Rhône valley and along the coast toward Spain. By March 1348 Spain's Mediterranean coast was under attack, and by the end of March Bordeaux had become a new center of spread.",
+      "when": "March 1348",
+      "where": "Barcelona, Bordeaux",
+      "sources": [
+        "benedictow"
+      ],
+      "evidence": "Benedictow: \"As early as March 1348, both Lyon's and Spain's Mediterranean coasts were under attack\"; Bordeaux \"by the end of March had become a critical new centre of spread.\""
+    },
+    {
+      "id": "TL-07",
+      "category": "timeline",
+      "title": "Paris, summer 1348",
+      "text": "The plague reached Paris in the summer of 1348. The chronicler Jean de Venette dated its arrival to around August 1348, and it lasted through that year and the next.",
+      "when": "Summer 1348",
+      "where": "Paris",
+      "sources": [
+        "venette",
+        "benedictow"
+      ],
+      "evidence": "Venette: after a bright star appeared over Paris in August 1348, the pestilence \"followed very shortly in Paris\". Benedictow: from June a plague front moved \"south-eastwards towards Paris.\""
+    },
+    {
+      "id": "TL-08",
+      "category": "timeline",
+      "title": "London",
+      "text": "London was infected by about August 1348, and suffered worst between February and May 1349.",
+      "when": "1348–1349",
+      "where": "London",
+      "sources": [
+        "benedictow",
+        "brit-black-death"
+      ],
+      "evidence": "Benedictow: \"London was contaminated in early August.\" Britannica: \"London suffered most violently between February and May 1349.\""
+    },
+    {
+      "id": "TL-09",
+      "category": "timeline",
+      "title": "Winter slowed the plague",
+      "text": "The plague spread mostly in warm seasons. Winter slowed it or stopped it for a while, especially in the Alps and northern Europe.",
+      "when": "1347–1353",
+      "where": "Europe",
+      "sources": [
+        "benedictow"
+      ],
+      "evidence": "Benedictow: \"the pace of spread slowed strongly during the winter and stopped completely in mountain areas such as the Alps and the northerly parts of Europe.\""
+    },
+    {
+      "id": "TL-10",
+      "category": "timeline",
+      "title": "It came back",
+      "text": "The Black Death was not the end. Plague returned in 1361–63, 1369–71, 1374–75, 1390, and 1400.",
+      "when": "1361–1400",
+      "where": "Europe",
+      "sources": [
+        "brit-black-death"
+      ],
+      "evidence": "Britannica: \"There were recurrences of the plague in 1361–63, 1369–71, 1374–75, 1390, and 1400.\""
+    },
+    {
+      "id": "TL-11",
+      "category": "timeline",
+      "title": "Almost nowhere escaped",
+      "text": "Iceland and Finland are the only regions known for certain to have escaped the Black Death, because of their small populations and limited contact with other places.",
+      "when": "1346–1353",
+      "where": "Iceland, Finland",
+      "sources": [
+        "benedictow"
+      ],
+      "evidence": "Benedictow: \"Iceland and Finland are the only regions that, we know with certainty, avoided the Black Death.\""
+    },
+    {
+      "id": "TL-12",
+      "category": "timeline",
+      "title": "The name came later",
+      "text": "People at the time called it \"the pestilence\" or \"the great mortality.\" The name \"Black Death\" came centuries later, probably from a mistranslation of the Latin word atra, which can mean both \"terrible\" and \"black.\"",
+      "when": "later centuries",
+      "where": "Europe",
+      "sources": [
+        "benedictow",
+        "chauliac"
+      ],
+      "evidence": "Benedictow: \"The frightening name ... only came several centuries after its visitation (and was probably a mistranslation of the Latin word 'atra' meaning both 'terrible' and 'black').\""
+    },
+    {
+      "id": "CI-01",
+      "category": "cities",
+      "title": "Florence",
+      "text": "Florence was one of the hardest-hit cities. Historian Ole Benedictow estimates that 60 percent of its people died within a few months of 1348. Boccaccio set his famous book the Decameron in plague-stricken Florence.",
+      "when": "1348",
+      "where": "Florence",
+      "sources": [
+        "benedictow",
+        "boccaccio"
+      ],
+      "evidence": "Benedictow: \"In the course of just a few months, 60 per cent of Florence's population died from the plague, and probably the same proportion in Siena.\""
+    },
+    {
+      "id": "CI-02",
+      "category": "cities",
+      "title": "Chroniclers' numbers disagree",
+      "text": "Writers of the time gave very different death tolls for Florence: the chronicler Villani said three in every five died, Archbishop Antoninus estimated 60,000, and Boccaccio said 100,000. Numbers like these are rough guesses.",
+      "when": "1348",
+      "where": "Florence",
+      "sources": [
+        "brown-decameron"
+      ],
+      "evidence": "Decameron Web: \"Villani says three out of every five died\"; \"Antoninus ... estimates the toll at 60,000\"; \"Boccaccio says 100,000\"; \"Estimates of the dead vary greatly.\"",
+      "debate": "Chroniclers' figures are often exaggerated or inconsistent."
+    },
+    {
+      "id": "CI-03",
+      "category": "cities",
+      "title": "A chronicler dies",
+      "text": "Giovanni Villani, a Florentine chronicler who had been a partner in the Peruzzi banking company, died in the plague of 1348.",
+      "when": "1348",
+      "where": "Florence",
+      "sources": [
+        "brit-villani"
+      ],
+      "evidence": "Britannica: Villani died in Florence in 1348, during the plague; he had been a partner in the Peruzzi banking firm."
+    },
+    {
+      "id": "CI-04",
+      "category": "cities",
+      "title": "Siena's unfinished cathedral",
+      "text": "Siena lost so many people that its plan to enlarge the cathedral was abandoned, and the deaths of painters such as Ambrogio and Pietro Lorenzetti ended the first Sienese school of painting.",
+      "when": "1348",
+      "where": "Siena (Tuscany)",
+      "sources": [
+        "brit-black-death"
+      ],
+      "evidence": "Britannica: \"the project of enlarging the cathedral was abandoned, and the death of many great painters, such as Ambrogio and Pietro Lorenzetti, brought the development of the first Sienese school to a premature end.\""
+    },
+    {
+      "id": "CI-05",
+      "category": "cities",
+      "title": "Paris: the Hôtel-Dieu",
+      "text": "In Paris, Jean de Venette wrote that more than 500 dead a day were carried from the Hôtel-Dieu hospital to the cemetery, and that many of the nuns who nursed the sick died too.",
+      "when": "1348–1349",
+      "where": "Paris",
+      "sources": [
+        "venette"
+      ],
+      "evidence": "Venette: \"more than five hundred dead were carried daily with great devotion in carts to the cemetery\"; \"A very great number of the saintly sisters of the Hôtel-Dieu who, not fearing to die, nursed the sick\" died."
+    },
+    {
+      "id": "CI-06",
+      "category": "cities",
+      "title": "Uneven death rates",
+      "text": "Death rates varied from place to place. The duchy of Milan, Flanders, and Béarn seem to have escaped comparatively lightly, while Tuscany, Aragon, Catalonia, and Languedoc were very hard-hit.",
+      "when": "1348–1350",
+      "where": "Europe",
+      "sources": [
+        "brit-black-death"
+      ],
+      "evidence": "Britannica: \"some districts, such as the duchy of Milan, Flanders, and Béarn, seem to have escaped comparatively lightly, others, such as Tuscany, Aragon, Catalonia, and Languedoc, were very hard-hit.\""
+    },
+    {
+      "id": "CI-07",
+      "category": "cities",
+      "title": "A princess at Bordeaux",
+      "text": "Even royalty died. Joan, daughter of King Edward III of England, died at Bordeaux on her way to marry the son of the king of Castile.",
+      "when": "1348",
+      "where": "Bordeaux",
+      "sources": [
+        "brit-black-death"
+      ],
+      "evidence": "Britannica: \"Joan, daughter of the English king Edward III, died at Bordeaux on the way to her wedding with Alfonso's son.\""
+    },
+    {
+      "id": "CI-08",
+      "category": "cities",
+      "title": "Tunis and Ibn Khaldun",
+      "text": "The plague struck Tunis in North Africa and killed both parents of the young scholar Ibn Khaldun, who later became a famous historian.",
+      "when": "1349",
+      "where": "Tunis",
+      "sources": [
+        "brit-ibn-khaldun",
+        "brit-black-death"
+      ],
+      "evidence": "Britannica: \"In 1349, however, the Black Death struck Tunis and took away both his father and his mother.\""
+    },
+    {
+      "id": "CI-09",
+      "category": "cities",
+      "title": "Ragusa nearly emptied",
+      "text": "In 1348 the Black Death nearly emptied Ragusa (today Dubrovnik, Croatia), a merchant republic on the Adriatic that depended on grain brought in by ship.",
+      "when": "1348",
+      "where": "Ragusa",
+      "sources": [
+        "brit-ragusa"
+      ],
+      "evidence": "Britannica: \"for the citizens of Ragusa ... it was the year 1348, the Black Death's first blow. It spread to every country in Europe, and it nearly emptied Ragusa.\""
+    },
+    {
+      "id": "CI-10",
+      "category": "cities",
+      "title": "England loses half",
+      "text": "In 1348–49 the Black Death killed around half of England's population. About 1,000 English villages were emptied or disappeared completely.",
+      "when": "1348–1349",
+      "where": "England",
+      "sources": [
+        "bailey",
+        "brit-black-death"
+      ],
+      "evidence": "Bailey: \"the Black Death swept through England and killed around half its population.\" Britannica: \"the depopulation or total disappearance of about 1,000 villages.\""
+    },
+    {
+      "id": "CI-11",
+      "category": "cities",
+      "title": "Messina flees",
+      "text": "In Messina the Genoese sailors were driven out, but the disease spread anyway. Terrified people fled to nearby Catania, which refused to let them be buried inside the town.",
+      "when": "October 1347",
+      "where": "Messina",
+      "sources": [
+        "piazza"
+      ],
+      "evidence": "Michele da Piazza: the citizens of Catania demanded a prohibition \"of burying fugitives from Messina within the town.\""
+    },
+    {
+      "id": "CI-12",
+      "category": "cities",
+      "title": "The Low Countries were not spared",
+      "text": "Some older maps show the Low Countries (including Flanders and Bruges) as almost untouched by plague. Newer research shows this came from gaps in the old data: many regions of the Low Countries were hit by the Black Death.",
+      "when": "1349",
+      "where": "Bruges, Low Countries",
+      "sources": [
+        "roosen-curtis",
+        "brit-black-death"
+      ],
+      "evidence": "Roosen and Curtis: the old data set has \"crucial gaps in spatial coverage, leaving out large parts of the Low Countries\"; \"many regions of the Low Countries were hit by the Black Death.\"",
+      "debate": "How badly the Low Countries, Poland and some other regions were hit is still debated."
+    },
+    {
+      "id": "CI-13",
+      "category": "cities",
+      "title": "Strasbourg, summer 1349",
+      "text": "The chronicler Jacob von Königshofen recorded that the plague reached Strasbourg in the summer of 1349, months after the city's Jewish community had been murdered. He estimated that about 16,000 people died there.",
+      "when": "Summer 1349",
+      "where": "Strasbourg",
+      "sources": [
+        "fordham-jews"
+      ],
+      "evidence": "Königshofen: \"This epidemic also came to Strasbourg in the summer of the above mentioned year, and it is estimated that about sixteen thousand people died.\""
+    },
+    {
+      "id": "SO-01",
+      "category": "social",
+      "title": "A punishment from God?",
+      "text": "Most people believed the plague was God's punishment for their sins. They answered with prayer, processions, and acts of penance, or with fatalism.",
+      "when": "1347–1353",
+      "where": "Europe",
+      "sources": [
+        "benedictow",
+        "carlin-paris"
+      ],
+      "evidence": "Benedictow: \"Most people believed plague and mass illness to be a punishment from God for their sins. They responded with religious penitential acts.\""
+    },
+    {
+      "id": "SO-02",
+      "category": "social",
+      "title": "The flagellants",
+      "text": "Flagellants marched from town to town in processions with crosses and banners, whipping themselves to atone for sins and calling on people to repent. Their movement grew quickly during the Black Death. Members vowed to take part for 33 and a half days.",
+      "when": "1348–1349",
+      "where": "Germany, Low Countries, France",
+      "sources": [
+        "brit-flagellants",
+        "toke-flagellants",
+        "venette"
+      ],
+      "evidence": "Britannica: flagellants \"marched through European towns, whipping each other to atone for their sins ... They gained many new members in the mid-14th century while the Black Death was ravaging Europe.\" Toke: \"all who should join the brotherhood for thirty-three and a half days should be saved.\""
+    },
+    {
+      "id": "SO-03",
+      "category": "social",
+      "title": "The Pope bans the flagellants",
+      "text": "Pope Clement VI condemned the flagellant movement and banned its public processions in letters dated 20 October 1349. After that the movement shrank quickly.",
+      "when": "20 October 1349",
+      "where": "Avignon",
+      "sources": [
+        "toke-flagellants",
+        "venette"
+      ],
+      "evidence": "Toke: \"the pope, after careful inquiry, condemned the movement and prohibited the processions, by letters dated 20 Oct., 1349.\" Venette: Clement VI \"forbade the Flagellants under threat of excommunication.\""
+    },
+    {
+      "id": "SO-04",
+      "category": "social",
+      "title": "Flight from the cities",
+      "text": "Many people who could afford it fled the cities for the countryside. Boccaccio's Decameron begins with a group of young Florentines leaving the city, and the physician Guy de Chauliac wrote that the best protection was to flee before the plague arrived.",
+      "when": "1348",
+      "where": "Florence, Avignon",
+      "sources": [
+        "boccaccio",
+        "chauliac"
+      ],
+      "evidence": "Boccaccio: many \"deserted their city ... and went into voluntary exile, or migrated to the country parts.\" Chauliac: \"there was nothing better than to flee the area before it was infected.\""
+    },
+    {
+      "id": "SO-05",
+      "category": "social",
+      "title": "Shutting themselves away",
+      "text": "Some families shut themselves inside houses where no one was sick and lived apart from everyone else.",
+      "when": "1348",
+      "where": "Florence",
+      "sources": [
+        "boccaccio"
+      ],
+      "evidence": "Boccaccio: some \"formed communities in houses where there were no sick, and lived a separate and secluded life.\""
+    },
+    {
+      "id": "SO-06",
+      "category": "social",
+      "title": "Families torn apart",
+      "text": "Fear broke normal bonds. Writers described brothers abandoning brothers and even parents abandoning their children. Funerals became rushed or stopped altogether.",
+      "when": "1348",
+      "where": "Florence, Avignon",
+      "sources": [
+        "boccaccio",
+        "chauliac",
+        "brown-decameron"
+      ],
+      "evidence": "Boccaccio: \"fathers and mothers were found to abandon their own children.\" Chauliac: \"The father did not visit his son, nor the son his father.\" Decameron Web: \"Funeral rites became perfunctory or stopped altogether.\""
+    },
+    {
+      "id": "SO-07",
+      "category": "social",
+      "title": "A false accusation",
+      "text": "Across Europe, Jews were falsely accused of causing the plague by poisoning wells. The accusation was untrue: Jews were dying of the plague too. Beginning in September 1348, Jews were tortured into false \"confessions.\"",
+      "when": "1348–1349",
+      "where": "Europe",
+      "sources": [
+        "ej-black-death",
+        "venette",
+        "chauliac"
+      ],
+      "evidence": "Encyclopaedia Judaica: accusation that \"the Jews had poisoned the wells and other water sources\"; Jews died of plague too; \"The first occasion on which Jews were tortured to confess ... was in September 1348.\""
+    },
+    {
+      "id": "SO-08",
+      "category": "social",
+      "title": "Clement VI defends the Jews",
+      "text": "In 1348 Pope Clement VI issued papal bulls (official letters) that rejected the poisoning accusation and called for Jews to be protected. He also welcomed Jews in Avignon. Elsewhere his appeals had little effect, and the massacres continued.",
+      "when": "1348",
+      "where": "Avignon",
+      "sources": [
+        "ej-bulls",
+        "ej-black-death",
+        "brit-clement"
+      ],
+      "evidence": "Encyclopaedia Judaica: Clement VI's bull \"urged the protection of Jews against the accusation\"; he wrote that \"certain Christians, seduced by that liar, the devil, are imputing the pestilence to poisoning by Jews\"; appeals \"were ineffective. The massacres of the Jews continued.\" Britannica: \"He welcomed Jews there.\""
+    },
+    {
+      "id": "SO-09",
+      "category": "social",
+      "title": "Strasbourg, February 1349",
+      "text": "On 14 February 1349, before the plague had even reached Strasbourg, the city's Jewish community was murdered. The city council, which had refused to act against the Jews, was overthrown first. The chronicler Königshofen admitted that debts owed to Jewish moneylenders were a real motive.",
+      "when": "14 February 1349",
+      "where": "Strasbourg",
+      "sources": [
+        "fordham-jews",
+        "ej-black-death"
+      ],
+      "evidence": "Königshofen: the old council \"did not believe that anything ought to be done to the Jews\"; \"The money was indeed the thing that killed the Jews.\""
+    },
+    {
+      "id": "SO-10",
+      "category": "social",
+      "title": "Some tried to protect",
+      "text": "Some leaders tried to protect Jewish communities, such as the old city council of Strasbourg and the leading citizens of Basel, but mobs overruled them.",
+      "when": "1349",
+      "where": "Strasbourg, Basel",
+      "sources": [
+        "ej-black-death",
+        "fordham-jews"
+      ],
+      "evidence": "Encyclopaedia Judaica: in Basel \"the patricians also unsuccessfully attempted to protect the Jews.\""
+    },
+    {
+      "id": "SO-11",
+      "category": "social",
+      "title": "Guards at the gates",
+      "text": "Towns posted guards at their gates and turned away strangers. Pistoia in Tuscany banned its people from traveling to or from nearby Pisa and Lucca.",
+      "when": "1348",
+      "where": "Pistoia, Avignon",
+      "sources": [
+        "chauliac",
+        "douglas"
+      ],
+      "evidence": "Chauliac: \"guards were posted in cities and towns, and they permitted no one to enter, unless he was well known.\" Douglas quotes Pistoia's ordinance: no one \"shall in any way dare or presume to go to Pisa or Lucca.\""
+    },
+    {
+      "id": "SO-12",
+      "category": "social",
+      "title": "Life after the plague",
+      "text": "After the epidemic ended, the survivors married, and Jean de Venette noticed an unusually large number of births.",
+      "when": "1349–1350",
+      "where": "France",
+      "sources": [
+        "venette"
+      ],
+      "evidence": "Venette: \"the men and women who survived married each other. There was no sterility among the women, but on the contrary fertility beyond the ordinary.\""
+    },
+    {
+      "id": "SO-13",
+      "category": "social",
+      "title": "A less rigid society",
+      "text": "With so many workers dead, the survivors gained bargaining power. This brought a new flexibility to what had been a very rigid social order.",
+      "when": "after 1350",
+      "where": "Europe",
+      "sources": [
+        "brit-black-death"
+      ],
+      "evidence": "Britannica: \"These changes brought a new fluidity to the hitherto rigid stratification of society.\""
+    },
+    {
+      "id": "EC-01",
+      "category": "economic",
+      "title": "Troubled times before the plague",
+      "text": "Italy's economy was already struggling before the plague arrived. The great Florentine banks failed: the Peruzzi in 1343, the Acciaiuoli in 1345, and the Bardi in 1346. There were also famines in 1346–47.",
+      "when": "1343–1347",
+      "where": "Florence, Italy",
+      "sources": [
+        "brit-italy"
+      ],
+      "evidence": "Britannica (Wickham): \"In 1343 the Peruzzi company collapsed, in 1345 the Acciaiuoli, and in 1346 the Bardi\"; famines in \"1346–47.\""
+    },
+    {
+      "id": "EC-02",
+      "category": "economic",
+      "title": "Too few workers",
+      "text": "So many laborers died that much less land could be farmed, which ruined many landowners. To keep tenants, lords began paying wages or charging money rents instead of demanding unpaid labor.",
+      "when": "after 1349",
+      "where": "Europe",
+      "sources": [
+        "brit-black-death"
+      ],
+      "evidence": "Britannica: \"The shortage of labor compelled them to substitute wages or money rents in place of labor services in an effort to keep their tenants.\""
+    },
+    {
+      "id": "EC-03",
+      "category": "economic",
+      "title": "Wages rise",
+      "text": "Because workers were scarce, wages rose for both craftsmen and peasants.",
+      "when": "after 1349",
+      "where": "Europe",
+      "sources": [
+        "brit-black-death",
+        "brown-decameron"
+      ],
+      "evidence": "Britannica: \"There was also a general rise in wages for artisans and peasants.\""
+    },
+    {
+      "id": "EC-04",
+      "category": "economic",
+      "title": "Everything twice as dear",
+      "text": "Prices rose too. Jean de Venette complained that after the plague everything cost twice as much: tools, food, goods, and hired workers.",
+      "when": "after 1349",
+      "where": "France",
+      "sources": [
+        "venette",
+        "brown-decameron"
+      ],
+      "evidence": "Venette: \"everything was twice as dear, whether it were utensils, victuals, or merchandise, hired helpers or peasants and serfs.\""
+    },
+    {
+      "id": "EC-05",
+      "category": "economic",
+      "title": "The Ordinance of Labourers (1349)",
+      "text": "On 18 June 1349, while the plague was still raging, the English Crown issued the Ordinance of Labourers. It capped wages at pre-plague levels and required able-bodied people under 60 to work.",
+      "when": "18 June 1349",
+      "where": "England",
+      "sources": [
+        "bailey",
+        "statute-avalon"
+      ],
+      "evidence": "Bailey: \"The Ordinance of Labourers was issued on 18 June 1349 when the pandemic was still raging.\" Statute: applies to everyone \"able bodied and below the age of sixty years.\""
+    },
+    {
+      "id": "EC-06",
+      "category": "economic",
+      "title": "The Statute of Labourers (1351)",
+      "text": "In February 1351, at the first Parliament after the plague, the Statute of Labourers strengthened these rules. It complained that workers refused to work unless paid two or three times the old wages.",
+      "when": "February 1351",
+      "where": "England",
+      "sources": [
+        "bailey",
+        "statute-avalon"
+      ],
+      "evidence": "Bailey: \"At the first post-plague session of parliament in February 1351 it was reinforced by the Statute of Labourers\"; workers \"unwilling to work unless they were paid twice or three times the level of wages before the pestilence.\""
+    },
+    {
+      "id": "EC-07",
+      "category": "economic",
+      "title": "The wage laws failed",
+      "text": "The labor laws soon failed to hold wages down. They caused lasting resentment, which fed into the grievances behind the Peasants' Revolt of 1381.",
+      "when": "1351–1381",
+      "where": "England",
+      "sources": [
+        "bailey",
+        "cannon"
+      ],
+      "evidence": "Bailey: \"despite subsequent revisions, the legislation soon failed.\" Cannon: \"The statute was an early attempt at a wage freeze, rarely a popular policy\"; resentment contributed to the Peasants' Revolt of 1381."
+    },
+    {
+      "id": "EC-08",
+      "category": "economic",
+      "title": "A long recovery",
+      "text": "Western Europe's population did not return to its pre-1348 level until the early 1500s.",
+      "when": "1348–1500s",
+      "where": "Western Europe",
+      "sources": [
+        "brit-black-death"
+      ],
+      "evidence": "Britannica: \"The population of western Europe did not again reach its pre-1348 level until the beginning of the 16th century.\""
+    },
+    {
+      "id": "EC-09",
+      "category": "economic",
+      "title": "Wars paused",
+      "text": "For a short time the plague brought a pause in wars.",
+      "when": "1348–1350",
+      "where": "Europe",
+      "sources": [
+        "brit-black-death"
+      ],
+      "evidence": "Britannica: \"A cessation of wars and a sudden slump in trade immediately followed but were only of short duration.\""
+    },
+    {
+      "id": "ME-01",
+      "category": "medical",
+      "title": "The real cause",
+      "text": "Today we know the Black Death was plague, caused by the bacterium Yersinia pestis. DNA taken from medieval skeletons has confirmed this. No one at the time knew bacteria existed.",
+      "when": "modern research",
+      "where": "",
+      "sources": [
+        "brit-black-death",
+        "spyrou",
+        "benedictow"
+      ],
+      "evidence": "Britannica: \"widely believed to have been the result of plague, caused by infection with the bacterium Yersinia pestis.\" Spyrou et al.: \"a clear involvement of the plague bacterium Yersinia pestis.\""
+    },
+    {
+      "id": "ME-02",
+      "category": "medical",
+      "title": "Bubonic and pneumonic plague",
+      "text": "Bubonic plague causes painful swellings called buboes in the groin, armpits, or neck. If the infection reaches the lungs it becomes pneumonic plague, a more severe form that can spread through coughing.",
+      "when": "",
+      "where": "",
+      "sources": [
+        "brit-bubonic",
+        "benedictow"
+      ],
+      "evidence": "Britannica: \"The lymph nodes most commonly affected are those in the armpits, groin, or neck\"; untreated infection can reach \"the lungs, resulting in pneumonic plague.\""
+    },
+    {
+      "id": "ME-03",
+      "category": "medical",
+      "title": "Chauliac's two forms",
+      "text": "In Avignon, Guy de Chauliac described two forms. For the first two months, victims had fever and coughed up blood, and died within three days. After that, victims had swellings in the armpits and groin and died within five days.",
+      "when": "1348",
+      "where": "Avignon",
+      "sources": [
+        "chauliac"
+      ],
+      "evidence": "Chauliac: \"the first lasted two months, accompanied by continuous fever and a spitting up of blood, and one died within three days. The second ... principally under the armpits and in the groin, and one died within five days.\""
+    },
+    {
+      "id": "ME-04",
+      "category": "medical",
+      "title": "Blamed on the planets",
+      "text": "In October 1348 the medical faculty of the University of Paris reported that the plague was caused by a conjunction of three planets on 20 March 1345, which had supposedly corrupted the air.",
+      "when": "October 1348",
+      "where": "Paris",
+      "sources": [
+        "carlin-paris"
+      ],
+      "evidence": "Paris Medical Faculty: \"In 1345, at one hour after noon on 20 March, there was a major conjunction of three planets in Aquarius\"; the plague \"has arisen from corrupt air.\""
+    },
+    {
+      "id": "ME-05",
+      "category": "medical",
+      "title": "Bad air and the humors",
+      "text": "Medieval doctors believed illness came from \"corrupt air\" (the miasma theory) and from an imbalance of the body's humors (fluids). Guy de Chauliac wrote that the planets had turned the body's humors \"venomous.\"",
+      "when": "1348",
+      "where": "Paris, Avignon",
+      "sources": [
+        "carlin-paris",
+        "chauliac"
+      ],
+      "evidence": "Chauliac: the conjunction \"changed the thick humors [of the body] into something scorched and venomous.\""
+    },
+    {
+      "id": "ME-06",
+      "category": "medical",
+      "title": "Treatments of the time",
+      "text": "Doctors tried bloodletting, purging pills of aloe, fires to \"purify\" the air, a medicine called theriac, sweet-smelling herbs, and poultices of cooked figs and onions on the swellings. None of these could cure plague.",
+      "when": "1348",
+      "where": "Avignon",
+      "sources": [
+        "chauliac",
+        "brit-bubonic"
+      ],
+      "evidence": "Chauliac: \"purge oneself with pills of aloe and reduce the blood through a phlebotomy, purify the air with a fire, and comfort the heart with a theriac\"; buboes \"ripened with figs and onions.\""
+    },
+    {
+      "id": "ME-07",
+      "category": "medical",
+      "title": "Flowers and spices",
+      "text": "People in Florence walked around holding flowers, fragrant herbs, or spices to their noses, hoping good smells would protect them from bad air.",
+      "when": "1348",
+      "where": "Florence",
+      "sources": [
+        "boccaccio"
+      ],
+      "evidence": "Boccaccio: \"carrying in the hands flowers or fragrant herbs or divers sorts of spices, which they frequently raised to their noses.\""
+    },
+    {
+      "id": "ME-08",
+      "category": "medical",
+      "title": "Doctors were helpless",
+      "text": "Both Boccaccio and the physician Guy de Chauliac admitted that medicine could do almost nothing against the plague. Today plague is treated with antibiotics.",
+      "when": "1348",
+      "where": "Florence, Avignon",
+      "sources": [
+        "boccaccio",
+        "chauliac",
+        "brit-bubonic"
+      ],
+      "evidence": "Chauliac: \"the mortality rendered doctors useless and put them to shame.\" Boccaccio: the disease \"set entirely at nought both the art of the physician and the virtue of physic.\" Britannica: plague \"is treated primarily with antibiotics.\""
+    },
+    {
+      "id": "ME-09",
+      "category": "medical",
+      "title": "A doctor who stayed",
+      "text": "Guy de Chauliac stayed in Avignon to avoid a bad reputation. Near the end of the outbreak he caught the plague himself, was ill for about six weeks, and survived.",
+      "when": "1348",
+      "where": "Avignon",
+      "sources": [
+        "chauliac"
+      ],
+      "evidence": "Chauliac: \"I, in order to avoid a bad reputation, did not dare depart ... I fell into a continuous fever, with an aposteme on the groin, and I was sick for nearly six weeks.\""
+    },
+    {
+      "id": "ME-10",
+      "category": "medical",
+      "title": "Rats or people?",
+      "text": "Historians still debate how plague spread from person to person. The traditional view blames fleas on black rats. A 2018 study found that human fleas and body lice fit the death records of nine European outbreaks better.",
+      "when": "",
+      "where": "",
+      "sources": [
+        "benedictow",
+        "dean"
+      ],
+      "evidence": "Benedictow: plague arose \"when rodents in human habitation, normally black rats, become infected.\" Dean et al.: \"human ectoparasites, like body lice and human fleas, might be more likely than rats to have caused the rapidly developing epidemics.\"",
+      "debate": "Rat fleas versus human fleas and lice is an open scientific debate."
+    },
+    {
+      "id": "ME-11",
+      "category": "medical",
+      "title": "No beaked masks yet",
+      "text": "The famous beaked \"plague doctor\" costume did not exist during the Black Death. It was invented by the French physician Charles de Lorme in the 1600s, almost 300 years later.",
+      "when": "1619",
+      "where": "Paris",
+      "sources": [
+        "wellcome-mask",
+        "natgeo-mask"
+      ],
+      "evidence": "Wellcome Collection: \"The plague prevention costume was invented by French physician Charles de Lorme (1584–1678) as a result of the 1619 Paris pandemic.\""
+    },
+    {
+      "id": "ME-12",
+      "category": "medical",
+      "title": "Early health measures",
+      "text": "During the Black Death some Italian cities tried early health measures. By 1348 Venice required incoming ships to wait before sailors could enter the city, and in Milan the ruler Luchino Visconti ordered houses with sick people boarded up. These measures were haphazard and limited.",
+      "when": "1347–1353",
+      "where": "Venice, Milan",
+      "sources": [
+        "douglas"
+      ],
+      "evidence": "Douglas: \"Venice by 1348 required that all incoming ships isolate themselves for a time\"; Luchino Visconti \"ordered city officials to board up any home containing someone sick\"; measures were \"instituted somewhat haphazardly and on a very limited scope during the Black Death.\""
+    },
+    {
+      "id": "ME-13",
+      "category": "medical",
+      "title": "No plan in England",
+      "text": "England had no coordinated public-health response to the Black Death, not even restrictions on travel or isolation of the sick. The government's main concern was keeping order.",
+      "when": "1348–1349",
+      "where": "England",
+      "sources": [
+        "bailey"
+      ],
+      "evidence": "Bailey: \"There was no coordinated public health response to the initial epidemics in England, not even basic restrictions on the movement of people or the isolation of the sick.\""
+    },
+    {
+      "id": "ME-14",
+      "category": "medical",
+      "title": "What came next: quarantine (1377)",
+      "text": "Formal quarantine came later. On 27 July 1377, after the plague had kept returning, Ragusa ordered travelers from plague areas to spend 30 days in isolation on the island of Mrkan or in the town of Cavtat before entering.",
+      "when": "27 July 1377",
+      "where": "Ragusa",
+      "sources": [
+        "brit-ragusa",
+        "gensini"
+      ],
+      "evidence": "Britannica: \"On this day in 1377, the lawmakers there instituted the first quarantine\"; arrivals \"made to sit 30 days (later extended to 40) in isolation.\" Gensini et al.: modern preventive quarantine \"dates back to 1377.\""
+    },
+    {
+      "id": "ME-15",
+      "category": "medical",
+      "title": "What came next: forty days",
+      "text": "The 30-day wait was later extended to 40 days, which Venice also adopted. Our word \"quarantine\" comes from quaranta, Italian for forty. Venice opened the first permanent plague hospital (lazaretto) in 1423.",
+      "when": "after 1377; 1423",
+      "where": "Venice",
+      "sources": [
+        "brit-ragusa",
+        "tran",
+        "tognotti",
+        "gensini"
+      ],
+      "evidence": "Tran et al.: Venice increased \"the 30-day isolation decreed in Ragusa ... to a 40-day isolation known as quarantine.\" Tognotti: \"the first permanent plague hospital (lazaretto) was opened by the Republic of Venice in 1423.\""
+    },
+    {
+      "id": "CH-01",
+      "category": "church",
+      "title": "Popes at Avignon",
+      "text": "During the Black Death the popes lived in Avignon, not Rome (1309–1377). Clement VI was pope from 1342 until his death in Avignon in 1352.",
+      "when": "1309–1377",
+      "where": "Avignon",
+      "sources": [
+        "brit-clement"
+      ],
+      "evidence": "Britannica: Clement VI \"was the pope from 1342 to 1352\"; the Avignon papacy lasted \"1309–77.\""
+    },
+    {
+      "id": "CH-02",
+      "category": "church",
+      "title": "The papal court loses a quarter",
+      "text": "About one-fourth of Pope Clement VI's staff at Avignon died in the Black Death.",
+      "when": "1348",
+      "where": "Avignon",
+      "sources": [
+        "brit-clement",
+        "brit-black-death"
+      ],
+      "evidence": "Britannica: \"one-fourth of Clement's staff died at Avignon\"; \"The papal court at Avignon was reduced by one-fourth.\""
+    },
+    {
+      "id": "CH-03",
+      "category": "church",
+      "title": "Clergy hit hard",
+      "text": "Priests caught the disease while caring for the sick and dying. In English dioceses about 45–50 percent of the clergy died, and monasteries suffered some of the highest death rates of all.",
+      "when": "1348–1349",
+      "where": "England, Europe",
+      "sources": [
+        "newberry",
+        "brit-black-death"
+      ],
+      "evidence": "Newberry: \"death rates in English dioceses averaging forty-five to fifty percent.\" Britannica: \"within the towns the monastic communities provided the highest incidence of victims.\""
+    },
+    {
+      "id": "CH-04",
+      "category": "church",
+      "title": "Two archbishops in a row",
+      "text": "Canterbury, England's most important church post, lost two archbishops one after the other: John de Stratford and Thomas Bradwardine.",
+      "when": "1348–1349",
+      "where": "Canterbury (England)",
+      "sources": [
+        "brit-black-death"
+      ],
+      "evidence": "Britannica: \"Canterbury lost two successive archbishops, John de Stratford and Thomas Bradwardine.\""
+    },
+    {
+      "id": "CH-05",
+      "category": "church",
+      "title": "Confess to anyone",
+      "text": "So many priests died that in 1349 Ralph of Shrewsbury, Bishop of Bath and Wells, told his people that if no priest could be found, the dying could confess their sins to any layperson, \"even to a woman.\"",
+      "when": "1349",
+      "where": "England",
+      "sources": [
+        "newberry"
+      ],
+      "evidence": "Newberry: dying persons should confess \"to any lay person, even to a woman if a man is not available.\""
+    },
+    {
+      "id": "CH-06",
+      "category": "church",
+      "title": "Faith shaken",
+      "text": "Faith in the Church weakened, partly because so many clergy had died. The Church lost some of its monopoly over saving souls as people turned to mysticism. North of the Alps, art and poetry became preoccupied with death.",
+      "when": "after 1348",
+      "where": "Europe",
+      "sources": [
+        "brit-black-death",
+        "brown-decameron"
+      ],
+      "evidence": "Britannica: \"the Roman Catholic Church lost some of its monopoly over the salvation of souls as people turned to mysticism.\" Decameron Web: \"Faith in religion decreased after the plague, both because of the death of so many of the clergy.\""
+    },
+    {
+      "id": "CH-07",
+      "category": "church",
+      "title": "Religion at home",
+      "text": "After the Black Death, more ordinary people practiced religion on their own, using prayer books such as Books of Hours and asking for religious writings in their own language instead of Latin. Criticism of clergy also grew.",
+      "when": "after 1350",
+      "where": "England",
+      "sources": [
+        "newberry"
+      ],
+      "evidence": "Newberry: Books of Hours and lay primers became more popular; demand grew for religious texts in English; the Church faced mounting criticism."
+    },
+    {
+      "id": "CH-08",
+      "category": "church",
+      "title": "The Jubilee of 1350",
+      "text": "In 1343 Clement VI had declared a Holy Year (Jubilee) for 1350. Despite the plague and an earthquake in Rome in 1349, huge crowds of pilgrims came to Rome. The Vatican reports more than one and a half million.",
+      "when": "1350",
+      "where": "Rome",
+      "sources": [
+        "vatican-jubilee"
+      ],
+      "evidence": "Vatican: \"Despite the scourge of the plague and a disastrous earthquake that struck the Eternal City in 1349 ... More than one and a half million pilgrims poured into the city.\"",
+      "debate": "Medieval crowd sizes are estimates."
+    },
+    {
+      "id": "DB-01",
+      "category": "cities",
+      "title": "How many died?",
+      "text": "Estimates differ. Britannica gives about 25 million deaths in Europe, around one-third of the population, which matches what the chronicler Froissart said at the time. Historian Ole Benedictow argues for about 60 percent, around 50 million. Regional death rates ranged from one-eighth to two-thirds.",
+      "when": "1347–1353",
+      "where": "Europe",
+      "sources": [
+        "brit-black-death",
+        "benedictow"
+      ],
+      "evidence": "Britannica: \"A rough estimate is that 25 million people in Europe died\"; \"between one-eighth and two-thirds of the population\"; Froissart's one-third \"may be fairly accurate.\" Benedictow: \"likely that the Black Death swept away around 60 per cent of Europe's population ... around 50 million.\"",
+      "debate": "Overall mortality is one of the biggest debates about the Black Death."
+    },
+    {
+      "id": "EC-10",
+      "category": "economic",
+      "title": "The survivors inherit",
+      "text": "So many people died that survivors inherited their property, sometimes more land than they wanted. For roughly a century afterward, wealth was spread more evenly, as the richest lost part of their share to everyone else.",
+      "when": "after 1348",
+      "where": "Europe",
+      "sources": [
+        "aea-alfani"
+      ],
+      "evidence": "Alfani (AEA): reshuffling of properties led \"to people inheriting more property than they want to have\"; \"wealthy elites losing a significant share of the overall wealth to the advantage of all other strata of society.\""
+    },
+    {
+      "id": "EC-11",
+      "category": "economic",
+      "title": "The gold florin",
+      "text": "The gold florin, first minted in Florence in 1252, won fame across Europe for its reliable weight and purity and was widely imitated.",
+      "when": "1252",
+      "where": "Florence",
+      "sources": [
+        "brit-florin"
+      ],
+      "evidence": "Britannica: \"Regular weight (about 3.50 grams, 54 grains) and fineness won the fiorino universal fame and wide imitation.\""
+    },
+    {
+      "id": "CH-09",
+      "category": "church",
+      "title": "What is a papal bull?",
+      "text": "A papal bull is an official document from the pope. Metal seals were called bulls, and the name passed to the papal documents that carried them.",
+      "when": "",
+      "where": "",
+      "sources": [
+        "brit-diplomatics"
+      ],
+      "evidence": "Britannica: \"Seals were made of wax or of metal; if the latter, they were called bulls (hence, the use of this term for a certain group of papal documents).\""
+    }
+  ]
+}

@@ -1,0 +1,1236 @@
+{
+  "note": "Chronicle cards are dated history and always appear in their round. Event cards are shuffled; one is drawn each round. Fortune cards are a personal deck: a house draws one when it rolls a 6 on the profit die or opens a trading post. Every card lists the fact IDs its history comes from. Effects are carried out by src/engine/events.js and src/engine/fortune.js.",
+  "chronicle": [
+    {
+      "id": "CHR-caffa",
+      "round": 1,
+      "theme": "trade",
+      "title": "The Siege of Caffa",
+      "text": "News comes from the Black Sea: a Mongol army besieged the Genoese port of Caffa, plague broke out, and Italian ships fled west carrying the sickness with them.",
+      "factIds": [
+        "TR-01",
+        "TR-02",
+        "TR-03"
+      ],
+      "effect": {
+        "type": "none"
+      }
+    },
+    {
+      "id": "CHR-messina",
+      "round": 1,
+      "theme": "trade",
+      "title": "Twelve Galleys at Messina",
+      "text": "Genoese galleys arrive in Messina with sick sailors. The city drives them out, but the disease has already come ashore.",
+      "factIds": [
+        "TR-06",
+        "TR-07",
+        "CI-11"
+      ],
+      "effect": {
+        "type": "none"
+      }
+    },
+    {
+      "id": "CHR-avignon",
+      "round": 2,
+      "theme": "church",
+      "title": "The Great Mortality at Avignon",
+      "text": "The plague reaches the papal city of Avignon. The pope's physician, Guy de Chauliac, records what he sees.",
+      "factIds": [
+        "TL-05",
+        "ME-03",
+        "CH-01",
+        "CH-02",
+        "ME-02"
+      ],
+      "effect": {
+        "type": "none"
+      }
+    },
+    {
+      "id": "CHR-gates",
+      "round": 2,
+      "theme": "social",
+      "title": "Cities Guard Their Gates",
+      "text": "Frightened towns post guards and turn strangers away. This round, no one may open a trading post in a Stricken city or in a city next to one.",
+      "factIds": [
+        "SO-11",
+        "ME-12"
+      ],
+      "effect": {
+        "type": "noNewPostsNearPlague"
+      }
+    },
+    {
+      "id": "CHR-florence",
+      "round": 2,
+      "theme": "cities",
+      "title": "Florence, 1348",
+      "text": "In Florence those who can afford it flee to the countryside, while others hold sweet-smelling flowers to their noses against the 'bad air.'",
+      "factIds": [
+        "CI-01",
+        "SO-04",
+        "ME-07"
+      ],
+      "effect": {
+        "type": "none"
+      }
+    },
+    {
+      "id": "CHR-paris-report",
+      "round": 3,
+      "theme": "medical",
+      "title": "The Paris Report",
+      "text": "The medical faculty of the University of Paris issues its official explanation of the plague. Their answer: the planets and corrupt air.",
+      "factIds": [
+        "ME-04",
+        "ME-05"
+      ],
+      "effect": {
+        "type": "none"
+      }
+    },
+    {
+      "id": "CHR-accusation",
+      "round": 3,
+      "theme": "persecution",
+      "title": "A False Accusation, and a Pope's Reply",
+      "text": "Rumors spread that Jews poisoned the wells. The accusation is false: Jews are dying of the plague too. Pope Clement VI issues bulls rejecting the lie and calling for Jews to be protected, but far from Avignon few listen.",
+      "factIds": [
+        "SO-07",
+        "SO-08"
+      ],
+      "effect": {
+        "type": "none"
+      }
+    },
+    {
+      "id": "CHR-england",
+      "round": 3,
+      "theme": "trade",
+      "title": "A Ship to England",
+      "text": "A ship brings the plague to Melcombe Regis in Dorset. From there it spreads across England.",
+      "factIds": [
+        "TR-08",
+        "ME-13"
+      ],
+      "effect": {
+        "type": "none"
+      }
+    },
+    {
+      "id": "CHR-strasbourg",
+      "round": 4,
+      "theme": "persecution",
+      "title": "Strasbourg, February 1349",
+      "text": "In Strasbourg a mob overthrows the council that refused to harm the Jewish community, and the community is murdered, before the plague has even reached the city. The accusations were false. The violence was unjust. Your house may take a costly stand to shelter and defend the community.",
+      "factIds": [
+        "SO-09",
+        "SO-10",
+        "SO-07"
+      ],
+      "effect": {
+        "type": "persecution",
+        "city": "strasbourg"
+      }
+    },
+    {
+      "id": "CHR-ordinance",
+      "round": 4,
+      "theme": "economic",
+      "title": "The Ordinance of Labourers",
+      "text": "With workers scarce, England's government orders wages frozen at pre-plague levels. Merchants with posts in England must decide whether to obey.",
+      "factIds": [
+        "EC-05",
+        "EC-03"
+      ],
+      "effect": {
+        "type": "wageLaw",
+        "cities": [
+          "london",
+          "melcombe"
+        ]
+      }
+    },
+    {
+      "id": "CHR-flagellants",
+      "round": 4,
+      "theme": "social",
+      "title": "The Flagellants Arrive",
+      "text": "A flagellant procession arrives, marching with crosses and banners, whipping themselves to beg God's mercy. Will your house give them alms?",
+      "factIds": [
+        "SO-02",
+        "SO-01"
+      ],
+      "effect": {
+        "type": "offer",
+        "id": "flagellantAlms",
+        "label": "Give alms to the flagellants",
+        "cost": {
+          "florins": 2
+        },
+        "gain": {
+          "reputation": 1
+        },
+        "decline": "Keep your distance"
+      }
+    },
+    {
+      "id": "CHR-ban",
+      "round": 5,
+      "theme": "church",
+      "title": "The Pope Bans the Flagellants",
+      "text": "Pope Clement VI condemns the flagellant movement and forbids its processions. Houses that gave alms to the flagellants lose 1 reputation.",
+      "factIds": [
+        "SO-03"
+      ],
+      "effect": {
+        "type": "reputationIfOffer",
+        "offer": "flagellantAlms",
+        "reputation": -1
+      }
+    },
+    {
+      "id": "CHR-confess",
+      "round": 5,
+      "theme": "church",
+      "title": "Confess to Anyone",
+      "text": "So many priests have died that a bishop allows the dying to confess to any layperson. Parishes need help: Charity & Piety gives +1 extra reputation this round.",
+      "factIds": [
+        "CH-05",
+        "CH-03"
+      ],
+      "effect": {
+        "type": "charityBonus",
+        "delta": 1
+      }
+    },
+    {
+      "id": "CHR-north",
+      "round": 5,
+      "theme": "trade",
+      "title": "Hanseatic Ships Sail North",
+      "text": "A ship from England brings the plague to Bergen. Hanseatic ships heading home carry it to the Baltic.",
+      "factIds": [
+        "TR-09",
+        "CI-13"
+      ],
+      "effect": {
+        "type": "none"
+      }
+    },
+    {
+      "id": "CHR-jubilee",
+      "round": 6,
+      "theme": "church",
+      "title": "The Jubilee of 1350",
+      "text": "Despite the plague, pilgrims crowd the roads to Rome for the Holy Year. Your house may pay for a pilgrimage.",
+      "factIds": [
+        "CH-08"
+      ],
+      "effect": {
+        "type": "offer",
+        "id": "jubilee",
+        "label": "Fund a pilgrimage to Rome",
+        "cost": {
+          "florins": 3
+        },
+        "gain": {
+          "reputation": 2
+        },
+        "decline": "Stay home"
+      }
+    },
+    {
+      "id": "CHR-baltic",
+      "round": 6,
+      "theme": "timeline",
+      "title": "The Plague Reaches the Baltic",
+      "text": "The plague reaches Scandinavia and the Baltic lands.",
+      "factIds": [
+        "TL-02"
+      ],
+      "effect": {
+        "type": "none"
+      }
+    },
+    {
+      "id": "CHR-marry",
+      "round": 7,
+      "theme": "social",
+      "title": "Survivors Marry",
+      "text": "With the epidemic fading, survivors marry and many children are born. Houses that have lost 2 or more family members gain 1 family member.",
+      "factIds": [
+        "SO-12"
+      ],
+      "effect": {
+        "type": "newFamily",
+        "minLost": 2,
+        "gain": 1
+      }
+    },
+    {
+      "id": "CHR-dear",
+      "round": 7,
+      "theme": "economic",
+      "title": "Everything Twice as Dear",
+      "text": "Prices climb everywhere. This round, shipments to Aftermath cities earn +1 extra.",
+      "factIds": [
+        "EC-04"
+      ],
+      "effect": {
+        "type": "marketBonus",
+        "delta": 1
+      }
+    },
+    {
+      "id": "CHR-statute",
+      "round": 8,
+      "theme": "economic",
+      "title": "The Statute of Labourers",
+      "text": "England's first Parliament after the plague strengthens the wage freeze. Merchants with posts in England must decide again whether to obey.",
+      "factIds": [
+        "EC-06",
+        "EC-07"
+      ],
+      "effect": {
+        "type": "wageLaw",
+        "cities": [
+          "london",
+          "melcombe"
+        ]
+      }
+    },
+    {
+      "id": "CHR-russia",
+      "round": 9,
+      "theme": "trade",
+      "title": "Toward Russia",
+      "text": "The plague enters the lands of Novgorod, not from the east, but from the west along the trade routes.",
+      "factIds": [
+        "TR-10"
+      ],
+      "effect": {
+        "type": "none"
+      }
+    },
+    {
+      "id": "CHR-society",
+      "round": 9,
+      "theme": "economic",
+      "title": "Lords Must Pay",
+      "text": "Short of workers, landowners start paying wages and money rents. This round the player in last place gains 3 florins.",
+      "factIds": [
+        "EC-02",
+        "SO-13"
+      ],
+      "effect": {
+        "type": "lastPlaceBonus",
+        "florins": 3
+      }
+    },
+    {
+      "id": "CHR-revive",
+      "round": 10,
+      "theme": "trade",
+      "title": "Trade Revives",
+      "text": "The slump in trade after the plague does not last. This round every shipment earns +1.",
+      "factIds": [
+        "TR-11"
+      ],
+      "effect": {
+        "type": "roundModifier",
+        "profit": 1
+      }
+    },
+    {
+      "id": "CHR-clement",
+      "round": 11,
+      "theme": "church",
+      "title": "Death of Clement VI",
+      "text": "Pope Clement VI dies at Avignon in December 1352.",
+      "factIds": [
+        "CH-01"
+      ],
+      "effect": {
+        "type": "none"
+      }
+    },
+    {
+      "id": "CHR-novgorod",
+      "round": 11,
+      "theme": "cities",
+      "title": "Novgorod",
+      "text": "The plague breaks out in the city of Novgorod.",
+      "factIds": [
+        "TR-10"
+      ],
+      "effect": {
+        "type": "none"
+      }
+    },
+    {
+      "id": "CHR-moscow",
+      "round": 12,
+      "theme": "cities",
+      "title": "Moscow, 1353",
+      "text": "The plague ravages Moscow, nearly the last major city it reaches. Europe begins its long recovery, but the plague will return.",
+      "factIds": [
+        "TR-10",
+        "TL-10",
+        "EC-08"
+      ],
+      "effect": {
+        "type": "none"
+      }
+    }
+  ],
+  "deck": [
+    {
+      "id": "EV-wages",
+      "theme": "economic",
+      "title": "Wages Rise",
+      "text": "Workers are scarce and demand more. This round the wage for shipping from an Aftermath city is 1 florin higher.",
+      "factIds": [
+        "EC-03"
+      ],
+      "effect": {
+        "type": "costModifier",
+        "cost": "wageAftermath",
+        "delta": 1
+      }
+    },
+    {
+      "id": "EV-prices",
+      "theme": "economic",
+      "title": "Prices Soar",
+      "text": "Goods are scarce and prices jump. This round, shipments to Aftermath cities earn +1 extra.",
+      "factIds": [
+        "EC-04"
+      ],
+      "effect": {
+        "type": "marketBonus",
+        "delta": 1
+      }
+    },
+    {
+      "id": "EV-fields",
+      "theme": "economic",
+      "title": "Fields Go Unplowed",
+      "text": "With so many laborers dead, land lies empty and rents fail. Lose 1 florin for each of your trading posts in an Aftermath city.",
+      "factIds": [
+        "EC-02"
+      ],
+      "effect": {
+        "type": "florinsPerPost",
+        "state": "aftermath",
+        "florins": -1
+      }
+    },
+    {
+      "id": "EV-slump",
+      "theme": "trade",
+      "title": "Trade Slump",
+      "text": "Buyers are dead or gone. This round every shipment earns 1 less.",
+      "factIds": [
+        "TR-11"
+      ],
+      "effect": {
+        "type": "roundModifier",
+        "profit": -1
+      }
+    },
+    {
+      "id": "EV-wars",
+      "theme": "economic",
+      "title": "Wars Pause",
+      "text": "For a short time the plague halts the fighting. This round sea shipments earn +1.",
+      "factIds": [
+        "EC-09"
+      ],
+      "effect": {
+        "type": "roundModifier",
+        "profit": 1,
+        "routeType": "sea"
+      }
+    },
+    {
+      "id": "EV-banks",
+      "theme": "economic",
+      "title": "Memories of the Bank Crash",
+      "text": "Creditors remember the Florentine bank failures and call in their loans. Every house with 20 or more florins pays 2 florins.",
+      "factIds": [
+        "EC-01"
+      ],
+      "effect": {
+        "type": "loseIfRich",
+        "threshold": 20,
+        "florins": 2
+      }
+    },
+    {
+      "id": "EV-flight",
+      "theme": "social",
+      "title": "Flight to the Countryside",
+      "text": "Carts crowd the roads out of town. This round you may take one Move Family action without spending an action point. (Fleeing still costs reputation.)",
+      "factIds": [
+        "SO-04"
+      ],
+      "effect": {
+        "type": "freeAction",
+        "action": "move"
+      }
+    },
+    {
+      "id": "EV-doors",
+      "theme": "social",
+      "title": "Behind Closed Doors",
+      "text": "Some families shut themselves away from the sick. This round you may take one Prepare Household action for free: no action point, no florins.",
+      "factIds": [
+        "SO-05"
+      ],
+      "effect": {
+        "type": "freeAction",
+        "action": "prepare"
+      }
+    },
+    {
+      "id": "EV-gates",
+      "theme": "social",
+      "title": "Guards at the Gates",
+      "text": "Towns turn away strangers. This round, no one may open a trading post in a Stricken city or in a city next to one.",
+      "factIds": [
+        "SO-11"
+      ],
+      "effect": {
+        "type": "noNewPostsNearPlague"
+      }
+    },
+    {
+      "id": "EV-torn",
+      "theme": "social",
+      "title": "Families Torn Apart",
+      "text": "Fear makes people abandon even their own relatives. Will your house care for the sick of your street?",
+      "factIds": [
+        "SO-06"
+      ],
+      "effect": {
+        "type": "offer",
+        "id": "careSick",
+        "label": "Care for the sick",
+        "cost": {
+          "florins": 2
+        },
+        "gain": {
+          "reputation": 1
+        },
+        "decline": "Stay away"
+      }
+    },
+    {
+      "id": "EV-procession",
+      "theme": "social",
+      "title": "A Punishment from God?",
+      "text": "Believing the plague is punishment for sin, your city holds a penitential procession. Will your house pay for candles and banners?",
+      "factIds": [
+        "SO-01"
+      ],
+      "effect": {
+        "type": "offer",
+        "id": "procession",
+        "label": "Fund the procession",
+        "cost": {
+          "florins": 2
+        },
+        "gain": {
+          "reputation": 1
+        },
+        "decline": "Decline"
+      }
+    },
+    {
+      "id": "EV-opportunity",
+      "theme": "social",
+      "title": "New Opportunities",
+      "text": "With so many dead, survivors can bargain for better terms. The player in last place gains 3 florins.",
+      "factIds": [
+        "SO-13"
+      ],
+      "effect": {
+        "type": "lastPlaceBonus",
+        "florins": 3
+      }
+    },
+    {
+      "id": "EV-quack",
+      "theme": "medical",
+      "title": "A Remedy Seller",
+      "text": "A seller offers a 'sure cure' of theriac and aloe pills for 3 florins. Buy it?",
+      "factIds": [
+        "ME-06",
+        "ME-08"
+      ],
+      "effect": {
+        "type": "offer",
+        "id": "quack",
+        "label": "Buy the cure",
+        "cost": {
+          "florins": 3
+        },
+        "gain": {},
+        "decline": "Refuse",
+        "reveal": "The 'cure' does nothing. No medieval remedy could cure the plague."
+      }
+    },
+    {
+      "id": "EV-summer",
+      "theme": "medical",
+      "title": "A Hot Season",
+      "text": "The plague spreads fastest in warm weather. This round the contagion risk on every shipment is 1 higher.",
+      "factIds": [
+        "TL-09",
+        "ME-05"
+      ],
+      "effect": {
+        "type": "contagionModifier",
+        "delta": 1
+      }
+    },
+    {
+      "id": "EV-stayed",
+      "theme": "medical",
+      "title": "A Doctor Who Stayed",
+      "text": "People remember who stayed and who ran. Houses with no family at a country estate gain 1 reputation; houses with family at an estate lose 1.",
+      "factIds": [
+        "ME-09",
+        "SO-04"
+      ],
+      "effect": {
+        "type": "reputationByFlight",
+        "stayed": 1,
+        "fled": -1
+      }
+    },
+    {
+      "id": "EV-planets",
+      "theme": "medical",
+      "title": "Astrologers' Advice",
+      "text": "Physicians consult the stars and are eager for patients. This round Consult Physician costs 1 florin less.",
+      "factIds": [
+        "ME-04"
+      ],
+      "effect": {
+        "type": "costModifier",
+        "cost": "physician",
+        "delta": -1
+      }
+    },
+    {
+      "id": "EV-mask",
+      "theme": "medical",
+      "title": "Myth Buster: The Beaked Mask",
+      "text": "You will not see any beaked 'plague doctors' in this game. That costume was invented almost 300 years later.",
+      "factIds": [
+        "ME-11"
+      ],
+      "effect": {
+        "type": "none"
+      }
+    },
+    {
+      "id": "EV-ships",
+      "theme": "medical",
+      "title": "Crowded Ships",
+      "text": "Scholars still debate whether rats or people carried the plague, but crowded ships spread it either way. This round the contagion risk on sea shipments is 1 higher.",
+      "factIds": [
+        "ME-10",
+        "TR-05"
+      ],
+      "effect": {
+        "type": "contagionModifier",
+        "delta": 1,
+        "routeType": "sea"
+      }
+    },
+    {
+      "id": "EV-winter",
+      "theme": "medical",
+      "title": "Winter Cold",
+      "text": "Cold weather slows the plague. This round the contagion risk on every shipment is 1 lower.",
+      "factIds": [
+        "TL-09"
+      ],
+      "effect": {
+        "type": "contagionModifier",
+        "delta": -1
+      }
+    },
+    {
+      "id": "EV-clergy",
+      "theme": "church",
+      "title": "The Clergy Hit Hard",
+      "text": "Priests who tended the dying have died themselves. Charity & Piety gives +1 extra reputation this round.",
+      "factIds": [
+        "CH-03"
+      ],
+      "effect": {
+        "type": "charityBonus",
+        "delta": 1
+      }
+    },
+    {
+      "id": "EV-faith",
+      "theme": "church",
+      "title": "Faith Shaken",
+      "text": "Many people lose trust in the Church. Charity & Piety gives 1 less reputation this round.",
+      "factIds": [
+        "CH-06"
+      ],
+      "effect": {
+        "type": "charityBonus",
+        "delta": -1
+      }
+    },
+    {
+      "id": "EV-hours",
+      "theme": "church",
+      "title": "Religion at Home",
+      "text": "Families pray at home with Books of Hours. Will your house buy one?",
+      "factIds": [
+        "CH-07"
+      ],
+      "effect": {
+        "type": "offer",
+        "id": "bookOfHours",
+        "label": "Buy a Book of Hours",
+        "cost": {
+          "florins": 2
+        },
+        "gain": {
+          "reputation": 1
+        },
+        "decline": "Decline"
+      }
+    },
+    {
+      "id": "EV-archbishops",
+      "theme": "church",
+      "title": "Two Archbishops in a Row",
+      "text": "Canterbury loses two archbishops one after the other, and churches everywhere need support. This round Charity & Piety costs 1 florin less.",
+      "factIds": [
+        "CH-04"
+      ],
+      "effect": {
+        "type": "costModifier",
+        "cost": "charity",
+        "delta": -1
+      }
+    },
+    {
+      "id": "EV-avignon",
+      "theme": "church",
+      "title": "Petitions to Avignon",
+      "text": "The papal court has lost a quarter of its staff and needs merchants' help. Houses with a trading post in Avignon gain 1 reputation.",
+      "factIds": [
+        "CH-02"
+      ],
+      "effect": {
+        "type": "postBonus",
+        "cities": [
+          "avignon"
+        ],
+        "reputation": 1
+      }
+    },
+    {
+      "id": "EV-fast",
+      "theme": "trade",
+      "title": "Faster by Sea",
+      "text": "Ships race between ports. This round sea shipments earn +1, but their contagion risk is also 1 higher.",
+      "factIds": [
+        "TR-05"
+      ],
+      "effect": {
+        "type": "multi",
+        "effects": [
+          {
+            "type": "roundModifier",
+            "profit": 1,
+            "routeType": "sea"
+          },
+          {
+            "type": "contagionModifier",
+            "delta": 1,
+            "routeType": "sea"
+          }
+        ]
+      }
+    },
+    {
+      "id": "EV-network",
+      "theme": "trade",
+      "title": "The Great Network",
+      "text": "London and Bruges link the Italian trade to the Hanseatic League. Houses with a trading post in London or Bruges gain 2 florins.",
+      "factIds": [
+        "TR-04"
+      ],
+      "effect": {
+        "type": "postBonus",
+        "cities": [
+          "london",
+          "bruges"
+        ],
+        "florins": 2
+      }
+    },
+    {
+      "id": "EV-tally",
+      "theme": "cities",
+      "title": "The Chronicler's Tally",
+      "text": "Chroniclers write down huge death tolls, but their numbers rarely agree. How do historians know how many died?",
+      "factIds": [
+        "CI-02",
+        "DB-01"
+      ],
+      "effect": {
+        "type": "none"
+      }
+    },
+    {
+      "id": "EV-uneven",
+      "theme": "cities",
+      "title": "Uneven Losses",
+      "text": "Some regions escape lightly while others are devastated. This round Stricken cities in Tuscany and Catalonia (Florence, Pisa, Barcelona) earn 1 less on shipments.",
+      "factIds": [
+        "CI-06"
+      ],
+      "effect": {
+        "type": "cityProfitModifier",
+        "cities": [
+          "florence",
+          "pisa",
+          "barcelona"
+        ],
+        "onlyStricken": true,
+        "profit": -1
+      }
+    },
+    {
+      "id": "EV-siena",
+      "theme": "cities",
+      "title": "Siena's Unfinished Cathedral",
+      "text": "Tuscany has lost so many people that great building projects stop. Houses with trading posts in Florence or Pisa lose 1 florin.",
+      "factIds": [
+        "CI-04"
+      ],
+      "effect": {
+        "type": "postBonus",
+        "cities": [
+          "florence",
+          "pisa"
+        ],
+        "florins": -1
+      }
+    },
+    {
+      "id": "EV-scholar",
+      "theme": "cities",
+      "title": "A Scholar's Loss",
+      "text": "Across the sea in Tunis, the plague takes both parents of the young Ibn Khaldun. Houses with a trading post in Tunis gain 1 reputation for helping his community.",
+      "factIds": [
+        "CI-08"
+      ],
+      "effect": {
+        "type": "postBonus",
+        "cities": [
+          "tunis"
+        ],
+        "reputation": 1
+      }
+    },
+    {
+      "id": "EV-avignon-letter",
+      "theme": "church",
+      "title": "A Letter from Avignon",
+      "text": "The papal court thanks one house, chosen at random, for its loyalty. That house gains 2 reputation.",
+      "factIds": [
+        "CH-01"
+      ],
+      "effect": {
+        "type": "onePlayer",
+        "effect": {
+          "type": "gain",
+          "reputation": 2
+        }
+      }
+    },
+    {
+      "id": "EV-will",
+      "theme": "economic",
+      "title": "An Unexpected Will",
+      "text": "One house, chosen at random, inherits a dead partner's goods. That house gains 4 florins.",
+      "factIds": [
+        "EC-10"
+      ],
+      "effect": {
+        "type": "onePlayer",
+        "effect": {
+          "type": "gain",
+          "florins": 4
+        }
+      }
+    },
+    {
+      "id": "EV-loan",
+      "theme": "economic",
+      "title": "An Old Loan",
+      "text": "One house, chosen at random, must repay an old loan to nervous bankers. That house loses 3 florins.",
+      "factIds": [
+        "EC-01"
+      ],
+      "effect": {
+        "type": "onePlayer",
+        "effect": {
+          "type": "gain",
+          "florins": -3
+        }
+      }
+    },
+    {
+      "id": "EV-seized",
+      "theme": "social",
+      "title": "Cargo Seized at the Gate",
+      "text": "Guards at a city gate seize a cart belonging to one house, chosen at random. That house loses 2 florins.",
+      "factIds": [
+        "SO-11"
+      ],
+      "effect": {
+        "type": "onePlayer",
+        "effect": {
+          "type": "gain",
+          "florins": -2
+        }
+      }
+    }
+  ],
+  "fortune": [
+    {
+      "id": "FO-spices",
+      "tone": "good",
+      "title": "A Cargo of Spices",
+      "text": "Your agents buy pepper and cinnamon cheaply in the eastern markets. Gain 5 florins.",
+      "factIds": [
+        "TR-04"
+      ],
+      "effect": {
+        "type": "gain",
+        "florins": 5
+      }
+    },
+    {
+      "id": "FO-galley",
+      "tone": "good",
+      "title": "A Fast Galley",
+      "text": "A swift ship joins your fleet. Your next shipment this round earns 3 extra florins.",
+      "factIds": [
+        "TR-05"
+      ],
+      "effect": {
+        "type": "nextShip",
+        "profit": 3
+      }
+    },
+    {
+      "id": "FO-clean",
+      "tone": "good",
+      "title": "A Clean Hold",
+      "text": "Your crew scrubs the hold and turns away sick passengers. Your next shipment this round cannot be infected: no contagion die is rolled.",
+      "factIds": [
+        "ME-10"
+      ],
+      "effect": {
+        "type": "nextShip",
+        "profit": 0,
+        "safe": true
+      }
+    },
+    {
+      "id": "FO-credit",
+      "tone": "good",
+      "title": "A Letter of Credit",
+      "text": "A banker backs your venture with gold florins. Take 1 extra action point this turn.",
+      "factIds": [
+        "EC-11"
+      ],
+      "effect": {
+        "type": "extraAP",
+        "ap": 1
+      }
+    },
+    {
+      "id": "FO-partners",
+      "tone": "good",
+      "title": "Hanseatic Partners",
+      "text": "Northern merchants offer you space in their warehouse. Your next Open Trading Post this round costs no florins and no action point.",
+      "factIds": [
+        "TR-04",
+        "TR-09"
+      ],
+      "effect": {
+        "type": "freeAction",
+        "action": "post"
+      }
+    },
+    {
+      "id": "FO-will",
+      "tone": "good",
+      "title": "A Cousin's Will",
+      "text": "A distant relative dies and leaves your house property. Gain 4 florins.",
+      "factIds": [
+        "EC-10"
+      ],
+      "effect": {
+        "type": "gain",
+        "florins": 4
+      }
+    },
+    {
+      "id": "FO-wedding",
+      "tone": "good",
+      "title": "A Wedding",
+      "text": "A marriage brings a new member into your house. Gain 1 family member (a house can have at most 5).",
+      "factIds": [
+        "SO-12"
+      ],
+      "effect": {
+        "type": "newFamily",
+        "gain": 1
+      }
+    },
+    {
+      "id": "FO-doctor",
+      "tone": "good",
+      "title": "A Doctor Who Stays",
+      "text": "A brave physician offers to care for your family. Your next Consult Physician this round costs no florins and no action point.",
+      "factIds": [
+        "ME-09"
+      ],
+      "effect": {
+        "type": "freeAction",
+        "action": "physician"
+      }
+    },
+    {
+      "id": "FO-refuge",
+      "tone": "good",
+      "title": "A Country Refuge",
+      "text": "Friends offer your family shelter in the countryside. Your next Move Family this round is free, and fleeing costs no reputation.",
+      "factIds": [
+        "SO-04"
+      ],
+      "effect": {
+        "type": "freeAction",
+        "action": "moveNoPenalty"
+      }
+    },
+    {
+      "id": "FO-blessing",
+      "tone": "good",
+      "title": "A Pilgrim's Blessing",
+      "text": "Pilgrims praise your house's piety on the roads to Rome. Gain 1 reputation.",
+      "factIds": [
+        "CH-08"
+      ],
+      "effect": {
+        "type": "gain",
+        "reputation": 1
+      }
+    },
+    {
+      "id": "FO-chronicler",
+      "tone": "good",
+      "title": "The Chronicler's Praise",
+      "text": "A chronicler writes kindly of your house, though his numbers are rarely exact. Gain 1 reputation.",
+      "factIds": [
+        "CI-02"
+      ],
+      "effect": {
+        "type": "gain",
+        "reputation": 1
+      }
+    },
+    {
+      "id": "FO-letters",
+      "tone": "good",
+      "title": "Letters from the East",
+      "text": "Your agents send warning ahead of the plague. You see which cities it reaches next round, according to history.",
+      "factIds": [
+        "TR-07",
+        "TL-02"
+      ],
+      "effect": {
+        "type": "omen"
+      }
+    },
+    {
+      "id": "FO-treaty",
+      "tone": "good",
+      "title": "A Trade Treaty",
+      "text": "You sign a trade treaty with the poorest rival house. You each gain 2 florins.",
+      "factIds": [
+        "TR-04"
+      ],
+      "effect": {
+        "type": "treaty",
+        "florins": 2
+      }
+    },
+    {
+      "id": "FO-confraternity",
+      "tone": "choice",
+      "title": "A Confraternity Invites You",
+      "text": "A lay brotherhood that cares for the sick invites your house to join. Pay 3 florins to gain 2 reputation?",
+      "factIds": [
+        "CH-07"
+      ],
+      "effect": {
+        "type": "offer",
+        "id": "fortuneConfraternity",
+        "label": "Join the confraternity",
+        "cost": {
+          "florins": 3
+        },
+        "gain": {
+          "reputation": 2
+        },
+        "decline": "Decline politely"
+      }
+    },
+    {
+      "id": "FO-fires",
+      "tone": "choice",
+      "title": "Fear of Bad Air",
+      "text": "Neighbours demand that you light fires to 'purify' the air. Pay 2 florins, or lose 1 reputation. (The fires do nothing against the plague.)",
+      "factIds": [
+        "ME-05",
+        "ME-06"
+      ],
+      "effect": {
+        "type": "offer",
+        "id": "fortuneFires",
+        "label": "Pay for the fires",
+        "cost": {
+          "florins": 2
+        },
+        "gain": {},
+        "decline": "Refuse",
+        "declinePenalty": {
+          "reputation": 1
+        }
+      }
+    },
+    {
+      "id": "FO-wages",
+      "tone": "choice",
+      "title": "Workers Demand Double",
+      "text": "With labour scarce, your workers want double wages. Pay 3 florins, or your home post cannot ship this round.",
+      "factIds": [
+        "EC-04",
+        "EC-06"
+      ],
+      "effect": {
+        "type": "offer",
+        "id": "fortuneWages",
+        "label": "Pay the wages",
+        "cost": {
+          "florins": 3
+        },
+        "gain": {},
+        "decline": "Refuse",
+        "declinePenalty": {
+          "blockHome": true
+        }
+      }
+    },
+    {
+      "id": "FO-turned",
+      "tone": "bad",
+      "title": "Turned Away at Port",
+      "text": "A frightened port drives your ship away, as Messina drove out the Genoese. Lose 2 florins.",
+      "factIds": [
+        "CI-11"
+      ],
+      "effect": {
+        "type": "gain",
+        "florins": -2
+      }
+    },
+    {
+      "id": "FO-held",
+      "tone": "bad",
+      "title": "Held Offshore",
+      "text": "Officials make your ship wait at sea before it may land. Your next shipment this round earns 2 florins less.",
+      "factIds": [
+        "ME-12"
+      ],
+      "effect": {
+        "type": "nextShip",
+        "profit": -2
+      }
+    },
+    {
+      "id": "FO-creditors",
+      "tone": "bad",
+      "title": "Creditors Call",
+      "text": "Remembering the great bank crashes, your lenders want their money back. Lose 10 percent of your florins (rounded down).",
+      "factIds": [
+        "EC-01"
+      ],
+      "effect": {
+        "type": "losePercent",
+        "percent": 10
+      }
+    },
+    {
+      "id": "FO-illness",
+      "tone": "bad",
+      "title": "Illness in the House",
+      "text": "A fever strikes. If any of your family live in a Stricken city, one of them must roll for survival right now.",
+      "factIds": [
+        "ME-02",
+        "ME-03"
+      ],
+      "effect": {
+        "type": "illness"
+      }
+    },
+    {
+      "id": "FO-gates",
+      "tone": "bad",
+      "title": "Closed Gates",
+      "text": "Guards turn your agents away. Opening a trading post costs you 4 florins more this round.",
+      "factIds": [
+        "SO-11"
+      ],
+      "effect": {
+        "type": "personalCost",
+        "cost": "openPost",
+        "delta": 4
+      }
+    },
+    {
+      "id": "FO-servants",
+      "tone": "bad",
+      "title": "Servants Flee",
+      "text": "Your servants run from the city in fear. Lose 1 action point this turn, if you have one left.",
+      "factIds": [
+        "SO-06"
+      ],
+      "effect": {
+        "type": "extraAP",
+        "ap": -1
+      }
+    }
+  ]
+}
