@@ -4,7 +4,7 @@
 import { openTransport } from './transport.js';
 import {
   makeRoomCode, trimState, validateJoin, HELLO, PING, JOIN, LEAVE, ACT, DECIDE, END, NEXT,
-  LOBBY, STATE, TOAST, REJECT, CLOSED, PROBE, HOST_HERE, ROLL_CALL, OFFLINE_AFTER_MS,
+  LOBBY, STATE, TOAST, REJECT, CLOSED, PROBE, HOST_HERE, ROLL_CALL, BEAT, PING_EVERY_MS, OFFLINE_AFTER_MS,
 } from './protocol.js';
 
 // Resolves true if another big screen already answers on this code.
@@ -56,6 +56,8 @@ export async function hostRoom({ code = null, seats = [], started = false, joinR
       if (closed) return;
       closed = true;
       clearInterval(watch);
+      clearInterval(beat);
+      window.removeEventListener('pagehide', onPageHide);
       t.send({ t: CLOSED });
       setTimeout(() => t.close(), 300);
     },
@@ -117,6 +119,12 @@ export async function hostRoom({ code = null, seats = [], started = false, joinR
     }
     if (changed) { room.onChange(); if (!room.started) room.pushLobby(); }
   }, 4000);
+
+  // A heartbeat, so devices notice if this screen disappears without saying goodbye
+  // (crash, lost connection), and a goodbye when its tab is closed or reloaded.
+  const beat = setInterval(() => t.send({ t: BEAT }), PING_EVERY_MS);
+  const onPageHide = () => room.close();
+  window.addEventListener('pagehide', onPageHide);
 
   // Devices still on the page from before (a reopened saved game) report in now.
   t.send({ t: ROLL_CALL });

@@ -2,7 +2,7 @@
 // The device id lives in sessionStorage (one per browser tab, kept across a
 // reload) so a reloaded or woken-up phone gets its house back.
 import { openTransport } from './transport.js';
-import { makeClientId, HELLO, PING, LEAVE, ROLL_CALL, PING_EVERY_MS } from './protocol.js';
+import { makeClientId, HELLO, PING, LEAVE, ROLL_CALL, PING_EVERY_MS, HOST_GONE_AFTER_MS } from './protocol.js';
 
 const CID_KEY = 'ports-of-plague-device';
 const ROOM_KEY = 'ports-of-plague-room';
@@ -26,13 +26,17 @@ function rememberRoom(code) {
   try { if (code) sessionStorage.setItem(ROOM_KEY, code); else sessionStorage.removeItem(ROOM_KEY); } catch { /* ignore */ }
 }
 
-export async function joinRoom(code, { onMessage }) {
+// onHostGone: the big screen stopped sending anything (closed without a goodbye).
+export async function joinRoom(code, { onMessage, onHostGone }) {
   const cid = clientId();
   const t = await openTransport(code);
   let rev = null;
   let closed = false;
+  let lastHost = null; // when the big screen was last heard from (its messages have no sender)
   t.onMessage((m) => {
-    if (closed || !m || typeof m !== 'object' || (m.to && m.to !== cid)) return;
+    if (closed || !m || typeof m !== 'object') return;
+    if (!m.from) lastHost = Date.now();
+    if (m.to && m.to !== cid) return;
     if (m.t === ROLL_CALL) { hello(); return; }
     if (typeof m.rev === 'number') rev = m.rev;
     onMessage(m);
@@ -41,7 +45,11 @@ export async function joinRoom(code, { onMessage }) {
   const hello = () => send({ t: HELLO });
   // The ping carries the last state seen, so the host can resend a missed update.
   const ping = setInterval(() => send({ t: PING, rev }), PING_EVERY_MS);
-  const onVisible = () => { if (document.visibilityState === 'visible') hello(); };
+  const watchHost = setInterval(() => {
+    if (lastHost && document.visibilityState === 'visible' && Date.now() - lastHost > HOST_GONE_AFTER_MS) onHostGone?.();
+  }, 5000);
+  // A phone that was asleep has heard nothing: give the big screen time to answer.
+  const onVisible = () => { if (document.visibilityState === 'visible') { if (lastHost) lastHost = Date.now(); hello(); } };
   document.addEventListener('visibilitychange', onVisible);
   window.addEventListener('online', hello);
   rememberRoom(code);
@@ -55,6 +63,7 @@ export async function joinRoom(code, { onMessage }) {
       if (leave) send({ t: LEAVE });
       closed = true;
       clearInterval(ping);
+      clearInterval(watchHost);
       document.removeEventListener('visibilitychange', onVisible);
       window.removeEventListener('online', hello);
       rememberRoom(null);

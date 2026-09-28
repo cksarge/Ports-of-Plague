@@ -7,7 +7,7 @@ import {
   scorePlayer, familyTotal, cardById,
   roundInfo, totalRounds, roundNumber, fortuneById,
 } from '../engine/index.js';
-import { $, $$, esc, openDialog, dialogOpen, toast, announce, crestSvg } from './dom.js';
+import { $, $$, esc, openDialog, dialogOpen, toast, announce, crestSvg, isTyping } from './dom.js';
 import { createMap, updateMap, animateShipment, animateStrike, redrawStains, startAmbient, floatText } from './map.js';
 import { noteHtml } from './notes.js';
 import { showRules, showJournal, showCity } from './panels.js';
@@ -104,7 +104,7 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
 
   const onKey = (e) => {
     if (dialogOpen() || passing || e.ctrlKey || e.metaKey || e.altKey) return;
-    if (e.target.matches?.('input, select, textarea')) return;
+    if (isTyping(e)) return;
     const k = e.key.toLowerCase();
     if (k === 'r') { e.preventDefault(); showRules(); return; }
     if (k === 'j') { e.preventDefault(); showJournal(state.journal); return; }

@@ -10,6 +10,10 @@ import { fileURLToPath } from 'node:url';
 const root = new URL('..', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
 
+// The MIT licenses of the bundled libraries (the Supabase realtime client used
+// for multi-device play) travel with the code, at the top of the script.
+const notices = ['MIT-supabase-realtime-js.txt', 'MIT-supabase-phoenix.txt']
+  .map((f) => read(`assets/licenses/${f}`).trim()).join('\n\n---\n\n').replace(/\*\//g, '* /');
 const result = await build({
   entryPoints: [fileURLToPath(new URL('src/ui/main.js', root))],
   bundle: true,
@@ -19,6 +23,7 @@ const result = await build({
   // Old enough for iPhones and iPads on iOS 15 (the first Safari with <dialog>).
   target: ['es2020', 'safari15', 'chrome90', 'firefox98'],
   legalComments: 'none',
+  banner: { js: `/*! Ports of Plague includes these open-source libraries:\n\n${notices}\n*/` },
 });
 const js = result.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
 

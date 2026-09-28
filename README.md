@@ -28,7 +28,7 @@ Each player leads a merchant family in a real trading city. Ship goods along his
 2. Each player opens https://cksarge.github.io/Ports-of-Plague/ on their own phone, tablet or computer, chooses **Join a game**, types the code, and picks a house name and home city.
 3. When everyone is in, press **Roll for turn order** on the big screen.
 
-The big screen shows the map, the dice and every card, sized so nothing ever needs scrolling. On your turn your own device shows your house, the actions and your decision cards; on the story cards, **anyone** can press **Next**. Any time, each device can also open the **Rules**, the **Historian's Journal**, the **Chronicle** (recent events and the latest historical note), the **Map** (tap a city for its history) and **the card on the big screen** ("Read the card here"), so nobody has to walk up to the big screen. On a computer the keys are **R**, **J**, **C**, **M** and **Enter** for Next. A device that reloads or goes to sleep rejoins by itself. A player on a new device can take their place back by joining with the same code and typing their house name. **Save & menu** on the big screen keeps the room: **Continue saved game** reopens the same code.
+The big screen shows the map, the dice and every card, sized so nothing ever needs scrolling. On your turn your own device shows your house, the actions and your decision cards; on the story cards, **anyone** can press **Next**. Any time, each device can also open the **Rules**, the **Historian's Journal**, the **Chronicle** (recent events and the latest historical note), the **Map** (tap a city for its history) and **the card on the big screen** ("Read the card here"), so nobody has to walk up to the big screen. On a computer the keys are **R**, **J**, **C**, **M** and **Enter** for Next. A device that reloads or goes to sleep rejoins by itself. A player on a new device can take their place back by joining with the same code and typing their house name. If the big screen leaves (**Save & menu**, closing its tab, or losing its connection for a minute), every device shows a message and goes back to the menu. **Continue saved game** reopens the same code, and players join again with it to get their houses back.
 
 Multi-device play needs an internet connection (the finished file still works offline for one-device play). It uses Supabase to pass messages between the devices; see *Supabase setup* below.
 
@@ -101,6 +101,7 @@ research/notes.md      raw research notes with the quotations used to verify eac
 research/facts-review.md  easy-to-read list of all facts and sources
 docs/                  printable documents and reports
 assets/fonts/          fonts (SIL Open Font License) with their licenses
+assets/licenses/       MIT licenses of the Supabase realtime client used for multi-device play
 ```
 
 **Why the printed and in-game rules always match:** both are made by the same function (`src/render/rulebook.js`) from `data/rulebook.json`, and every number in the text is filled in from `data/config.json`. That is the same file the game engine uses. The audit also checks the numbers written directly into the rules and cards.
@@ -126,9 +127,10 @@ The site is served straight from the `main` branch (Settings → Pages → Deplo
 - **Map:** coastlines, rivers and lakes from [Natural Earth](https://www.naturalearthdata.com/) (public domain).
 - **Fonts:** EB Garamond, Cinzel and UnifrakturMaguntia, all under the SIL Open Font License (see `assets/fonts/`).
 - **Sound and music:** original, generated live in the browser with the Web Audio API (a lute-like melody in the medieval Dorian mode, drone and frame drum, plus sound effects); no recordings are used.
+- **Playing on several devices:** messages between devices go through [Supabase Realtime](https://supabase.com/), using the open-source libraries `@supabase/realtime-js` (© 2020 Supabase) and `@supabase/phoenix` (© 2014 Chris McCord), both under the MIT License (see `assets/licenses/`; the texts are also at the top of the game's script). Only house names, home cities and game moves are sent; nothing is stored and there are no accounts.
 
 *Content note:* the game deals with mass death and with the persecution of Jewish communities. It treats both seriously and without graphic detail, and it states plainly that the accusations against Jews were false and the violence unjust.
 
 ## License
 
-The game's code and content are released under the MIT License (see `LICENSE`). The bundled fonts keep their own SIL Open Font License (see `assets/fonts/`), and the Natural Earth map data is in the public domain.
+The game's code and content are released under the MIT License (see `LICENSE`). The bundled fonts keep their own SIL Open Font License (see `assets/fonts/`), the bundled Supabase realtime client libraries keep their own MIT License (see `assets/licenses/`), and the Natural Earth map data is in the public domain.
