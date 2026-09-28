@@ -1,6 +1,9 @@
-// Tiny static file server for development (no packages needed).
+// Tiny static file server for development.
 //   npm start  →  http://localhost:8347/dev.html (live source files)
+// npm packages (only the Supabase realtime client) are bundled on request
+// at /vendor/<name>.js; dev.html maps the package name there.
 import { createServer } from 'node:http';
+import { build } from 'esbuild';
 import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -12,9 +15,18 @@ const types = {
   '.json': 'application/json; charset=utf-8', '.woff2': 'font/woff2', '.svg': 'image/svg+xml', '.png': 'image/png', '.pdf': 'application/pdf', '.md': 'text/plain; charset=utf-8',
 };
 
+const VENDOR = { '/vendor/realtime.js': '@supabase/realtime-js' };
+const vendorCache = {};
+
 createServer(async (req, res) => {
   try {
     let path = decodeURIComponent(new URL(req.url, 'http://x').pathname);
+    if (VENDOR[path]) {
+      vendorCache[path] ??= (await build({ stdin: { contents: `export * from '${VENDOR[path]}';`, resolveDir: root }, bundle: true, format: 'esm', write: false })).outputFiles[0].text;
+      res.writeHead(200, { 'Content-Type': types['.js'], 'Cache-Control': 'no-store' });
+      res.end(vendorCache[path]);
+      return;
+    }
     if (path.endsWith('/')) path += 'index.html';
     const file = normalize(join(root, path));
     if (!file.startsWith(root)) throw new Error('outside root');

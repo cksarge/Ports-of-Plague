@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ports of Plague</title>
-  <meta name="description" content="Ports of Plague: an educational board game about trade and the Black Death, 1347–1353, for 2–6 players on one computer.">
+  <meta name="description" content="Ports of Plague: an educational board game about trade and the Black Death, 1347–1353, for 2–6 players on one device or each on their own.">
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%23f4e8c8'/%3E%3Cpath d='M12 40h40l-6 10H18z' fill='%231d4a86'/%3E%3Cpath d='M32 38V10l14 22z' fill='%23a82318'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="src/styles/game.css">
 </head>
@@ -13,6 +13,7 @@
   <main id="app"></main>
   <div id="announcer" class="sr-only" aria-live="assertive"></div>
   <noscript>Ports of Plague needs JavaScript turned on to play.</noscript>
+  <script type="importmap">{ "imports": { "@supabase/realtime-js": "./vendor/realtime.js" } }</script>
   <script type="module" src="src/ui/main.js"></script>
 </body>
 </html>

@@ -16,7 +16,8 @@ const result = await build({
   format: 'iife',
   minify: true,
   write: false,
-  target: ['es2022'],
+  // Old enough for iPhones and iPads on iOS 15 (the first Safari with <dialog>).
+  target: ['es2020', 'safari15', 'chrome90', 'firefox98'],
   legalComments: 'none',
 });
 const js = result.outputFiles[0].text.replace(/<\/script/gi, '<\\/script');
@@ -31,6 +32,7 @@ let css = read('src/styles/game.css').replace(/url\(['"]?\.\.\/\.\.\/assets\/fon
 // inside the minified code would be read as special patterns and break it.
 const html = read('dev.html')
   .replace(/<link rel="stylesheet"[^>]*>/, () => `<style>\n${css}\n</style>`)
+  .replace(/\s*<script type="importmap">.*<\/script>/, '')
   .replace(/<script type="module" src="[^"]*"><\/script>/, () => `<script>\n${js}\n</script>`);
 writeFileSync(new URL('Ports-of-Plague.html', root), html);
 writeFileSync(new URL('index.html', root), html);

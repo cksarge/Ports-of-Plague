@@ -5,8 +5,10 @@ import { esc, crestSvg, $ } from './dom.js';
 import { noteHtml } from './notes.js';
 import { showJournal } from './panels.js';
 import { sfx } from './sound.js';
+import { zoomToFit, pageFits } from './fit.js';
 
-export function renderEnd(app, state, { onAgain, onMenu }) {
+// fit: the big screen of a multi-device game, where the results must fit without scrolling.
+export function renderEnd(app, state, { onAgain, onMenu, fit = false }) {
   const rows = state.finalScores;
   const names = state.winner.map((id) => esc(state.players[id].name)).join(' and ');
   const early = state.log.filter((e) => e.type === 'arrival' && e.early);
@@ -45,4 +47,8 @@ export function renderEnd(app, state, { onAgain, onMenu }) {
   $('#menu', app).onclick = onMenu;
   $('#again', app).onclick = onAgain;
   $('#again', app).focus();
+  if (fit) {
+    $('.frame', app).classList.add('end-fit');
+    zoomToFit($('.frame', app), pageFits, 0.4, { widen: true });
+  }
 }

@@ -54,7 +54,8 @@
             "Choose {{players.min}}–{{players.max}} players. Each picks a house name and a different home city (Venice, Genoa, Florence, Marseille, Barcelona, London, Bruges or Lübeck). Colors and crests are assigned by seat.",
             "Each house starts with **{{start.florins}} florins**, **{{start.family}} family members** in the home city, **{{start.reputation}} reputation** and **one trading post** in the home city. To balance their routes and plague dates, home cities start with slightly different amounts of money, shown on the setup screen.",
             "Choose **Standard** or **Quick Play**, and a difficulty: **Apprentice** (gentler plague, hints all game), **Chronicler** (standard) or **Great Mortality** (severity rolls +1, contagion risk +1).",
-            "Caffa begins Stricken. Each house rolls a die: the highest goes first and tied houses roll again. **This turn order stays the same all game.**"
+            "Caffa begins Stricken. Each house rolls a die: the highest goes first and tied houses roll again. **This turn order stays the same all game.**",
+            "**Playing on several devices (optional):** choose *Everyone on their own device*. The big screen shows the map, the dice and every card, plus a room code. Each player joins on a phone, tablet or computer with *Join a game* and the code, and takes their turn there. On a card, anyone can press *Next*. Each device can also show the rules, the Journal, the map and the current card."
           ]
         }
       ]

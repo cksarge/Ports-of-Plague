@@ -6,6 +6,10 @@ import { showRules, showCredits } from './panels.js';
 import { loadGame } from './save.js';
 import { createMap, updateMap, startAmbient, redrawStains, animateStrike, POS } from './map.js';
 import { music } from './music.js';
+import { hostRoom } from '../net/host.js';
+import { netAvailable } from '../net/transport.js';
+import { JOIN_ADDRESS } from '../net/config.js';
+import { zoomToFit, pageFits } from './fit.js';
 import { isMuted, setMuted, isMusicOn, setMusicOn } from './sound.js';
 
 let stopTitle = null;
@@ -54,7 +58,7 @@ function titleBackdrop(el) {
   return () => { clearInterval(interval); timers.forEach(clearTimeout); stopAmbient(); };
 }
 
-export function renderMenu(app, { onNew, onContinue }) {
+export function renderMenu(app, { onNew, onContinue, onJoin }) {
   stopTitleAnimation();
   const saved = loadGame();
   app.innerHTML = `<section class="screen title-screen">
@@ -66,6 +70,7 @@ export function renderMenu(app, { onNew, onContinue }) {
       <div class="menu-buttons">
         ${saved ? `<button class="btn primary" id="continue">Continue saved game<br><small style="font-family:var(--serif);font-weight:400">${esc(DATA.timeline.rounds[Math.max(0, saved.state.round - 1)]?.label ?? 'Start')} · ${saved.state.players.map((p) => esc(p.name)).join(', ')}</small></button>` : ''}
         <button class="btn ${saved ? '' : 'primary'}" id="new">New game</button>
+        <button class="btn" id="join">Join a game <small style="font-family:var(--serif);font-weight:400">(room code)</small></button>
         <button class="btn" id="rules">Rules <span class="key">R</span></button>
         <button class="btn ghost" id="about">About &amp; credits</button>
         <div style="display:flex;gap:0.6rem;justify-content:center">
@@ -73,7 +78,7 @@ export function renderMenu(app, { onNew, onContinue }) {
           <button class="btn small" id="menu-music" aria-pressed="${isMusicOn()}">${isMusicOn() ? '🎵 Music on' : '🎵 Music off'}</button>
         </div>
       </div>
-      <p class="menu-foot">${C.players.min}–${C.players.max} players on one computer · about ${C.timeEstimates.quick['2']}–60 minutes · mouse or keyboard</p>
+      <p class="menu-foot">${C.players.min}–${C.players.max} players on one device or each on their own · about ${C.timeEstimates.quick['2']}–60 minutes · touch, mouse or keyboard</p>
     </div></section>`;
   stopTitle = titleBackdrop($('#title-map', app));
   music.setMood('menu');
@@ -81,6 +86,7 @@ export function renderMenu(app, { onNew, onContinue }) {
   sb.onclick = () => { setMuted(!isMuted()); sb.setAttribute('aria-pressed', !isMuted()); sb.textContent = isMuted() ? '🔇 Sound off' : '🔊 Sound on'; };
   mb.onclick = () => { setMusicOn(!isMusicOn()); mb.setAttribute('aria-pressed', isMusicOn()); mb.textContent = isMusicOn() ? '🎵 Music on' : '🎵 Music off'; };
   $('#new', app).onclick = () => { stopTitleAnimation(); onNew(); };
+  $('#join', app).onclick = () => { stopTitleAnimation(); onJoin(); };
   $('#rules', app).onclick = showRules;
   $('#about', app).onclick = showCredits;
   if (saved) $('#continue', app).onclick = () => { stopTitleAnimation(); onContinue(saved); };
@@ -94,12 +100,16 @@ const DEFAULT_HOMES = ['genoa', 'bruges', 'venice', 'london', 'florence', 'lubec
 export function renderSetup(app, { onStart, onBack }) {
   app.onkeydown = null;
   const setup = {
+    where: 'here', // 'here': one shared device · 'devices': each player on their own device
     count: 2,
     difficulty: 'chronicler',
     mode: 'standard',
     hints: true,
     players: PLAYER_STYLES.map((s, i) => ({ name: DEFAULT_NAMES[i], home: DEFAULT_HOMES[i], ...s })),
   };
+  let room = null;
+  let roomError = '';
+  let opening = false;
   const homeInfo = (id) => {
     const c = CITIES[id];
     const h = c.home;
@@ -111,10 +121,25 @@ export function renderSetup(app, { onStart, onBack }) {
     chronicler: 'Chronicler: the standard game.',
     mortality: 'Great Mortality: severity rolls are 1 higher and every shipment has +1 contagion risk. For experienced merchants.',
   };
+  const devices = () => setup.where === 'devices';
+  // With a room open, this screen is the big screen: the room code and every
+  // house must be visible without scrolling.
+  const fitLobby = () => { const f = $('.setup', app); if (f) zoomToFit(f, pageFits, 0.5, { widen: true }); };
+  const onResize = () => { if (devices()) fitLobby(); };
+  window.addEventListener('resize', onResize);
+  const leaveSetup = () => window.removeEventListener('resize', onResize);
+  const playerCount = () => (devices() ? Math.max(room?.seats.length ?? 0, C.players.min) : setup.count);
   const draw = () => {
-    const est = C.timeEstimates[setup.mode][String(setup.count)];
+    const est = C.timeEstimates[setup.mode][String(playerCount())];
     app.innerHTML = `<section class="screen"><div class="setup frame">
       <h1>New Game</h1>
+      <div class="field"><span class="label" id="where-label">Play on</span>
+        <div class="seg" role="group" aria-labelledby="where-label">
+          <button class="btn small" data-where="here" aria-pressed="${!devices()}">This device only</button>
+          <button class="btn small" data-where="devices" aria-pressed="${devices()}">Everyone on their own device</button>
+        </div>
+        <span class="home-info">${devices() ? 'This screen shows the map for everyone. Each player joins on a phone, tablet or computer with the room code and takes their turn there.' : 'Players take turns on this device and pass it on.'}</span></div>
+      ${devices() ? '<div id="lobby" class="lobby" aria-live="polite"></div>' : `
       <div class="field"><span class="label" id="count-label">Number of players</span>
         <div class="seg" role="group" aria-labelledby="count-label">${Array.from({ length: C.players.max - C.players.min + 1 }, (_, i) => i + C.players.min).map((n) => `<button class="btn small" data-count="${n}" aria-pressed="${setup.count === n}">${n} players</button>`).join('')}</div></div>
       <div class="setup-grid">${setup.players.slice(0, setup.count).map((p, i) => `
@@ -124,13 +149,13 @@ export function renderSetup(app, { onStart, onBack }) {
           <div class="field"><label for="home-${i}">Home city</label>
             <select id="home-${i}" data-home="${i}">${HOME_CITIES.map((h) => `<option value="${h}" ${p.home === h ? 'selected' : ''}>${esc(CITIES[h].name)}</option>`).join('')}</select></div>
           <div class="home-info" id="info-${i}">${homeInfo(p.home)}</div>
-        </div>`).join('')}</div>
+        </div>`).join('')}</div>`}
       <div class="option-grid">
         <div class="field"><span class="label" id="mode-label">Game length</span>
           <div class="seg" role="group" aria-labelledby="mode-label">
             ${Object.entries(C.modes).map(([k, m]) => `<button class="btn small" data-mode="${k}" aria-pressed="${setup.mode === k}">${esc(m.label)}</button>`).join('')}
           </div>
-          <span class="home-info">${esc(C.modes[setup.mode].description)} ${C.modes[setup.mode].actionPoints} action points per turn.<br><span class="time-est">About ${est} minutes for ${setup.count} players</span>${est > 60 && setup.mode === 'standard' ? ' · Quick Play is recommended for this many players.' : ''}</span>
+          <span class="home-info">${esc(C.modes[setup.mode].description)} ${C.modes[setup.mode].actionPoints} action points per turn.<br><span class="time-est">About ${est} minutes for ${playerCount()} players</span>${est > 60 && setup.mode === 'standard' ? ' · Quick Play is recommended for this many players.' : ''}</span>
         </div>
         <div class="field"><span class="label" id="diff-label">Difficulty</span>
           <div class="seg" role="group" aria-labelledby="diff-label">
@@ -146,6 +171,7 @@ export function renderSetup(app, { onStart, onBack }) {
         <button class="btn primary" id="start">Roll for turn order →</button>
       </div>
     </div></section>`;
+    $$('[data-where]', app).forEach((b) => (b.onclick = () => { setup.where = b.dataset.where; if (devices()) openRoom(); else closeRoom(); draw(); }));
     $$('[data-count]', app).forEach((b) => (b.onclick = () => { setup.count = Number(b.dataset.count); fixHomes(); draw(); }));
     $$('[data-diff]', app).forEach((b) => (b.onclick = () => { setup.difficulty = b.dataset.diff; draw(); }));
     $$('[data-mode]', app).forEach((b) => (b.onclick = () => { setup.mode = b.dataset.mode; draw(); }));
@@ -156,14 +182,85 @@ export function renderSetup(app, { onStart, onBack }) {
       $(`#info-${i}`, app).innerHTML = homeInfo(sel.value);
     }));
     $('#hints', app).onchange = (e) => { setup.hints = e.target.checked; };
-    $('#back', app).onclick = onBack;
-    $('#start', app).onclick = () => {
-      const players = setup.players.slice(0, setup.count).map((p) => ({ ...p, name: p.name.trim() }));
-      const problem = validateSetup({ players });
-      if (problem) { $('#setup-error', app).textContent = problem; return; }
-      onStart({ players, difficulty: setup.difficulty, mode: setup.mode, hints: setup.hints || setup.difficulty === 'apprentice' });
-    };
+    $('#back', app).onclick = () => { closeRoom(); leaveSetup(); onBack(); };
+    $('#start', app).onclick = start;
+    if (devices()) drawLobby();
+    if (room) { room.options = { mode: setup.mode, difficulty: setup.difficulty }; room.pushLobby(); }
   };
+
+  // ---------- Lobby (multi-device play) ----------
+  async function openRoom() {
+    if (room || opening) return;
+    if (!netAvailable()) { roomError = 'Multi-device play is not set up on this copy of the game yet (see “Supabase setup” in the README).'; return; }
+    opening = true;
+    roomError = '';
+    try {
+      room = await hostRoom({ joinRules: { max: C.players.max, homes: HOME_CITIES } });
+      if (!devices()) { closeRoom(); return; }
+      room.options = { mode: setup.mode, difficulty: setup.difficulty };
+      room.onChange = () => { if (devices()) { drawLobby(); updateEstimate(); } };
+      room.pushLobby();
+    } catch {
+      roomError = 'Could not open a room. Check the internet connection and try again.';
+    } finally {
+      opening = false;
+      if (devices()) draw();
+    }
+  }
+  function closeRoom() {
+    room?.close();
+    room = null;
+  }
+  function drawLobby() {
+    const el = $('#lobby', app);
+    if (!el) return;
+    if (roomError) {
+      el.innerHTML = `<p class="error">${esc(roomError)}</p>${netAvailable() ? '<button class="btn small" id="retry">Try again</button>' : ''}`;
+      $('#retry', el)?.addEventListener('click', () => { roomError = ''; openRoom(); drawLobby(); });
+      return;
+    }
+    if (!room) { el.innerHTML = '<p>Opening a room…</p>'; return; }
+    const seats = room.seats;
+    el.innerHTML = `<div class="room-code-box">
+        <div>Join at <strong>${esc(JOIN_ADDRESS)}</strong> → <em>Join a game</em></div>
+        <div class="room-code" aria-label="Room code ${[...room.code].join(' ')}">${esc(room.code)}</div>
+      </div>
+      <h3>Houses (${seats.length} of ${C.players.max})</h3>
+      ${seats.length ? `<div class="setup-grid">${seats.map((s, i) => {
+        const style = PLAYER_STYLES[i];
+        return `<div class="house-card" style="--house:${style.color}">
+          <h3>${crestSvg(style, 26)} ${esc(s.name)} <span class="link-dot ${s.online ? 'on' : ''}" title="${s.online ? 'Connected' : 'Not connected'}"></span></h3>
+          <div class="home-info">${esc(CITIES[s.home].name)} · ${esc(style.colorName)}</div>
+          <button class="btn small ghost" data-remove="${i}">Remove</button></div>`;
+      }).join('')}</div>` : `<p class="home-info">Waiting for players… Each player opens the game on their own device, chooses <em>Join a game</em> and types the code.</p>`}`;
+    $$('[data-remove]', el).forEach((b) => (b.onclick = () => room.removeSeat(Number(b.dataset.remove))));
+    fitLobby();
+  }
+  function updateEstimate() {
+    const est = C.timeEstimates[setup.mode][String(playerCount())];
+    const t = $('.time-est', app);
+    if (t) t.textContent = `About ${est} minutes for ${playerCount()} players`;
+  }
+
+  function start() {
+    if (devices()) {
+      if (!room) { $('#setup-error', app).textContent = 'The room is not open yet.'; return; }
+      const players = room.seats.map((s) => ({ name: s.name, home: s.home }));
+      const problem = players.length < C.players.min ? `At least ${C.players.min} players must join first.` : validateSetup({ players });
+      if (problem) { $('#setup-error', app).textContent = problem; return; }
+      room.started = true;
+      const started = room;
+      room = null;
+      leaveSetup();
+      onStart({ players, difficulty: setup.difficulty, mode: setup.mode, hints: setup.hints || setup.difficulty === 'apprentice', room: started });
+      return;
+    }
+    const players = setup.players.slice(0, setup.count).map((p) => ({ ...p, name: p.name.trim() }));
+    const problem = validateSetup({ players });
+    if (problem) { $('#setup-error', app).textContent = problem; return; }
+    leaveSetup();
+    onStart({ players, difficulty: setup.difficulty, mode: setup.mode, hints: setup.hints || setup.difficulty === 'apprentice' });
+  }
   const fixHomes = () => {
     const used = new Set();
     for (const p of setup.players.slice(0, setup.count)) {
