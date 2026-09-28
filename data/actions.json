@@ -1,12 +1,17 @@
 {
-  "note": "The six actions. factIds are the history shown in the Historical Note when the action is used. Remedies are drawn by Consult Physician.",
+  "note": "The actions. Actions with group \"ledger\" appear under Merchant's Ledger in the sidebar. factIds are the history shown in the Historical Note when the action is used. Remedies are drawn by Consult Physician.",
   "actions": [
     { "id": "ship", "key": "1", "name": "Ship Goods", "short": "Send cargo along a route for profit", "factIds": ["TR-04", "TR-05"] },
     { "id": "post", "key": "2", "name": "Open Trading Post", "short": "Expand your network to a connected city", "factIds": ["TR-04"] },
     { "id": "move", "key": "3", "name": "Move Family", "short": "Move family between cities, or flee to your estate", "factIds": ["SO-04"] },
     { "id": "prepare", "key": "4", "name": "Prepare Household", "short": "Isolate and stockpile: better survival odds", "factIds": ["SO-05", "ME-12"] },
     { "id": "physician", "key": "5", "name": "Consult Physician", "short": "Medieval medicine: a slim chance, no cure", "factIds": ["ME-08", "ME-01"] },
-    { "id": "charity", "key": "6", "name": "Charity & Piety", "short": "Support hospital or church for reputation", "factIds": ["CH-03", "CH-07"] }
+    { "id": "charity", "key": "6", "name": "Charity & Piety", "short": "Support hospital or church for reputation", "factIds": ["CH-03", "CH-07"] },
+    { "id": "marry", "key": "7", "name": "Arrange a Marriage", "short": "After the plague passes, grow your family again", "group": "ledger", "factIds": ["SO-12"] },
+    { "id": "land", "key": "8", "name": "Buy Abandoned Land", "short": "Empty fields are cheap after the plague, but wages are high", "group": "ledger", "factIds": ["EC-02", "EC-10", "EC-03"] },
+    { "id": "loan", "key": "9", "name": "Take a Loan", "short": "Borrow now, repay more next round (no action point)", "group": "ledger", "factIds": ["EC-01", "EC-11"] },
+    { "id": "deal", "key": "0", "name": "Propose a Partnership", "short": "Share profits with another house (no action point)", "group": "ledger", "factIds": ["TR-04"] },
+    { "id": "gates", "key": "g", "name": "Close Your Gates", "short": "Turn rival merchants away from one of your cities", "group": "ledger", "factIds": ["SO-11"] }
   ],
   "remedies": [
     { "id": "bloodletting", "name": "Bloodletting", "text": "The physician opens a vein to 'reduce the blood' and rebalance the humors.", "factIds": ["ME-06", "ME-05"] },

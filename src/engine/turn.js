@@ -4,7 +4,8 @@
 // half-years at once). The interface calls advance() after showing each
 // phase; players act with performAction(), decide(), and endTurn().
 import { DATA } from '../data.js';
-import { C, addLog, emptyEffects, currentPlayer, roundInfo, modeOf, difficultyOf } from './state.js';
+import { C, addLog, emptyEffects, currentPlayer, roundInfo, modeOf, difficultyOf, clampReputation } from './state.js';
+import { CITIES } from '../data.js';
 import { applyCard, resolveDecision } from './events.js';
 import { historicalArrivals, mortalityPhase, advanceCities } from './plague.js';
 import { scorePlayer, rankPlayers, lastPlaceId } from './scoring.js';
@@ -58,7 +59,8 @@ function startRound(state) {
   state.currentEvent = null;
   state.persecution = null;
   for (const p of state.players) {
-    Object.assign(p, { shipped: [], prepared: [], physician: [], free: {}, englishBlocked: false, pending: [], ap: 0, nextShip: null, personalCosts: {} });
+    // Partnership offers wait for their answer across rounds; everything else is per round.
+    Object.assign(p, { shipped: [], prepared: [], physician: [], free: {}, englishBlocked: false, pending: p.pending.filter((d) => d.kind === 'deal'), ap: 0, nextShip: null, personalCosts: {} });
   }
   state.guildFavor = guildFavorFor(state);
   // Remember who was last at the halfway point (used to measure comebacks).
@@ -99,6 +101,8 @@ function beginTurn(state) {
   const p = currentPlayer(state);
   p.ap = actionPointsFor(state, p);
   p.charityThisTurn = 0;
+  p.marriedThisTurn = 0;
+  p.proposedThisTurn = false;
   addLog(state, { type: 'turn', player: p.id, text: `${p.name}'s turn (${p.ap} action points${state.guildFavor === p.id ? ', including Guild’s Favor' : ''}).` });
 }
 
@@ -131,12 +135,66 @@ function plaguePhase(state) {
     const label = DATA.timeline.rounds[h - 1].label;
     addLog(state, { type: 'plague', half: h, text: `Plague phase (${label}): family members in Stricken cities roll for survival.` });
     mortalityPhase(state);
+    payLandWages(state);
     advanceCities(state);
+  }
+  settleLoans(state);
+  expireAgreements(state);
+}
+
+// Land holdings need hired workers every half-year; wages were high.
+function payLandWages(state) {
+  for (const p of state.players) {
+    if (!p.land.length) continue;
+    const wage = p.land.length * C.costs.landWage;
+    if (p.florins >= wage) {
+      p.florins -= wage;
+      addLog(state, { type: 'upkeep', player: p.id, text: `${p.name} pays ${wage}ƒ in wages for its land.`, factIds: ['EC-03'] });
+    } else {
+      p.reputation -= 1;
+      clampReputation(p);
+      addLog(state, { type: 'upkeep', player: p.id, text: `${p.name} cannot pay its farm workers. The fields go untended: −1 reputation.`, factIds: ['EC-03'] });
+    }
+  }
+}
+
+// Loans fall due in the plague phase of the round after they were taken.
+function settleLoans(state, { final = false } = {}) {
+  for (const p of state.players) {
+    if (!p.loan || (!final && state.roundEnd < p.loan.due)) continue;
+    const { owed } = p.loan;
+    p.loan = null;
+    if (p.florins >= owed) {
+      p.florins -= owed;
+      addLog(state, { type: 'loanRepaid', player: p.id, text: `${p.name} repays its loan: ${owed}ƒ.`, factIds: [] });
+    } else {
+      const paid = p.florins;
+      p.florins = 0;
+      p.reputation -= C.penalties.loanDefaultReputation;
+      clampReputation(p);
+      p.stats.defaults++;
+      addLog(state, { type: 'loanDefault', player: p.id, text: `${p.name} can pay only ${paid}ƒ of the ${owed}ƒ it owes. The banker spreads the news: −${C.penalties.loanDefaultReputation} reputation.`, factIds: ['EC-01'] });
+    }
+  }
+}
+
+// Partnerships and closed gates last until the end of the next round.
+function expireAgreements(state) {
+  for (const p of state.players) {
+    if (p.deal && state.roundEnd >= p.deal.until) {
+      if (p.id < p.deal.partner) addLog(state, { type: 'dealEnd', player: p.id, text: `The partnership between ${p.name} and ${state.players[p.deal.partner].name} ends.` });
+      p.deal = null;
+    }
+    if (p.gates && state.roundEnd >= p.gates.until) {
+      addLog(state, { type: 'gatesOpen', player: p.id, text: `${p.name} opens the gates of ${CITIES[p.gates.city].name} again.` });
+      p.gates = null;
+    }
   }
 }
 
 function endGame(state) {
   state.phase = 'ended';
+  settleLoans(state, { final: true });
   state.finalScores = rankPlayers(state);
   state.winner = state.finalScores.filter((r) => r.place === 1).map((r) => r.id);
   const names = state.winner.map((id) => state.players[id].name).join(' and ');

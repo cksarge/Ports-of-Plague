@@ -1,9 +1,9 @@
-// Legacy score = Wealth + Family + Reputation + Balance bonus (lowest of the three).
+// Legacy score = Wealth (florins, posts, land) + Family + Reputation + Balance bonus (lowest of the three).
 import { C, familyTotal } from './state.js';
 
 export function scorePlayer(p) {
   const s = C.scoring;
-  const wealth = Math.floor(p.florins / s.florinsPerPoint) + p.posts.length * s.pointsPerPost;
+  const wealth = Math.floor(p.florins / s.florinsPerPoint) + p.posts.length * s.pointsPerPost + (p.land?.length ?? 0) * s.pointsPerLand;
   const family = familyTotal(p) * s.pointsPerFamily;
   // Reputation: full points up to the soft cap, then 1 point per `reputationHighRate` above it.
   const soft = s.reputationSoftCap ?? Infinity;

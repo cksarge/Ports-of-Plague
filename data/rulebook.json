@@ -74,7 +74,7 @@
             "**Chronicle.** The date advances. The plague reaches every city whose real arrival date falls in this round; each becomes Stricken and rolls severity. Then the round's dated Chronicle cards are read.",
             "**Event.** One Event card is drawn. If it offers a choice, each player decides at the start of their own turn.",
             "**Actions.** Players take turns in the fixed order, each with **{{modes.standard.actionPoints}} action points (AP)** ({{modes.quick.actionPoints}} in Quick Play). A pass-the-device screen appears between turns.",
-            "**Plague & upkeep.** Family members in Stricken cities roll for survival. Cities Stricken for {{plague.strickenRounds}} half-years move to Aftermath."
+            "**Plague & upkeep.** Family members in Stricken cities roll for survival. Cities Stricken for {{plague.strickenRounds}} half-years move to Aftermath. Land wages are paid, loans that are due are repaid, and partnerships and closed gates that have run their course end."
           ]
         },
         {
@@ -98,7 +98,7 @@
             [
               "**Ship Goods** (1)",
               "1 AP",
-              "Choose one of your trading posts that has not shipped this round and a route leaving it. Earn the route value + the profit die (1–{{shipping.profitDie}}) + {{gains.familyAtPostBonus}} if a family member lives at that post + {{gains.aftermathPriceBonus}} if the destination is in Aftermath, minus {{costs.wageAftermath}} wage if the origin is in Aftermath. If the origin is Stricken, the contagion die is rolled too (see *Plague*)."
+              "Choose one of your trading posts that has not shipped this round and a route leaving it. Earn the route value + the profit die (1–{{shipping.profitDie}}) + {{gains.familyAtPostBonus}} if a family member lives at that post + {{gains.aftermathPriceBonus}} if the destination is in Aftermath, minus {{costs.wageAftermath}} wage if the origin is in Aftermath. If the origin is Stricken, the contagion die is rolled too (see *Plague*). You may pay {{costs.holdOffshore}}ƒ more to **hold the ship offshore** (see *Plague*)."
             ],
             [
               "**Open Trading Post** (2)",
@@ -126,6 +126,31 @@
               "Fund a hospital, a confraternity or your parish church: +{{gains.charityReputation}} reputation. Once per turn. The house in last place pays {{costs.charityDiscountLastPlace}}ƒ less."
             ],
             [
+              "**Arrange a Marriage** (7)",
+              "1 AP + {{costs.marriage}}ƒ",
+              "Only in a city in **Aftermath** where you have a post and family: +{{gains.marriageFamily}} family member there. After the epidemic, survivors married and many children were born {{fact:SO-12}}. Your family cannot grow beyond {{start.family}}. Once per turn."
+            ],
+            [
+              "**Buy Abandoned Land** (8)",
+              "1 AP + {{costs.buyLand}}ƒ",
+              "Only near a city in **Aftermath** where you have a post, one holding per city. So many farmers died that fields lay empty {{fact:EC-02}}. Each holding is worth {{scoring.pointsPerLand}} Wealth points at the end, but workers were scarce {{fact:EC-03}}: pay {{costs.landWage}}ƒ per holding in every plague phase, or lose 1 reputation if you cannot."
+            ],
+            [
+              "**Take a Loan** (9)",
+              "no AP",
+              "Borrow {{gains.loan}}ƒ now and repay {{costs.loanRepay}}ƒ in the plague phase of the next round. Florence's great banks had failed just before the plague {{fact:EC-01}}. If you cannot pay in full, you pay what you have and lose {{penalties.loanDefaultReputation}} reputation. One loan at a time; not in the final round."
+            ],
+            [
+              "**Propose a Partnership** (0)",
+              "no AP",
+              "Offer another house a partnership (once per turn). They accept or decline at the start of their next turn. Until the end of the next round, when either partner ships to a city where the other has a post, the shipper earns {{gains.dealShipperBonus}}ƒ more and the partner {{gains.dealBonus}}ƒ, like the linked trade networks of Italy and the Hanseatic League {{fact:TR-04}}. One partner at a time."
+            ],
+            [
+              "**Close Your Gates** (G)",
+              "1 AP, −{{penalties.gatesReputation}} reputation",
+              "Pick a city that is not Stricken where you have a post and family. Until the end of the next round, rival houses cannot open a post there and earn {{penalties.gatesProfit}}ƒ less shipping to it. Frightened towns really did turn strangers away {{fact:SO-11}}. One city at a time."
+            ],
+            [
               "**End Turn** (E)",
               "–",
               "Unused action points are lost."
@@ -147,7 +172,7 @@
           "items": [
             "**Historical spread.** At the start of each round, the plague reaches the cities it really reached in that half-year. The date and its source are shown in a Historical Note.",
             "**Severity.** Each newly Stricken city rolls the severity die: 1–2 **Light** (1 pip), 3–4 **Heavy** (2), 5–6 **Devastating** (3). Hard-hit Tuscany and Catalonia (Florence, Pisa, Barcelona) add 1; Flanders (Bruges) subtracts 1 {{fact:CI-06}}. On Apprentice difficulty, every roll is 1 lower (never below Light).",
-            "**Contagion.** When you ship from a Stricken city, the contagion die is rolled. If it is equal to or lower than that city's severity, the cargo is **infected**: you earn only half the profit (rounded down) and lose {{penalties.infectedCargoReputation}} reputation, as ports blamed plague ships {{fact:CI-11}}. If the destination is Safe and the plague really reached it in the *next* round, it becomes Stricken now, {{plague.earlyArrivalWindow}} round early. If the destination is already Stricken, its severity rises by 1 (maximum 3). Otherwise the infection dies out.",
+            "**Contagion.** When you ship from a Stricken city, the contagion die is rolled. If it is equal to or lower than that city's severity, the cargo is **infected**: you earn only half the profit (rounded down) and lose {{penalties.infectedCargoReputation}} reputation, as ports blamed plague ships {{fact:CI-11}}. If the destination is Safe and the plague really reached it in the *next* round, it becomes Stricken now, {{plague.earlyArrivalWindow}} round early. If the destination is already Stricken, its severity rises by 1 (maximum 3). Otherwise the infection dies out. **Holding a ship offshore** (+{{costs.holdOffshore}}ƒ) means an infected cargo still earns half, but you lose no reputation and it cannot spread. By 1348 Venice made arriving ships wait before sailors could land {{fact:ME-12}}; formal quarantine only came in 1377 {{fact:ME-14}}.",
             "**Survival.** In the Plague phase, each family member in a Stricken city rolls the mortality die, adding +{{plague.prepareBonus}} if the household was prepared. If the result is equal to or lower than the severity, that family member dies.",
             "**The last heir.** A house's last family member never dies; a distant cousin inherits. No one is eliminated.",
             "**Inheritance.** For each family member lost, the house inherits {{gains.inheritance}}ƒ. Survivors really did inherit the property of the dead {{fact:EC-10}}.",
@@ -186,7 +211,7 @@
           "rows": [
             [
               "**Wealth**",
-              "1 per {{scoring.florinsPerPoint}}ƒ (rounded down), plus {{scoring.pointsPerPost}} per trading post"
+              "1 per {{scoring.florinsPerPoint}}ƒ (rounded down), plus {{scoring.pointsPerPost}} per trading post, plus {{scoring.pointsPerLand}} per land holding"
             ],
             [
               "**Family**",
@@ -208,7 +233,7 @@
         },
         {
           "type": "p",
-          "text": "**Comebacks.** From round {{comeback.guildFavorFromRound}} on (counted in half-years), a house in last place that trails the leader by {{comeback.guildFavorMinGap}} or more Legacy points receives **Guild's Favor**: +{{comeback.guildFavorAP}} AP. Inheritance, the Survivors Marry chronicle and cheaper charity also help houses that fall behind."
+          "text": "**Comebacks.** From round {{comeback.guildFavorFromRound}} on (counted in half-years), a house in last place that trails the leader by {{comeback.guildFavorMinGap}} or more Legacy points receives **Guild's Favor**: +{{comeback.guildFavorAP}} AP. Inheritance, the Survivors Marry chronicle, weddings, loans and cheaper charity also help houses that fall behind."
         }
       ]
     },
@@ -222,8 +247,8 @@
             "**Round:** Chronicle → Event → Actions ({{modes.standard.actionPoints}} AP each; {{modes.quick.actionPoints}} in Quick Play) → Plague & upkeep. Turn order never changes.",
             "**Ship:** route value + profit die + family {{gains.familyAtPostBonus}} + Aftermath destination {{gains.aftermathPriceBonus}} − Aftermath wage {{costs.wageAftermath}}. From a Stricken city: contagion die ≤ severity means infected (half profit, −{{penalties.infectedCargoReputation}} reputation, may spread). Profit die {{fortune.drawOnProfitDie}}: draw a Fortune card.",
             "**Survival:** mortality die (+{{plague.prepareBonus}} if prepared) ≤ severity means the family member dies. The last heir always survives. Each loss inherits {{gains.inheritance}}ƒ.",
-            "**Costs:** Post {{costs.openPost}}ƒ · Prepare {{costs.prepareHousehold}}ƒ · Physician {{costs.physician}}ƒ · Charity {{costs.charity}}ƒ · Protect {{costs.protectCommunity}}ƒ + 1 AP.",
-            "**Keys:** 1–6 actions · E end turn · R rules · J journal · M sound · N music · Enter confirm · Esc cancel."
+            "**Costs:** Post {{costs.openPost}}ƒ · Prepare {{costs.prepareHousehold}}ƒ · Physician {{costs.physician}}ƒ · Charity {{costs.charity}}ƒ · Protect {{costs.protectCommunity}}ƒ + 1 AP · Offshore +{{costs.holdOffshore}}ƒ · Marriage {{costs.marriage}}ƒ · Land {{costs.buyLand}}ƒ (+{{costs.landWage}}ƒ per half-year) · Loan +{{gains.loan}}ƒ now, {{costs.loanRepay}}ƒ next round · Gates −{{penalties.gatesReputation}} reputation.",
+            "**Keys:** 1–6 actions · 7 marriage · 8 land · 9 loan · 0 partnership · G gates · E end turn · R rules · J journal · M sound · N music · Enter confirm · Esc cancel."
           ]
         }
       ]

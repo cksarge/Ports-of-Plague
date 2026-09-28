@@ -4,7 +4,7 @@ import { DATA, CITIES, HOME_CITIES } from '../src/data.js';
 import {
   C, ESTATE, createGame, advance, endTurn, decide, currentPlayer, performAction, checkAction,
   scorePlayer, rankPlayers, mortalityPhase, advanceCities, familyTotal, shipQuote, legalShipments,
-  applyCard, cardById, strikeCity, legalPosts,
+  applyCard, cardById, strikeCity, legalPosts, routesFrom, otherEnd,
 } from '../src/engine/index.js';
 import { playBotGame } from '../src/engine/sim.js';
 import { fillTemplate } from '../src/render/template.js';
@@ -361,4 +361,154 @@ test('rules text: every placeholder resolves against config.json', () => {
   for (const sec of DATA.rulebook.sections) {
     for (const t of sectionTexts(sec)) assert.doesNotThrow(() => fillTemplate(t, C), `section ${sec.title}`);
   }
+});
+
+// ---------- Merchant's Ledger and Hold Offshore ----------
+
+// Ends every remaining turn this round (declining offers), which runs the plague phase.
+function finishRound(state) {
+  while (state.phase === 'actions') {
+    clearPending(state);
+    endTurn(state);
+  }
+}
+// Plays on until it is `p`'s turn in the next round.
+function nextTurnOf(state, p) {
+  finishRound(state);
+  toActions(state);
+  while (currentPlayer(state) !== p) { clearPending(state); endTurn(state); }
+  return clearPending(state);
+}
+
+test('hold offshore: infected cargo costs no reputation and does not spread', () => {
+  const s = toActions(createGame({ players: four(), seed: 21 }));
+  const p = clearPending(s);
+  p.posts.push('messina');
+  s.cities.messina.severity = 3;
+  s.effects.contagion.all = 6; // guarantee infection
+  p.florins = 20;
+  const rep = p.reputation;
+  const r = performAction(s, { type: 'ship', from: 'messina', route: 'messina-genoa', offshore: true });
+  assert.ok(r.ok && r.entry.infected);
+  assert.equal(s.cities.genoa.state, 'safe', 'the plague did not spread');
+  assert.equal(p.reputation, rep, 'no reputation lost');
+  assert.equal(p.florins, 20 - C.costs.holdOffshore + r.entry.profit);
+  assert.match(checkAction(s, { type: 'ship', from: p.home, route: routesFrom(p.home)[0].id, offshore: true }), /Stricken city/);
+});
+
+test('arrange a marriage: only in Aftermath, and never above the starting family', () => {
+  const s = toActions(createGame({ players: four(), seed: 4 }));
+  const p = clearPending(s);
+  p.florins = 20;
+  p.family[p.home] = 3;
+  assert.match(checkAction(s, { type: 'marry', city: p.home }), /not in Aftermath/);
+  s.cities[p.home].state = 'aftermath';
+  const ap = p.ap;
+  assert.ok(performAction(s, { type: 'marry', city: p.home }).ok);
+  assert.equal(p.family[p.home], 4);
+  assert.equal(p.florins, 20 - C.costs.marriage);
+  assert.equal(p.ap, ap - 1);
+  assert.match(checkAction(s, { type: 'marry', city: p.home }), /already arranged a marriage/);
+  p.family[p.home] = C.start.family;
+  p.marriedThisTurn = 0;
+  assert.match(checkAction(s, { type: 'marry', city: p.home }), /already has 5 family/);
+});
+
+test('abandoned land: adds Wealth points and charges wages each half-year', () => {
+  for (const broke of [false, true]) {
+    const s = toActions(createGame({ players: four(), seed: 6 }));
+    const p = clearPending(s);
+    s.cities[p.home].state = 'aftermath';
+    p.florins = 20;
+    assert.ok(performAction(s, { type: 'land', city: p.home }).ok);
+    assert.equal(scorePlayer(p).wealth, Math.floor(p.florins / C.scoring.florinsPerPoint) + p.posts.length + C.scoring.pointsPerLand);
+    assert.match(checkAction(s, { type: 'land', city: p.home }), /already own land/);
+    p.family = { [ESTATE]: familyTotal(p) }; // keep inheritance out of the sums
+    p.florins = broke ? 0 : 10;
+    const rep = p.reputation;
+    finishRound(s);
+    assert.equal(p.florins, broke ? 0 : 10 - C.costs.landWage);
+    assert.equal(p.reputation, broke ? rep - 1 : rep);
+  }
+});
+
+test('loan: no action point, repaid next round, default costs reputation, settled at the end', () => {
+  const s = toActions(createGame({ players: four(), seed: 9 }));
+  const p = clearPending(s);
+  const f = p.florins, ap = p.ap;
+  assert.ok(performAction(s, { type: 'loan' }).ok);
+  assert.equal(p.florins, f + C.gains.loan);
+  assert.equal(p.ap, ap);
+  assert.match(checkAction(s, { type: 'loan' }), /already owe/);
+  p.family = { [ESTATE]: familyTotal(p) };
+  finishRound(s);
+  assert.ok(p.loan, 'not due yet after the first round');
+  nextTurnOf(s, p);
+  p.family = { [ESTATE]: familyTotal(p) };
+  p.florins = 3;
+  p.reputation = 10;
+  finishRound(s);
+  assert.equal(p.loan, null);
+  assert.equal(p.florins, 0);
+  assert.equal(p.reputation, 10 - C.penalties.loanDefaultReputation);
+
+  s.round = s.roundEnd = C.rounds;
+  s.phase = 'actions';
+  s.turn = s.order.indexOf(p.id);
+  assert.match(checkAction(s, { type: 'loan' }), /final round/);
+  p.loan = { owed: C.costs.loanRepay, due: 99 };
+  p.florins = 20;
+  s.phase = 'plague';
+  advance(s);
+  assert.equal(s.phase, 'ended');
+  assert.equal(p.florins, 20 - C.costs.loanRepay, 'open debts are paid before final scoring');
+});
+
+test('partnership: the other house decides, both earn on shared cities, then it ends', () => {
+  const s = toActions(createGame({ players: four(), seed: 12 }));
+  const a = clearPending(s);
+  const b = s.players[s.order[1]];
+  assert.ok(performAction(s, { type: 'deal', partner: b.id }).ok);
+  assert.match(checkAction(s, { type: 'deal', partner: s.order[2] }), /already proposed/);
+  assert.ok(b.pending.some((d) => d.kind === 'deal'));
+  endTurn(s);
+  while (b.pending.length) decide(s, b.pending[0].kind === 'deal' ? true : b.pending[0].kind === 'wageLaw' ? 'pay' : false);
+  assert.equal(a.deal.partner, b.id);
+  assert.equal(b.deal.partner, a.id);
+  const route = routesFrom(b.home).find((r) => !s.cities[b.home].state.startsWith('strick'));
+  const dest = otherEnd(route, b.home);
+  a.posts.push(dest);
+  const q = shipQuote(s, b, route.id, b.home);
+  assert.ok(q.parts.some((x) => x.label.startsWith('Partner') && x.value === C.gains.dealShipperBonus));
+  const af = a.florins;
+  assert.ok(performAction(s, { type: 'ship', from: b.home, route: route.id }).ok);
+  assert.equal(a.florins, af + C.gains.dealBonus);
+  finishRound(s);
+  assert.ok(a.deal, 'still partners after the first round');
+  toActions(s);
+  finishRound(s);
+  assert.equal(a.deal, null);
+  assert.equal(b.deal, null);
+});
+
+test('close your gates: rivals cannot open a post there and earn less shipping in', () => {
+  const s = toActions(createGame({ players: four(), seed: 14 }));
+  const a = clearPending(s);
+  const rep = a.reputation;
+  assert.ok(performAction(s, { type: 'gates', city: a.home }).ok);
+  assert.equal(a.reputation, rep - C.penalties.gatesReputation);
+  endTurn(s);
+  const b = clearPending(s);
+  const route = routesFrom(a.home)[0];
+  const near = otherEnd(route, a.home);
+  if (!b.posts.includes(near)) b.posts.push(near);
+  b.florins = 30;
+  assert.match(checkAction(s, { type: 'post', city: a.home }), /closed the gates/);
+  const q = shipQuote(s, b, route.id, near);
+  assert.ok(q.parts.some((x) => x.label.startsWith('Gates closed') && x.value === -C.penalties.gatesProfit));
+  finishRound(s);
+  assert.ok(a.gates);
+  toActions(s);
+  finishRound(s);
+  assert.equal(a.gates, null, 'the gates open again after the next round');
 });

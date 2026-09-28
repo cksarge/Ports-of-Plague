@@ -1,6 +1,6 @@
 // Chronicle and Event card effects, and the player decisions they create.
 import { DATA, CITIES } from '../data.js';
-import { C, addLog, clampReputation, familyAt, familyTotal } from './state.js';
+import { C, addLog, clampReputation, familyAt, familyTotal, untilRound } from './state.js';
 import { lastPlaceId } from './scoring.js';
 import { roll, pick } from './rng.js';
 import { applyGain, fortuneById } from './fortune.js';
@@ -157,10 +157,15 @@ export function canAccept(state, p, d) {
     if (p.florins < C.costs.protectCommunity) return `Protecting the community costs ${C.costs.protectCommunity}ƒ.`;
     if (p.ap < 1) return 'Protecting the community takes 1 action point.';
   }
+  if (d.kind === 'deal') {
+    const from = state.players[d.from];
+    if (p.deal) return `You already have a partnership with ${state.players[p.deal.partner].name}.`;
+    if (from.deal) return `${from.name} has found another partner in the meantime.`;
+  }
   return null;
 }
 
-// Resolves one pending decision. choice: true/false for offers and protect,
+// Resolves one pending decision. choice: true/false for offers, protect and deals,
 // 'obey' or 'pay' for wage laws.
 export function resolveDecision(state, p, choice) {
   const d = p.pending[0];
@@ -203,6 +208,18 @@ export function resolveDecision(state, p, choice) {
     } else {
       text = `${p.name} does not intervene in ${city}.`;
     }
+  } else if (d.kind === 'deal') {
+    const from = state.players[d.from];
+    if (choice) {
+      const until = untilRound(state, C.limits.dealRounds);
+      p.deal = { partner: from.id, until };
+      from.deal = { partner: p.id, until };
+      p.stats.deals++;
+      from.stats.deals++;
+      text = `${p.name} and ${from.name} become partners until the end of next round. When either ships to a city where the other has a post, both earn ${C.gains.dealBonus}ƒ more.`;
+    } else {
+      text = `${p.name} declines ${from.name}'s partnership.`;
+    }
   } else if (d.kind === 'wageLaw') {
     if (choice === 'obey') {
       p.reputation += C.wageLaw.obeyReputation;
@@ -218,6 +235,7 @@ export function resolveDecision(state, p, choice) {
     }
   }
   const card = cardById(d.card);
-  const entry = addLog(state, { type: 'decision', player: p.id, kind: d.kind, choice, text, factIds: card?.factIds ?? [], ...result });
+  const factIds = d.kind === 'deal' ? ['TR-04'] : card?.factIds ?? [];
+  const entry = addLog(state, { type: 'decision', player: p.id, kind: d.kind, choice, text, factIds, ...result });
   return { ok: true, entry, decision: d };
 }

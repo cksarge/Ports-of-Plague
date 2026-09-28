@@ -9,15 +9,16 @@
 ## 2. What the game is (0:30–1:15)
 - *Ports of Plague* is a board game played on one computer by 2–6 players, taking turns (hot seat). It has a painted map board, ships and carts sailing the trade routes, dice, cards and house banners, all animated.
 - Each player is a merchant family based in a real trading city (Marseille, Genoa, Venice, Florence, Barcelona, London, Bruges, Lübeck). A dice roll at the start sets the turn order for the whole game.
-- 12 rounds of half a year each (Late 1347 to Early 1353), or 6 rounds of a whole year in **Quick Play**. Three difficulties, from Apprentice to Great Mortality. About 29–60 minutes.
+- 12 rounds of half a year each (Late 1347 to Early 1353), or 6 rounds of a whole year in **Quick Play**. Three difficulties, from Apprentice to Great Mortality. About 30–60 minutes.
 - **Goal:** the highest *Legacy* in 1353 = Wealth + Family + Reputation, plus your weakest category again. **Balance beats greed.**
 
 ## 3. How it plays: strategy and chance (1:15–2:15)
 - On your turn you spend 2 action points (3 in Quick Play): ship goods, open trading posts, move or protect your family, consult a physician, or give to charity.
+- **Merchant's Ledger:** once the plague has passed a city, you can arrange a marriage or buy abandoned land there. You can also take a loan, propose a partnership to another house, or close your city's gates to rivals. [SO-12, EC-02, EC-01, TR-04, SO-11]
 - **Fortune cards:** roll a 6 on the profit die or open a trading post and you draw a personal card (spice cargoes, extra actions, warnings of where the plague goes next, but also illness and nervous creditors), so no two players' games are the same.
 - **Chance:** a profit die, a contagion die (infected cargo), a severity die for each stricken city, and survival dice for family members.
-- **Strategy:** sea routes pay more, but cargo from a stricken city can carry the plague, even bringing it to the next city one round early. Fleeing keeps your family safe but costs reputation.
-- Comeback rules: inheritance, cheaper charity, and Guild's Favor (an extra action for a house far behind). No one is ever eliminated.
+- **Strategy:** sea routes pay more, but cargo from a stricken city can carry the plague, even bringing it to the next city one round early. Fleeing keeps your family safe but costs reputation. Paying to hold a ship offshore, as Venice made ships wait in 1348, stops infected cargo from spreading. [ME-12]
+- Comeback rules: inheritance, weddings, loans, cheaper charity, and Guild's Favor (an extra action for a house far behind). No one is ever eliminated.
 
 ## 4. The history inside the game (2:15–3:45)
 - **Real timeline and trade routes:** the plague reaches each of the 25 cities in the half-year it really did (Messina Oct 1347, Florence 1348, London Aug 1348, Bergen July 1349, Moscow 1353). [TR-06, TL-08, TR-09, TR-10]

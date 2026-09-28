@@ -4,8 +4,8 @@
 
 Each player leads a merchant family in a real trading city. Ship goods along historical trade routes for profit, but every ship can carry the plague. The plague reaches each of the 25 cities on the map in the half-year it really did. Protect your family, keep your good name, and face the choices people faced then. The highest **Legacy** (Wealth + Family + Reputation + your weakest one again) in 1353 wins.
 
-- **Standard** game: 12 rounds of half a year (about 39 / 51 / 63 minutes for 2 / 3 / 4 players).
-- **Quick Play**: 6 rounds of a whole year (about 29–63 minutes for 2–6 players; recommended for 5–6 players).
+- **Standard** game: 12 rounds of half a year (about 41 / 55 / 69 minutes for 2 / 3 / 4 players).
+- **Quick Play**: 6 rounds of a whole year (about 30–68 minutes for 2–6 players; recommended for 5–6 players).
 - Three difficulties: Apprentice, Chronicler and Great Mortality.
 - A dice roll at the start sets a turn order that stays the same all game. Personal **Fortune cards** (drawn on a profit roll of 6 or when opening a trading post) make every player's game different.
 
@@ -19,14 +19,14 @@ Each player leads a merchant family in a real trading city. Ship goods along his
 
 - Choose 2–6 players, house names, home cities, game length and difficulty, then press **Roll for turn order**.
 - Pass the computer to whoever the screen names. Everything else (dice, plague spread, scoring, rules) is handled by the game.
-- Keys: **1–6** actions · **E** end turn · **R** rules · **J** Historian's Journal · **M** sound effects on/off · **N** music on/off · **Enter** confirm · **Esc** cancel.
+- Keys: **1–6** actions · **7** marriage · **8** land · **9** loan · **0** partnership · **G** close gates · **E** end turn · **R** rules · **J** Historian's Journal · **M** sound effects on/off · **N** music on/off · **Enter** confirm · **Esc** cancel.
 - The game saves itself in the browser after every move. Use **Continue saved game** on the menu to pick up where you left off.
 
 ## Printable documents: folder `Printable Documents (PDF)/`
 
 | File | What it is |
 |---|---|
-| `Ports-of-Plague-Rule-Book.pdf` | 3-page Rule Book with historical background (same text as the in-game Rules screen) |
+| `Ports-of-Plague-Rule-Book.pdf` | 4-page Rule Book with historical background (same text as the in-game Rules screen) |
 | `Ports-of-Plague-Research-Sheet.pdf` | Historical Research Sheet: sources in MLA format, every fact with its source and where it appears in the game, and the historians' debates |
 | `Ports-of-Plague-Presentation-Outline.pdf` | Talking points for a 5-minute class presentation |
 
@@ -74,7 +74,7 @@ data/                  ← single source of truth for the game's content
   routes.json          40 sea and land routes
   events.json          24 dated Chronicle cards, 34 Event cards, 22 Fortune cards
   timeline.json        the 12 rounds (half-years), prologue and epilogue
-  actions.json         the 6 actions and the medieval remedies
+  actions.json         the 11 actions and the medieval remedies
   config.json          every rule number (costs, dice, scoring); used by the game AND the rule books
   rulebook.json        the rules text, used by BOTH the in-game Rules screen and the printed Rule Book
   map.json             the generated map
