@@ -44,8 +44,9 @@
 }
 
 * { box-sizing: border-box; }
-html, body { height: 100%; }
-html { background: var(--wood-1); }
+html { height: 100%; background: var(--wood-1); }
+/* min-height (not height) so the wood table grows with long, scrolling screens. */
+body { min-height: 100%; }
 body {
   margin: 0;
   font-family: var(--serif);
@@ -127,7 +128,8 @@ a { color: var(--lapis); }
 .menu-foot { margin-top: 1.4rem; font-size: 0.9rem; color: var(--ink-soft); }
 
 .setup { max-width: 1180px; width: 100%; }
-.setup-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin: 1rem 0; }
+/* At most 3 houses per row; fewer on narrow screens. */
+.setup-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(max(250px, calc((100% - 2rem) / 3)), 1fr)); gap: 1rem; margin: 1rem 0; }
 .house-card { border: 3px solid var(--house, #888); border-radius: var(--radius); padding: 0.8rem 0.9rem; background: #fffaf0; position: relative; overflow: hidden; }
 .house-card::before { content: ''; position: absolute; inset: 0 0 auto; height: 6px; background: var(--house, #888); }
 .house-card h3 { display: flex; align-items: center; gap: 0.5rem; }
