@@ -1,6 +1,6 @@
 # Ports of Plague
 
-*An educational board game about the Black Death, 1347–1353, played in a web browser by 2–6 players on one computer.*
+*An educational board game about the Black Death, 1347–1353, played in a web browser by 2–6 players, sharing one computer or each on their own phone, tablet or computer.*
 
 Each player leads a merchant family in a real trading city. Ship goods along historical trade routes for profit, but every ship can carry the plague. The plague reaches each of the 25 cities on the map in the half-year it really did. Protect your family, keep your good name, and face the choices people faced then. The highest **Legacy** (Wealth + Family + Reputation + your weakest one again) in 1353 wins.
 
@@ -21,6 +21,16 @@ Each player leads a merchant family in a real trading city. Ship goods along his
 - Pass the computer to whoever the screen names. Everything else (dice, plague spread, scoring, rules) is handled by the game.
 - Keys: **1–6** actions · **7** marriage · **8** land · **9** loan · **0** partnership · **G** close gates · **E** end turn · **R** rules · **J** Historian's Journal · **M** sound effects on/off · **N** music on/off · **Enter** confirm · **Esc** cancel.
 - The game saves itself in the browser after every move. Use **Continue saved game** on the menu to pick up where you left off.
+
+### Playing on several devices (Jackbox style)
+
+1. On the big screen (a laptop or a projector), choose **New game → Play on: Everyone on their own device**. A **room code** of 4 letters and numbers appears (like `B7KX`).
+2. Each player opens https://cksarge.github.io/Ports-of-Plague/ on their own phone, tablet or computer, chooses **Join a game**, types the code, and picks a house name and home city.
+3. When everyone is in, press **Roll for turn order** on the big screen.
+
+The big screen shows the map, the dice and every card, sized so nothing ever needs scrolling. On your turn your own device shows your house, the actions and your decision cards; on the story cards, **anyone** can press **Next**. Any time, each device can also open the **Rules**, the **Historian's Journal**, the **Chronicle** (recent events and the latest historical note), the **Map** (tap a city for its history) and **the card on the big screen** ("Read the card here"), so nobody has to walk up to the big screen. On a computer the keys are **R**, **J**, **C**, **M** and **Enter** for Next. A device that reloads or goes to sleep rejoins by itself. A player on a new device can take their place back by joining with the same code and typing their house name. **Save & menu** on the big screen keeps the room: **Continue saved game** reopens the same code.
+
+Multi-device play needs an internet connection (the finished file still works offline for one-device play). It uses Supabase to pass messages between the devices; see *Supabase setup* below.
 
 ## Printable documents: folder `Printable Documents (PDF)/`
 
@@ -43,7 +53,7 @@ To print an HTML version yourself, open it in a browser and use File → Print, 
 
 ## For rebuilding and checking (needs Node.js 20 or newer)
 
-Run once to install the single build tool (esbuild):
+Run once to install the build tool (esbuild) and the Supabase realtime client used for multi-device play:
 
 ```
 npm install
@@ -51,7 +61,7 @@ npm install
 
 | Command | What it does |
 |---|---|
-| `npm start` | Runs the game from the source files at http://localhost:8347/dev.html (for development) |
+| `npm start` | Runs the game from the source files at http://localhost:8347/dev.html (for development). Add `?net=local` to test multi-device play with several tabs of one browser, without internet or Supabase |
 | `npm run build` | Rebuilds the finished game: `Ports-of-Plague.html` and the identical `index.html` (the GitHub Pages front page) |
 | `npm run docs` | Regenerates the Rule Book, Research Sheet and presentation outline (HTML in `docs/`, PDFs in `Printable Documents (PDF)/`; PDFs need Google Chrome installed) |
 | `npm test` | Runs the automated tests of the game rules |
@@ -79,7 +89,10 @@ data/                  ← single source of truth for the game's content
   rulebook.json        the rules text, used by BOTH the in-game Rules screen and the printed Rule Book
   map.json             the generated map
 src/engine/            game rules (no display code), used by tests and the simulator too
-src/ui/                the interface: painted board and artwork (art.js), moving ships, dice, cards, dialogs, sound, saving
+src/ui/                the interface: painted board and artwork (art.js), moving ships, dice, cards, dialogs, sound, saving;
+                       prompts.js (action and decision choices) and stories.js (story cards), shared by the big screen and the players' devices;
+                       controller.js (a player's own device); fit.js (fits the big screen without scrolling)
+src/net/               multi-device play: room codes, messages and checks (protocol.js), big screen (host.js), player's device (client.js), Supabase connection (transport.js, config.js)
 src/render/            the shared Rule Book renderer and helpers
 src/styles/            screen and print styles
 tests/                 automated tests (node --test)
@@ -91,6 +104,17 @@ assets/fonts/          fonts (SIL Open Font License) with their licenses
 ```
 
 **Why the printed and in-game rules always match:** both are made by the same function (`src/render/rulebook.js`) from `data/rulebook.json`, and every number in the text is filled in from `data/config.json`. That is the same file the game engine uses. The audit also checks the numbers written directly into the rules and cards.
+
+## Supabase setup (once, for multi-device play)
+
+Supabase only relays messages between the devices in a room. It stores nothing, and there are no tables or logins.
+
+1. Create a free account at https://supabase.com and a new project (any name, the nearest region).
+2. Open **Project Settings → API** and copy the **Project URL** and the **publishable key** (called the "anon" key on older projects).
+3. Paste them into `src/net/config.js` (`SUPABASE_URL` and `SUPABASE_KEY`), then run `npm run build`, commit and push. The publishable key is meant to be public in web pages.
+4. **Free projects pause after about a week without use.** Before a presentation, open the Supabase dashboard and restore the project if it says *Paused*.
+
+Anyone who knows a room code can join that room, so codes are only for friendly games. The big screen checks every request: it only accepts moves from the device seated for the house whose turn it is, and checks each move against the rules. It is not built to stop a determined cheater with programming tools.
 
 ## Publishing on GitHub Pages
 

@@ -1,7 +1,7 @@
 {
   "name": "ports-of-plague",
   "version": "1.0.0",
-  "description": "Ports of Plague \u2014 an educational hot-seat board game about the Black Death, 1347\u20131353",
+  "description": "Ports of Plague — an educational hot-seat board game about the Black Death, 1347–1353",
   "type": "module",
   "private": true,
   "scripts": {
@@ -16,5 +16,8 @@
   },
   "devDependencies": {
     "esbuild": "^0.28.2"
+  },
+  "dependencies": {
+    "@supabase/realtime-js": "^2.117.2"
   }
 }
