@@ -16,7 +16,10 @@
     "maxReputation": 20,
     "minReputation": 0,
     "moveFamilyMax": 2,
-    "charityPerTurn": 1
+    "charityPerTurn": 1,
+    "dealRounds": 2,
+    "gatesRounds": 2,
+    "marriagePerTurn": 1
   },
   "costs": {
     "openPost": 8,
@@ -25,20 +28,32 @@
     "charity": 4,
     "charityDiscountLastPlace": 1,
     "protectCommunity": 3,
-    "wageAftermath": 1
+    "wageAftermath": 1,
+    "marriage": 6,
+    "buyLand": 6,
+    "landWage": 1,
+    "holdOffshore": 2,
+    "loanRepay": 8
   },
   "gains": {
     "charityReputation": 1,
     "protectReputation": 3,
     "inheritance": 3,
     "familyAtPostBonus": 1,
-    "aftermathPriceBonus": 2
+    "aftermathPriceBonus": 2,
+    "loan": 6,
+    "dealBonus": 1,
+    "dealShipperBonus": 1,
+    "marriageFamily": 1
   },
   "penalties": {
     "fleeReputation": 1,
     "infectedCargoReputation": 1,
     "unrestProfit": 1,
-    "unrestRounds": 2
+    "unrestRounds": 2,
+    "gatesReputation": 1,
+    "gatesProfit": 1,
+    "loanDefaultReputation": 2
   },
   "plague": {
     "strickenRounds": 2,
@@ -77,7 +92,8 @@
     "reputationPoints": 1,
     "reputationSoftCap": 10,
     "reputationHighRate": 3,
-    "balanceBonus": "lowest"
+    "balanceBonus": "lowest",
+    "pointsPerLand": 2
   },
   "difficulty": {
     "apprentice": {
@@ -118,6 +134,11 @@
     "prepare": "4",
     "physician": "5",
     "charity": "6",
+    "marry": "7",
+    "land": "8",
+    "loan": "9",
+    "deal": "0",
+    "gates": "G",
     "endTurn": "E",
     "rules": "R",
     "journal": "J",
@@ -149,18 +170,18 @@
   "turnOrderDie": 6,
   "timeEstimates": {
     "standard": {
-      "2": 39,
-      "3": 51,
-      "4": 63,
-      "5": 74,
-      "6": 86
+      "2": 41,
+      "3": 55,
+      "4": 69,
+      "5": 82,
+      "6": 95
     },
     "quick": {
-      "2": 29,
-      "3": 38,
-      "4": 46,
-      "5": 55,
-      "6": 63
+      "2": 30,
+      "3": 40,
+      "4": 49,
+      "5": 58,
+      "6": 68
     }
   }
 }

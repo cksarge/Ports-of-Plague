@@ -1,10 +1,10 @@
-// The six actions. Every action is checked by `check*` functions that
+// The actions. Every action is checked by `check*` functions that
 // return a plain-language reason when a move is illegal; `perform` only
 // runs after a successful check.
 import { DATA, CITIES } from '../data.js';
 import {
-  C, ESTATE, ROUTES, addLog, clampReputation, cost, currentPlayer, familyAt, isAftermath,
-  isStricken, neighbors, otherEnd, routesFrom, difficultyOf,
+  C, ESTATE, ROUTES, addLog, clampReputation, cost, currentPlayer, familyAt, familyTotal, isAftermath,
+  isStricken, neighbors, otherEnd, routesFrom, difficultyOf, gatesClosedBy, untilRound,
 } from './state.js';
 import { drawFortune } from './fortune.js';
 import { ENGLISH_CITIES } from './events.js';
@@ -23,7 +23,7 @@ function baseChecks(state, p, apNeeded = 1) {
 }
 
 // ---------- Ship Goods ----------
-export function shipQuote(state, p, routeId, from) {
+export function shipQuote(state, p, routeId, from, { offshore = false } = {}) {
   const r = ROUTES[routeId];
   const to = otherEnd(r, from);
   const fx = state.effects;
@@ -33,6 +33,10 @@ export function shipQuote(state, p, routeId, from) {
   if (isAftermath(state, to)) parts.push({ label: 'High prices at destination (Aftermath)', value: C.gains.aftermathPriceBonus + fx.marketBonus });
   if (isAftermath(state, from)) parts.push({ label: 'Wages at origin (Aftermath)', value: -cost(state, 'wageAftermath') });
   if (state.cities[from].unrest > 0 || state.cities[to].unrest > 0) parts.push({ label: 'Unrest', value: -C.penalties.unrestProfit });
+  const partner = dealPartner(state, p);
+  if (partner?.posts.includes(to) && C.gains.dealShipperBonus) parts.push({ label: `Partner's agent (${partner.name})`, value: C.gains.dealShipperBonus });
+  const gates = gatesClosedBy(state, to, p);
+  if (gates) parts.push({ label: `Gates closed by ${gates.name}`, value: -C.penalties.gatesProfit });
   for (const m of fx.cityProfit) {
     for (const c of [from, to]) {
       if (m.cities.includes(c) && (!m.onlyStricken || isStricken(state, c))) {
@@ -46,10 +50,16 @@ export function shipQuote(state, p, routeId, from) {
   const contagionRisk = isStricken(state, from) && !safe
     ? Math.max(0, Math.min(6, state.cities[from].severity + fx.contagion.all + fx.contagion[r.type] + (difficultyOf(state).contagionMod ?? 0)))
     : 0;
-  return { route: r, from, to, parts, fixed, min: Math.max(0, fixed + 1), max: Math.max(0, fixed + C.shipping.profitDie), contagionRisk, safe: safe && isStricken(state, from) };
+  const fee = offshore ? cost(state, 'holdOffshore') : 0;
+  return { route: r, from, to, parts, fixed, min: Math.max(0, fixed + 1), max: Math.max(0, fixed + C.shipping.profitDie), contagionRisk, safe: safe && isStricken(state, from), offshore, fee, partner: partner?.posts.includes(to) ? partner : null };
 }
 
-export function checkShip(state, p, { from, route }) {
+// The partner house of a live partnership, if any.
+export function dealPartner(state, p) {
+  return p.deal ? state.players[p.deal.partner] : null;
+}
+
+export function checkShip(state, p, { from, route, offshore = false }) {
   const why = baseChecks(state, p);
   if (why) return why;
   const r = ROUTES[route];
@@ -58,11 +68,17 @@ export function checkShip(state, p, { from, route }) {
   if (r.a !== from && r.b !== from) return `That route does not leave ${cityName(from)}.`;
   if (p.shipped.includes(from)) return `Your post in ${cityName(from)} has already shipped this round. Each post ships once per round.`;
   if (p.englishBlocked && ENGLISH_CITIES.includes(from)) return `You obeyed the wage law: workers in ${cityName(from)} refuse to work for the old wages this round.`;
+  if (offshore) {
+    if (!isStricken(state, from)) return `Holding a ship offshore only matters when it sails from a Stricken city.`;
+    if (p.florins < cost(state, 'holdOffshore')) return `Holding the ship offshore costs ${cost(state, 'holdOffshore')}ƒ; you have ${p.florins}ƒ.`;
+  }
   return null;
 }
 
-function doShip(state, p, { from, route }) {
-  const q = shipQuote(state, p, route, from);
+function doShip(state, p, { from, route, offshore = false }) {
+  const q = shipQuote(state, p, route, from, { offshore });
+  p.florins -= q.fee;
+  if (offshore) p.stats.offshore++;
   const profitDie = roll(state, C.shipping.profitDie);
   let contagionDie = null;
   let infected = false;
@@ -73,7 +89,12 @@ function doShip(state, p, { from, route }) {
   }
   let profit = Math.max(0, q.fixed + profitDie);
   let spread = null;
-  if (infected) {
+  if (infected && offshore) {
+    // The ship waits at anchor: the sickness shows before anyone lands.
+    profit = Math.floor(profit * C.shipping.infectedProfitFactor);
+    p.stats.infected++;
+    spread = { type: 'held' };
+  } else if (infected) {
     profit = Math.floor(profit * C.shipping.infectedProfitFactor);
     p.reputation -= C.penalties.infectedCargoReputation;
     clampReputation(p);
@@ -96,12 +117,16 @@ function doShip(state, p, { from, route }) {
   p.shipped.push(from);
   p.stats.shipments++;
   p.stats.earned += profit;
+  if (q.partner) q.partner.florins += C.gains.dealBonus;
   let text = `${p.name} ships from ${cityName(from)} to ${cityName(q.to)}: profit die ${profitDie}, earning ${profit}ƒ.`;
+  if (offshore) text += ` The ship waited offshore (${q.fee}ƒ).`;
   if (contagionDie !== null) text += ` Contagion die ${contagionDie} (infected on ${q.contagionRisk} or less): ${infected ? 'INFECTED cargo!' : 'clean cargo.'}`;
   if (spread?.type === 'worse') text += ` The plague in ${cityName(q.to)} grows worse (${severityName(spread.severity)}).`;
   if (spread?.type === 'none') text += ' The infection dies out.';
-  const factIds = infected ? ['TR-05', 'CI-11'] : [];
-  const entry = addLog(state, { type: 'ship', player: p.id, from, to: q.to, route, profitDie, contagionDie, contagionRisk: q.contagionRisk, infected, profit, spread: spread?.type ?? null, parts: q.parts, safe: q.safe, text, factIds });
+  if (spread?.type === 'held') text += ' The sickness shows while the ship waits at anchor: no one lands, no reputation is lost and the plague does not spread.';
+  if (q.partner) text += ` Partner ${q.partner.name} earns ${C.gains.dealBonus}ƒ.`;
+  const factIds = [...(infected && !offshore ? ['TR-05', 'CI-11'] : []), ...(offshore ? ['ME-12', 'ME-14'] : [])];
+  const entry = addLog(state, { type: 'ship', player: p.id, from, to: q.to, route, profitDie, contagionDie, contagionRisk: q.contagionRisk, infected, profit, spread: spread?.type ?? null, parts: q.parts, safe: q.safe, offshore, fee: q.fee, partner: q.partner?.id ?? null, text, factIds });
   if (profitDie === C.fortune.drawOnProfitDie) drawFortune(state, p, `rolled a ${profitDie} on the profit die`);
   return entry;
 }
@@ -116,6 +141,8 @@ export function checkPost(state, p, { city }) {
   if (p.posts.length >= C.limits.maxPosts) return `You already have the maximum of ${C.limits.maxPosts} trading posts.`;
   if (!p.posts.some((own) => neighbors(own).includes(city))) return `${cityName(city)} is not connected by a route to any of your posts.`;
   if (isStricken(state, city)) return `${cityName(city)} is Stricken: its gates are closed to new trading posts.`;
+  const gates = gatesClosedBy(state, city, p);
+  if (gates) return `${gates.name} has closed the gates of ${cityName(city)} to rival merchants.`;
   if (state.effects.noNewPostsNearPlague && neighbors(city).some((n) => isStricken(state, n))) {
     return `Guards at the gates: ${cityName(city)} is next to a Stricken city and turns strangers away this round.`;
   }
@@ -243,6 +270,103 @@ function doCharity(state, p, { kind }) {
   return addLog(state, { type: 'charity', player: p.id, kind, text: `${p.name}: ${k.label} (${price}ƒ). +${gain} reputation.`, factIds: k.factIds });
 }
 
+// ---------- Arrange a Marriage ----------
+export function checkMarry(state, p, { city }) {
+  const why = baseChecks(state, p);
+  if (why) return why;
+  if (!CITIES[city] || !p.posts.includes(city)) return 'Choose a city where you have a trading post.';
+  if (!isAftermath(state, city)) return `${cityName(city)} is not in Aftermath yet. Weddings wait until the plague has passed.`;
+  if (familyAt(p, city) < 1) return `Your family must live in ${cityName(city)} to arrange a marriage there.`;
+  if (familyTotal(p) >= C.start.family) return `Your house already has ${C.start.family} family members.`;
+  if (p.marriedThisTurn >= C.limits.marriagePerTurn) return 'You have already arranged a marriage this turn.';
+  if (p.florins < cost(state, 'marriage')) return `A wedding costs ${cost(state, 'marriage')}ƒ; you have ${p.florins}ƒ.`;
+  return null;
+}
+
+function doMarry(state, p, { city }) {
+  const price = cost(state, 'marriage');
+  p.florins -= price;
+  p.family[city] += C.gains.marriageFamily;
+  p.marriedThisTurn++;
+  p.stats.married++;
+  return addLog(state, { type: 'marry', player: p.id, city, text: `${p.name} celebrates a wedding in ${cityName(city)} (${price}ƒ). +${C.gains.marriageFamily} family member.`, factIds: ['SO-12'] });
+}
+
+// ---------- Buy Abandoned Land ----------
+export function checkLand(state, p, { city }) {
+  const why = baseChecks(state, p);
+  if (why) return why;
+  if (!CITIES[city] || !p.posts.includes(city)) return 'Choose a city where you have a trading post.';
+  if (!isAftermath(state, city)) return `${cityName(city)} is not in Aftermath yet. Its fields are still being worked.`;
+  if (p.land.includes(city)) return `You already own land near ${cityName(city)}.`;
+  if (p.florins < cost(state, 'buyLand')) return `The land costs ${cost(state, 'buyLand')}ƒ; you have ${p.florins}ƒ.`;
+  return null;
+}
+
+function doLand(state, p, { city }) {
+  const price = cost(state, 'buyLand');
+  p.florins -= price;
+  p.land.push(city);
+  p.stats.land++;
+  return addLog(state, { type: 'land', player: p.id, city, text: `${p.name} buys abandoned fields near ${cityName(city)} for ${price}ƒ. They are worth ${C.scoring.pointsPerLand} Wealth points at the end, but workers must be paid ${cost(state, 'landWage')}ƒ every half-year.`, factIds: ['EC-02', 'EC-10'] });
+}
+
+// ---------- Take a Loan (no action point) ----------
+export function checkLoan(state, p) {
+  const why = baseChecks(state, p, 0);
+  if (why) return why;
+  if (p.loan) return `You already owe ${p.loan.owed}ƒ. It must be repaid before you borrow again.`;
+  if (untilRound(state, 2) > C.rounds) return 'No banker will lend in the final round.';
+  return null;
+}
+
+function doLoan(state, p) {
+  p.florins += C.gains.loan;
+  p.loan = { owed: C.costs.loanRepay, due: untilRound(state, 2) };
+  p.stats.loans++;
+  return { entry: addLog(state, { type: 'loan', player: p.id, text: `${p.name} borrows ${C.gains.loan}ƒ. ${C.costs.loanRepay}ƒ is due in the plague phase of the next round.`, factIds: ['EC-01', 'EC-11'] }), free: true };
+}
+
+// ---------- Propose a Partnership (no action point) ----------
+export function checkDeal(state, p, { partner }) {
+  const why = baseChecks(state, p, 0);
+  if (why) return why;
+  const other = state.players[partner];
+  if (!other || other === p) return 'Choose another house.';
+  if (p.proposedThisTurn) return 'You have already proposed a partnership this turn.';
+  if (p.deal) return `You already have a partnership with ${state.players[p.deal.partner].name}.`;
+  if (other.deal) return `${other.name} already has a partner.`;
+  if (other.pending.some((d) => d.kind === 'deal')) return `${other.name} is already considering an offer.`;
+  return null;
+}
+
+function doDeal(state, p, { partner }) {
+  const other = state.players[partner];
+  p.proposedThisTurn = true;
+  other.pending.push({ kind: 'deal', from: p.id });
+  return { entry: addLog(state, { type: 'deal', player: p.id, partner, text: `${p.name} proposes a partnership to ${other.name}, who will answer at the start of their next turn.`, factIds: ['TR-04'] }), free: true };
+}
+
+// ---------- Close Your Gates ----------
+export function checkGates(state, p, { city }) {
+  const why = baseChecks(state, p);
+  if (why) return why;
+  if (!CITIES[city] || !p.posts.includes(city) || familyAt(p, city) < 1) return 'Choose a city where you have a trading post and family.';
+  if (isStricken(state, city)) return `${cityName(city)} is Stricken: it is too late to close the gates.`;
+  if (p.gates) return `Your gates in ${cityName(p.gates.city)} are already closed.`;
+  const other = gatesClosedBy(state, city, p);
+  if (other) return `${other.name} has already closed the gates of ${cityName(city)}.`;
+  return null;
+}
+
+function doGates(state, p, { city }) {
+  p.reputation -= C.penalties.gatesReputation;
+  clampReputation(p);
+  p.gates = { city, until: untilRound(state, C.limits.gatesRounds) };
+  p.stats.gates++;
+  return addLog(state, { type: 'gates', player: p.id, city, text: `${p.name} has guards posted at the gates of ${cityName(city)} (−${C.penalties.gatesReputation} reputation). Until the end of next round, rival houses cannot open a post there and earn ${C.penalties.gatesProfit}ƒ less shipping to it.`, factIds: ['SO-11'] });
+}
+
 // ---------- Dispatcher ----------
 const TABLE = {
   ship: [checkShip, doShip],
@@ -251,7 +375,14 @@ const TABLE = {
   prepare: [checkPrepare, doPrepare],
   physician: [checkPhysician, doPhysician],
   charity: [checkCharity, doCharity],
+  marry: [checkMarry, doMarry],
+  land: [checkLand, doLand],
+  loan: [checkLoan, doLoan],
+  deal: [checkDeal, doDeal],
+  gates: [checkGates, doGates],
 };
+
+export const ACTION_TYPES = Object.keys(TABLE);
 
 export function checkAction(state, action) {
   const p = currentPlayer(state);

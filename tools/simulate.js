@@ -8,10 +8,12 @@ import { DATA, CITIES, HOME_CITIES } from '../src/data.js';
 import { playBotGame } from '../src/engine/sim.js';
 import { STRATEGIES } from '../src/engine/bots.js';
 import { familyTotal } from '../src/engine/state.js';
+import { ACTION_TYPES as TYPES } from '../src/engine/actions.js';
 
 const GAMES = Number(process.argv[2] ?? 600);
 const T = DATA.config.timing;
-const ACTION_TYPES = new Set(['ship', 'post', 'move', 'prepare', 'physician', 'charity']);
+const ACTION_TYPES = new Set(TYPES);
+const LEDGER = ['married', 'land', 'loans', 'defaults', 'deals', 'gates', 'offshore'];
 
 // Small deterministic generator for choosing seats (separate from game dice).
 function lcg(seed) {
@@ -51,6 +53,7 @@ for (const mode of ['standard', 'quick']) for (const n of [2, 3, 4, 5, 6]) {
   const byStrat = Object.fromEntries(STRATEGIES.map((s) => [s, { games: 0, wins: 0, score: 0, wealth: 0, family: 0, rep: 0, lost: 0 }]));
   let totalSeconds = 0, totalTurns = 0, minMin = Infinity, maxMin = 0, totalActions = 0;
   let margin = 0, comebacks = 0, comebackGames = 0, early = 0, infected = 0, protectors = 0;
+  const ledger = Object.fromEntries(LEDGER.map((k) => [k, 0]));
   for (let g = 0; g < GAMES; g++) {
     const homes = sample(rand, HOME_CITIES, n);
     const strats = homes.map(() => STRATEGIES[Math.floor(rand() * STRATEGIES.length)]);
@@ -67,6 +70,7 @@ for (const mode of ['standard', 'quick']) for (const n of [2, 3, 4, 5, 6]) {
       const st = byStrat[p.strategy];
       st.games++; st.wins += won; st.score += row.total; st.wealth += row.wealth; st.family += row.family; st.rep += row.reputation;
       st.lost += p.lostFamily;
+      for (const k of LEDGER) ledger[k] += p.stats[k];
     }
     const sorted = [...state.finalScores];
     margin += sorted[0].total - sorted[1].total;
@@ -84,7 +88,7 @@ for (const mode of ['standard', 'quick']) for (const n of [2, 3, 4, 5, 6]) {
   const stratRows = STRATEGIES.map((s) => ({ s, ...byStrat[s], rate: byStrat[s].wins / Math.max(1, byStrat[s].games) }));
   const worstCity = cityRows.reduce((a, b) => (Math.abs(b.rate - fair) > Math.abs(a.rate - fair) ? b : a));
   const topStrat = stratRows.filter((r) => r.s !== 'random').reduce((a, b) => (b.rate > a.rate ? b : a));
-  summary[key] = { mode, n, comeback: comebacks / Math.max(1, comebackGames), avgMin, minMin, maxMin, cityRows, stratRows, fair, worstCity, topStrat };
+  summary[key] = { ledger, mode, n, comeback: comebacks / Math.max(1, comebackGames), avgMin, minMin, maxMin, cityRows, stratRows, fair, worstCity, topStrat };
 
   report.push(`## ${DATA.config.modes[mode].label}: ${n} players (${GAMES} games)`, '');
   report.push(`- Turns per game: **${totalTurns / GAMES}** (${DATA.config.rounds / DATA.config.modes[mode].span} rounds × ${n} players)`);
@@ -93,6 +97,7 @@ for (const mode of ['standard', 'quick']) for (const n of [2, 3, 4, 5, 6]) {
   report.push(`- Average winning margin: ${(margin / GAMES).toFixed(1)} Legacy points`);
   report.push(`- Infected shipments per game: ${(infected / GAMES).toFixed(1)}; cities struck early by trade: ${(early / GAMES).toFixed(1)}`);
   report.push(`- Times a house protected the persecuted community: ${(protectors / GAMES).toFixed(2)} per game`);
+  report.push(`- Merchant's Ledger per game: ${LEDGER.map((k) => `${k} ${(ledger[k] / GAMES).toFixed(2)}`).join(', ')}`);
   report.push(`- Comebacks: the house in last place at the halfway point went on to win ${pct(comebacks / Math.max(1, comebackGames))} of games`, '');
   report.push('| Home city | Seats | Win rate | Fair share |', '|---|---|---|---|');
   for (const r of cityRows) report.push(`| ${CITIES[r.c].name} | ${r.games} | ${pct(r.rate)} | ${pct(fair)} |`);
@@ -152,6 +157,7 @@ for (const s of Object.values(summary)) {
   const n = s.n;
   console.log(`\n${s.mode} ${n} players: ~${s.avgMin.toFixed(0)} min (range ${s.minMin.toFixed(0)}-${s.maxMin.toFixed(0)}), fair share ${pct(s.fair)}, comebacks ${pct(s.comeback)}`);
   console.log('  cities:     ' + s.cityRows.map((r) => `${r.c} ${pct(r.rate)}`).join(', '));
+  console.log('  ledger/game: ' + LEDGER.map((k) => `${k} ${(s.ledger[k] / GAMES).toFixed(2)}`).join(', '));
   console.log('  strategies: ' + s.stratRows.map((r) => `${r.s} ${pct(r.rate)} (L${(r.score / r.games).toFixed(0)} W${(r.wealth / r.games).toFixed(0)} F${(r.family / r.games).toFixed(0)} R${(r.rep / r.games).toFixed(0)})`).join(', '));
 }
 for (const m of ['standard', 'quick']) console.log(`\nHead-to-head ${m}: ` + Object.entries(h2hAll[m]).map(([k, v]) => `${k} ${pct(v.wins / H2H_GAMES)}`).join(', '));

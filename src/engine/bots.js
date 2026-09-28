@@ -2,7 +2,7 @@
 // They only use information a human player can see on screen: city states,
 // "threatened" warnings, scores and the cards in play. They never peek at
 // future historical arrival dates.
-import { C, ESTATE, currentPlayer, familyAt, familyLocations, familyTotal, isStricken, isThreatened, isAftermath, cost, routesFrom } from './state.js';
+import { C, ESTATE, currentPlayer, familyAt, familyLocations, familyTotal, isStricken, isThreatened, isAftermath, cost, routesFrom, neighbors } from './state.js';
 import { shipQuote, legalShipments, legalPosts, performAction, checkAction, charityCost } from './actions.js';
 import { decide, endTurn, actionPointsFor } from './turn.js';
 import { scorePlayer } from './scoring.js';
@@ -12,16 +12,27 @@ import { nextRandom, pick } from './rng.js';
 export const STRATEGIES = ['greedy', 'cautious', 'charitable', 'balanced', 'random'];
 
 function expectedShip(state, p, s) {
-  const q = shipQuote(state, p, s.route, s.from);
+  const q = shipQuote(state, p, s.route, s.from, { offshore: !!s.offshore });
   const mean = q.fixed + (C.shipping.profitDie + 1) / 2;
   const pInf = q.contagionRisk / 6;
-  const repCost = pInf * C.penalties.infectedCargoReputation;
-  return { value: mean * (1 - pInf * 0.5), repCost, q };
+  const repCost = s.offshore ? 0 : pInf * C.penalties.infectedCargoReputation;
+  return { value: mean * (1 - pInf * 0.5) - q.fee, repCost, q };
+}
+
+// Legal shipments, plus the "hold offshore" version of each one from a Stricken city.
+function shipOptions(state, p) {
+  const out = [];
+  for (const s of legalShipments(state, p)) {
+    out.push(s);
+    const held = { ...s, offshore: true };
+    if (!checkAction(state, held)) out.push(held);
+  }
+  return out;
 }
 
 function bestShipment(state, p, { avoidRisk = false } = {}) {
   let best = null;
-  for (const s of legalShipments(state, p)) {
+  for (const s of shipOptions(state, p)) {
     const e = expectedShip(state, p, s);
     const score = e.value - (avoidRisk ? e.repCost * 4 : e.repCost);
     if (!best || score > best.score) best = { action: s, score };
@@ -43,6 +54,8 @@ function decideAll(state, p, strategy) {
     if (d.kind === 'wageLaw') {
       choice = strategy === 'charitable' || (strategy === 'balanced' && scoreParts(p).lowest === 'reputation') ? 'obey' : 'pay';
       if (strategy === 'random') choice = nextRandom(state) < 0.5 ? 'obey' : 'pay';
+    } else if (d.kind === 'deal') {
+      choice = (strategy === 'random' ? nextRandom(state) < 0.5 : true) && !canAccept(state, p, d);
     } else if (d.kind === 'protect') {
       const want = { greedy: false, cautious: false, charitable: true, balanced: scoreParts(p).lowest === 'reputation' || p.florins > 15, random: nextRandom(state) < 0.5 }[strategy];
       choice = want && !canAccept(state, p, d);
@@ -135,6 +148,10 @@ function randomTurn(state, p) {
       ...legalShipments(state, p),
       ...legalPosts(state, p),
       { type: 'charity', kind: 'church' },
+      ...shipOptions(state, p).filter((a) => a.offshore),
+      ...p.posts.flatMap((c) => [{ type: 'marry', city: c }, { type: 'land', city: c }, { type: 'gates', city: c }]),
+      { type: 'loan' },
+      ...state.players.filter((o) => o !== p).map((o) => ({ type: 'deal', partner: o.id })),
       ...familyLocations(p).map((c) => ({ type: 'prepare', city: c })),
       ...familyLocations(p).map((c) => ({ type: 'physician', city: c })),
       ...familyLocations(p).flatMap((from) => [ESTATE, ...p.posts].filter((to) => to !== from).map((to) => ({ type: 'move', from, to, count: 1 }))),
@@ -151,6 +168,7 @@ function legacyOf(p, change) {
     florins: Math.max(0, p.florins + (change.florins ?? 0)),
     reputation: Math.max(0, Math.min(C.limits.maxReputation, p.reputation + (change.reputation ?? 0))),
     posts: change.posts ?? p.posts,
+    land: change.land ?? p.land,
     family: { total: familyTotal(p) + (change.family ?? 0) },
   };
   return scorePlayer(q).total;
@@ -169,8 +187,9 @@ function expectedDeaths(state, p, loc, { prepared = false } = {}) {
 }
 
 function candidateActions(state, p) {
-  const out = [...legalShipments(state, p), ...legalPosts(state, p)];
+  const out = [...shipOptions(state, p), ...legalPosts(state, p)];
   out.push({ type: 'charity', kind: 'hospital' });
+  for (const c of p.posts) out.push({ type: 'marry', city: c }, { type: 'land', city: c });
   for (const loc of familyLocations(p)) {
     out.push({ type: 'prepare', city: loc }, { type: 'physician', city: loc });
     for (const to of [ESTATE, ...p.posts]) if (to !== loc) out.push({ type: 'move', from: loc, to, count: Math.min(C.limits.moveFamilyMax, familyAt(p, loc)) });
@@ -207,11 +226,42 @@ function bestByLegacy(state, p) {
       const bonusLoss = a.to === ESTATE && familyAt(p, a.from) === a.count ? C.gains.familyAtPostBonus * 2 : 0;
       const bonusGain = a.from === ESTATE ? C.gains.familyAtPostBonus * 2 : 0;
       change = { family: saved, reputation: fled ? -C.penalties.fleeReputation : 0, florins: bonusGain - bonusLoss };
+    } else if (a.type === 'marry') {
+      change = { florins: -cost(state, 'marriage'), family: C.gains.marriageFamily };
+    } else if (a.type === 'land') {
+      const halvesLeft = C.rounds - state.roundEnd + 1;
+      change = { florins: -cost(state, 'buyLand') - halvesLeft * C.costs.landWage, land: [...p.land, a.city] };
     }
     const value = legacyOf(p, change) - base;
     if (!best || value > best.value) best = { action: a, value };
   }
   return best && best.value > 0.05 ? best.action : null;
+}
+
+// Land is worth buying only if its points beat the price plus the wages still to pay.
+function landPaysOff(state) {
+  const halvesLeft = C.rounds - state.roundEnd + 1;
+  return C.costs.buyLand + halvesLeft * C.costs.landWage < C.scoring.pointsPerLand * C.scoring.florinsPerPoint;
+}
+
+// Borrow when a wedding or land purchase is blocked only by a lack of florins.
+function borrowFor(state, p) {
+  if (checkAction(state, { type: 'loan' })) return false;
+  p.florins += C.gains.loan;
+  const helps = p.posts.some((c) => !checkAction(state, { type: 'marry', city: c }) || !checkAction(state, { type: 'land', city: c }));
+  p.florins -= C.gains.loan;
+  return helps && try_(state, { type: 'loan' });
+}
+
+// Offer a partnership to the house whose posts sit at the ends of our routes.
+function proposeDeal(state, p) {
+  const reach = new Set(p.posts.flatMap((c) => neighbors(c)));
+  let best = null;
+  for (const o of state.players) {
+    const overlap = o.posts.filter((c) => reach.has(c)).length + p.posts.filter((c) => o.posts.some((x) => neighbors(x).includes(c))).length;
+    if (overlap && !checkAction(state, { type: 'deal', partner: o.id }) && (!best || overlap > best.overlap)) best = { o, overlap };
+  }
+  return best ? try_(state, { type: 'deal', partner: best.o.id }) : false;
 }
 
 export function playTurn(state) {
@@ -222,6 +272,7 @@ export function playTurn(state) {
     randomTurn(state, p);
     return endTurn(state);
   }
+  proposeDeal(state, p);
   let guard = 0;
   while (p.ap > 0 && guard++ < 12) {
     decideAll(state, p, strategy);
@@ -229,7 +280,9 @@ export function playTurn(state) {
     let acted = false;
     switch (strategy) {
       case 'greedy':
-        acted = try_(state, bestShipment(state, p)?.action) || expand(state, p, 0);
+        // Reputation above the soft cap is cheap to spend on shutting rivals out.
+        if (!p.gates && p.reputation > C.scoring.reputationSoftCap + 1 && familyAt(p, p.home) && try_(state, { type: 'gates', city: p.home })) { acted = true; break; }
+        acted = try_(state, bestShipment(state, p)?.action) || (landPaysOff(state) && p.posts.some((c) => try_(state, { type: 'land', city: c }))) || expand(state, p, 0);
         break;
       case 'cautious':
         acted = protectFamily(state, p, { willFlee: true, threshold: 0.7 }) ||
@@ -243,7 +296,7 @@ export function playTurn(state) {
         break;
       case 'balanced':
       default:
-        acted = try_(state, bestByLegacy(state, p));
+        acted = try_(state, bestByLegacy(state, p)) || (borrowFor(state, p) && try_(state, bestByLegacy(state, p)));
         break;
     }
     if (!acted) break;

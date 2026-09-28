@@ -27,9 +27,11 @@ let css = read('src/styles/game.css').replace(/url\(['"]?\.\.\/\.\.\/assets\/fon
   return `url(data:font/woff2;base64,${b64})`;
 });
 
+// Replacement functions, not strings: in a replacement string, "$'" or "$&"
+// inside the minified code would be read as special patterns and break it.
 const html = read('dev.html')
-  .replace(/<link rel="stylesheet"[^>]*>/, `<style>\n${css}\n</style>`)
-  .replace(/<script type="module" src="[^"]*"><\/script>/, `<script>\n${js}\n</script>`);
+  .replace(/<link rel="stylesheet"[^>]*>/, () => `<style>\n${css}\n</style>`)
+  .replace(/<script type="module" src="[^"]*"><\/script>/, () => `<script>\n${js}\n</script>`);
 writeFileSync(new URL('Ports-of-Plague.html', root), html);
 writeFileSync(new URL('index.html', root), html);
 console.log(`Built Ports-of-Plague.html and index.html (${(html.length / 1024).toFixed(0)} KB each). Double-click either to play.`);

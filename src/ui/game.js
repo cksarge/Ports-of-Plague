@@ -5,6 +5,7 @@ import {
   scorePlayer, familyAt, familyTotal, familyLocations, isStricken, isThreatened, routesFrom,
   neighbors, cost, charityCost, CHARITY_KINDS, cardById, canAccept, severityName,
   roundInfo, actionPointsFor, lastPlaceId, legalPosts, totalRounds, roundNumber, modeOf, fortuneById, difficultyOf,
+  isAftermath, untilRound, dealPartner,
 } from '../engine/index.js';
 import { $, $$, esc, openDialog, dialogOpen, toast, announce, crestSvg } from './dom.js';
 import { createMap, updateMap, animateShipment, animateStrike, redrawStains, startAmbient, floatText } from './map.js';
@@ -16,7 +17,8 @@ import { music } from './music.js';
 import { saveGame } from './save.js';
 import { THEME_COLORS, themeIllustration, coinIcon, laurelIcon, familyIcon, candleIcon, heraldicBanner } from './art.js';
 
-const ACTION_ICONS = { ship: '⚓', post: '🏛', move: '🐎', prepare: '🚪', physician: '⚕', charity: '✝' };
+const ACTION_ICONS = { ship: '⚓', post: '🏛', move: '🐎', prepare: '🚪', physician: '⚕', charity: '✝', marry: '💍', land: '🌾', loan: '📜', deal: '🤝', gates: '⛨' };
+const NO_AP_ACTIONS = ['loan', 'deal'];
 
 // A card with an illustrated, colour-coded top band.
 function cardHtml({ theme, kind, title, body, extraClass = '' }) {
@@ -143,17 +145,21 @@ export function startGame(app, state, ui, { onExit, onEnd }) {
         <div class="legacy-bar" aria-hidden="true"><i style="width:${(100 * sc.wealth) / total}%;background:#d9a82b"></i><i style="width:${(100 * sc.family) / total}%;background:#8a3b2a"></i><i style="width:${(100 * sc.reputation) / total}%;background:#3f6b2a"></i><i style="width:${(100 * sc.balance) / total}%;background:#1d4a86"></i></div>
         <div style="font-size:0.9rem">Legacy: Wealth ${sc.wealth} + Family ${sc.family} + Reputation ${sc.reputation} + Balance ${sc.balance} = <strong>${sc.total}</strong></div>
         ${freeNotes(p)}
+        ${ledgerNotes(p)}
       </section>`);
       const hint = hintFor(p);
       if (hint) parts.push(`<div class="hint" role="note"><strong>Hint:</strong> ${hint}</div>`);
+      const actionBtn = (a) => {
+        const why = quickBlock(a.id, p);
+        return `<button class="action-btn" data-action="${a.id}" ${why ? `disabled title="${esc(why)}"` : ''} aria-keyshortcuts="${a.key.toUpperCase()}">
+          <span class="icon" aria-hidden="true">${ACTION_ICONS[a.id]}</span>
+          <span><span class="name">${esc(a.name)}</span><span class="desc">${esc(why ?? a.short)}</span></span>
+          <span><span class="key">${a.key.toUpperCase()}</span><br><small>${actionCostText(a.id, p)}</small></span></button>`;
+      };
       parts.push(`<section class="panel actions-panel" aria-label="Actions"><h2>Actions</h2><div class="actions">
-        ${DATA.actions.map((a) => {
-          const why = quickBlock(a.id, p);
-          return `<button class="action-btn" data-action="${a.id}" ${why ? `disabled title="${esc(why)}"` : ''} aria-keyshortcuts="${a.key}">
-            <span class="icon" aria-hidden="true">${ACTION_ICONS[a.id]}</span>
-            <span><span class="name">${esc(a.name)}</span><span class="desc">${esc(why ?? a.short)}</span></span>
-            <span><span class="key">${a.key}</span><br><small>${actionCostText(a.id, p)}</small></span></button>`;
-        }).join('')}
+        ${DATA.actions.filter((a) => !a.group).map(actionBtn).join('')}
+        <h3 class="ledger-head">Merchant's Ledger</h3>
+        ${DATA.actions.filter((a) => a.group === 'ledger').map(actionBtn).join('')}
         <button class="btn primary" id="end-turn" aria-keyshortcuts="E">End turn <span class="key">E</span></button>
       </div></section>`);
     } else {
@@ -189,11 +195,23 @@ export function startGame(app, state, ui, { onExit, onEnd }) {
     return notes.length ? `<div style="margin-top:0.35rem;font-size:0.88rem">🎡 <strong>Fortune:</strong> ${notes.map(esc).join(' · ')}</div>` : '';
   }
 
+  // Land, debt, partnership and closed gates: the Merchant's Ledger at a glance.
+  function ledgerNotes(p) {
+    const notes = [];
+    if (p.land.length) notes.push(`🌾 Land: ${p.land.map((c) => esc(CITIES[c].name)).join(', ')} (+${p.land.length * C.scoring.pointsPerLand} Wealth, ${p.land.length * C.costs.landWage}ƒ wages each half-year)`);
+    if (p.loan) notes.push(`📜 Debt: ${p.loan.owed}ƒ due ${esc(DATA.timeline.rounds[p.loan.due - 1].label)}`);
+    if (p.deal) notes.push(`🤝 Partner: ${esc(dealPartner(state, p).name)} until ${esc(DATA.timeline.rounds[p.deal.until - 1].label)}`);
+    if (p.gates) notes.push(`⛨ Gates closed: ${esc(CITIES[p.gates.city].name)} until ${esc(DATA.timeline.rounds[p.gates.until - 1].label)}`);
+    return notes.length ? `<div class="ledger-status">${notes.join('<br>')}</div>` : '';
+  }
+
   function actionCostText(id, p) {
     return {
       ship: '1 AP', post: p.free.post ? 'free' : `1 AP · ${cost(state, 'openPost', p)}ƒ`, move: p.free.move || p.free.moveNoPenalty ? 'free' : '1 AP',
       prepare: p.free.prepare ? 'free' : `1 AP · ${cost(state, 'prepareHousehold')}ƒ`, physician: p.free.physician ? 'free' : `1 AP · ${cost(state, 'physician')}ƒ`,
       charity: `1 AP · ${charityCost(state, p)}ƒ`,
+      marry: `1 AP · ${cost(state, 'marriage')}ƒ`, land: `1 AP · ${cost(state, 'buyLand')}ƒ`, loan: 'no AP', deal: 'no AP',
+      gates: `1 AP · −${C.penalties.gatesReputation} rep`,
     }[id];
   }
 
@@ -201,7 +219,7 @@ export function startGame(app, state, ui, { onExit, onEnd }) {
   function quickBlock(id, p) {
     if (busy) return 'Please wait…';
     if (p.pending.length) return 'Answer the card first.';
-    const free = (id === 'move' && (p.free.move || p.free.moveNoPenalty)) || (id === 'prepare' && p.free.prepare) || (id === 'post' && p.free.post) || (id === 'physician' && p.free.physician);
+    const free = NO_AP_ACTIONS.includes(id) || (id === 'move' && (p.free.move || p.free.moveNoPenalty)) || (id === 'prepare' && p.free.prepare) || (id === 'post' && p.free.post) || (id === 'physician' && p.free.physician);
     if (p.ap < 1 && !free) return 'No action points left.';
     if (id === 'ship' && !p.posts.some((c) => routesFrom(c).some((r) => !checkAction(state, { type: 'ship', from: c, route: r.id })))) return 'All your posts have shipped this round.';
     if (id === 'post' && !p.free.post && p.florins < cost(state, 'openPost', p)) return `Needs ${cost(state, 'openPost', p)}ƒ.`;
@@ -211,7 +229,18 @@ export function startGame(app, state, ui, { onExit, onEnd }) {
     if ((id === 'prepare' || id === 'physician') && !familyLocations(p).some((l) => l !== ESTATE && !checkAction(state, { type: id, city: l }))) {
       return familyLocations(p).every((l) => l === ESTATE) ? 'All your family is at the estate.' : `Not possible right now (cost ${id === 'prepare' ? cost(state, 'prepareHousehold') : cost(state, 'physician')}ƒ, once per city).`;
     }
+    if ((id === 'marry' || id === 'land') && !p.posts.some((c) => isAftermath(state, c))) return 'Opens when one of your cities reaches Aftermath.';
+    if (id === 'marry' || id === 'land' || id === 'gates') return firstReason(p.posts.map((c) => ({ type: id, city: c })));
+    if (id === 'loan') return checkAction(state, { type: 'loan' });
+    if (id === 'deal') return firstReason(state.players.filter((o) => o !== p).map((o) => ({ type: 'deal', partner: o.id })));
     return null;
+  }
+
+  // null if any of the actions is possible, otherwise the most useful reason why not.
+  function firstReason(actions) {
+    const reasons = actions.map((a) => checkAction(state, a));
+    if (reasons.some((r) => !r)) return null;
+    return reasons.find((r) => !/^Choose/.test(r)) ?? reasons[0] ?? 'Not possible right now.';
   }
 
   function hintFor(p) {
@@ -224,6 +253,8 @@ export function startGame(app, state, ui, { onExit, onEnd }) {
     if (danger) return `${esc(CITIES[danger].name)} is next to a Stricken city (spinning orange ring). The plague may arrive soon.`;
     if (p.shipped.length === 0) return `Start with <span class="key">1</span> Ship Goods: pick a route from one of your trading posts. Sea routes pay more. Roll a ${C.fortune.drawOnProfitDie} on the profit die and you draw a Fortune card!`;
     if (p.posts.length < 2 && p.florins >= cost(state, 'openPost', p)) return `A second trading post (<span class="key">2</span>, ${cost(state, 'openPost', p)}ƒ) lets you ship from two places, and opening it draws a Fortune card.`;
+    const after = p.posts.find((c) => isAftermath(state, c));
+    if (after && !p.land.length && familyTotal(p) < C.start.family) return `${esc(CITIES[after].name)} is in Aftermath: you can now <span class="key">7</span> Arrange a Marriage or <span class="key">8</span> Buy Abandoned Land there.`;
     return 'Tip: click any city on the map to read its history. Your weakest Legacy category counts twice, so keep all three healthy.';
   }
 
@@ -253,7 +284,7 @@ export function startGame(app, state, ui, { onExit, onEnd }) {
         // All plague phases of this round (two in Quick Play) are shown together.
         const group = [];
         let i = idx;
-        while (i < state.log.length && ['plague', 'mortality', 'aftermath'].includes(state.log[i].type)) group.push(state.log[i++]);
+        while (i < state.log.length && ['plague', 'mortality', 'aftermath', 'upkeep', 'loanRepaid', 'loanDefault', 'dealEnd', 'gatesOpen'].includes(state.log[i].type)) group.push(state.log[i++]);
         await showPlague(group);
         markSeen(group.at(-1).seq);
       } else if (next.type === 'fortune') {
@@ -406,6 +437,7 @@ export function startGame(app, state, ui, { onExit, onEnd }) {
         return;
       }
       if (e.type === 'aftermath') { body += `<p style="margin:0.3rem 0">❦ ${esc(e.text)}</p>`; return; }
+      if (e.type !== 'mortality') { body += `<p style="margin:0.3rem 0">📜 ${esc(e.text)}</p>`; return; }
       anyDeaths ||= e.deaths > 0;
       const p = state.players[e.player];
       const bonus = e.prepared ? C.plague.prepareBonus : 0;
@@ -471,6 +503,7 @@ export function startGame(app, state, ui, { onExit, onEnd }) {
   }
 
   async function askDecision(p, d) {
+    if (d.kind === 'deal') return askDeal(p, d);
     const card = cardById(d.card);
     const isFortune = !!d.fortune;
     let body = '';
@@ -516,6 +549,25 @@ export function startGame(app, state, ui, { onExit, onEnd }) {
     setNote(card.factIds);
   }
 
+  async function askDeal(p, d) {
+    const from = state.players[d.from];
+    const why = canAccept(state, p, d);
+    const shared = from.posts.filter((c) => p.posts.some((x) => x === c || neighbors(x).includes(c)));
+    const html = `<div class="frame">${cardHtml({ theme: 'trade', kind: `Decision for ${esc(p.name)}`, title: `A Partnership with ${from.name}`, body: `
+      <p>${crestSvg(from, 18)} <strong>${esc(from.name)}</strong> of ${esc(CITIES[from.home].name)} proposes a partnership until the end of next round.</p>
+      <p>When either house ships to a city where the other has a trading post, <strong>both earn ${C.gains.dealBonus}ƒ more</strong>. Their posts: ${from.posts.map((c) => esc(CITIES[c].name)).join(', ')}.${shared.length ? ` Your routes reach ${shared.map((c) => esc(CITIES[c].name)).join(', ')}.` : ''}</p>
+      ${noteHtml(['TR-04'])}` })}
+      <div class="dialog-actions"><button class="btn primary" data-value="yes" ${why ? 'disabled' : ''}>Accept the partnership</button><button class="btn" data-value="no">Decline</button>${why ? `<p class="error">${esc(why)}</p>` : ''}</div></div>`;
+    const v = await openDialog(html, { dismissable: false, label: `Partnership offer from ${from.name}` });
+    const r = decide(state, v === 'yes');
+    if (!r.ok) { toast(r.reason); return; }
+    save();
+    markSeen(r.entry.seq);
+    if (v === 'yes') sfx.coin();
+    toast(r.entry.text, 4500);
+    setNote(['TR-04']);
+  }
+
   // ---------- Actions ----------
   async function startAction(id) {
     const p = player();
@@ -557,15 +609,19 @@ export function startGame(app, state, ui, { onExit, onEnd }) {
         const risk = q.safe ? 'Clean hold: no contagion risk (Fortune card)' : q.contagionRisk ? `<span class="risk">Contagion: infected on a roll of ${q.contagionRisk} or less (${Math.round((q.contagionRisk / 6) * 100)}%)</span>` : 'No contagion risk (origin not Stricken)';
         const dest = state.cities[q.to].state === 'stricken' ? ' · destination Stricken' : state.cities[q.to].state === 'aftermath' ? ' · destination in Aftermath (+prices)' : '';
         items.push({ why, html: choiceBtn(`${from}|${r.id}`, `${esc(cityName(from))} → ${esc(cityName(q.to))} <small>(${r.type}, value ${r.value})</small>`, `Earn ${q.min}–${q.max}ƒ${dest} · ${risk}`, why, `data-route="${r.id}"`) });
+        if (q.contagionRisk && !why && !checkAction(state, { ...action, offshore: true })) {
+          items.push({ why: null, html: choiceBtn(`${from}|${r.id}|offshore`, `…and hold the ship offshore <small>(+${cost(state, 'holdOffshore')}ƒ)</small>`, 'If the cargo is infected: still half profit, but no reputation lost and the plague does not spread', null, `data-route="${r.id}"`) });
+        }
       }
       items.sort((a, b) => (a.why ? 1 : 0) - (b.why ? 1 : 0));
+      const anyOffshore = items.some((x) => x.html.includes('|offshore'));
       const v = await openDialog(`<div class="frame"><h2>⚓ Ship Goods</h2><p>Choose a route from one of your trading posts. Earnings = route value + profit die${p.posts.some((c) => familyAt(p, c)) ? ' + family bonus where your family lives' : ''}. A profit die of ${C.fortune.drawOnProfitDie} draws a Fortune card.</p>
-        <div class="choice-list">${items.map((x) => x.html).join('')}</div>
+        <div class="choice-list">${items.map((x) => x.html).join('')}</div>${anyOffshore ? noteHtml(['ME-12', 'ME-14']) : ''}
         <div class="dialog-actions"><button class="btn ghost" data-value="">Cancel <span class="key">Esc</span></button></div></div>`,
         { label: 'Ship Goods', onMount: (d) => hoverRoutes(d), side: true });
       if (!v) return null;
-      const [from, route] = v.split('|');
-      return { type: 'ship', from, route };
+      const [from, route, held] = v.split('|');
+      return held ? { type: 'ship', from, route, offshore: true } : { type: 'ship', from, route };
     }
     if (id === 'post') {
       const seen = new Set();
@@ -602,6 +658,47 @@ export function startGame(app, state, ui, { onExit, onEnd }) {
         ${noteHtml(DATA.actions.find((a) => a.id === id).factIds)}
         <div class="dialog-actions"><button class="btn ghost" data-value="">Cancel</button></div></div>`, { label: title, side: true });
       return v ? { type: id, city: v } : null;
+    }
+    if (id === 'marry' || id === 'land' || id === 'gates') {
+      const info = {
+        marry: { title: `💍 Arrange a Marriage (${cost(state, 'marriage')}ƒ)`, explain: `With the epidemic over, survivors married and many children were born. Choose a city in Aftermath where your family lives: +${C.gains.marriageFamily} family member there. Your house cannot grow beyond ${C.start.family}.` },
+        land: { title: `🌾 Buy Abandoned Land (${cost(state, 'buyLand')}ƒ)`, explain: `So many farmers died that fields lay empty. Land near a city in Aftermath is worth <strong>${C.scoring.pointsPerLand} Wealth points</strong> at the end, but workers were scarce and wages high: you pay ${C.costs.landWage}ƒ per holding every half-year (or lose 1 reputation if you cannot).` },
+        gates: { title: `⛨ Close Your Gates (−${C.penalties.gatesReputation} reputation)`, explain: `Frightened towns posted guards and turned strangers away. Until the end of next round, rival houses cannot open a trading post in the city you choose, and their shipments to it earn ${C.penalties.gatesProfit}ƒ less. Choose a city where you have a post and family.` },
+      }[id];
+      const items = p.posts.map((c) => {
+        const why = checkAction(state, { type: id, city: c });
+        const cs = state.cities[c];
+        const rivals = state.players.filter((o) => o !== p && o.posts.includes(c)).map((o) => o.name);
+        const status = `${cs.state === 'aftermath' ? 'Aftermath' : cs.state === 'stricken' ? 'Stricken' : isThreatened(state, c) ? 'Threatened' : 'Safe'} · ${familyAt(p, c)} family${id === 'gates' && rivals.length ? ` · rival posts: ${rivals.map(esc).join(', ')}` : ''}`;
+        return { id: c, why, html: choiceBtn(c, esc(CITIES[c].name), status, why) };
+      }).sort((a, b) => (a.why ? 1 : 0) - (b.why ? 1 : 0));
+      mapSel = { selectable: new Set(items.filter((x) => !x.why).map((x) => x.id)) };
+      updateMap(svg, state, mapSel);
+      const v = await openDialog(`<div class="frame"><h2>${info.title}</h2><p>${info.explain}</p><div class="choice-list">${items.map((x) => x.html).join('')}</div>
+        ${noteHtml(DATA.actions.find((a) => a.id === id).factIds)}
+        <div class="dialog-actions"><button class="btn ghost" data-value="">Cancel</button></div></div>`, { label: info.title, side: true });
+      return v ? { type: id, city: v } : null;
+    }
+    if (id === 'loan') {
+      const due = DATA.timeline.rounds[untilRound(state, 2) - 1].label;
+      const v = await openDialog(`<div class="frame"><h2>📜 Take a Loan</h2>
+        <p>Florence's great banks had collapsed just before the plague, so lenders were careful. A banker will lend you <strong>${C.gains.loan}ƒ</strong> now. You must repay <strong>${C.costs.loanRepay}ƒ</strong> in the plague phase of the next round (${esc(due)}).</p>
+        <p>If you cannot pay in full, you pay everything you have and lose <strong>${C.penalties.loanDefaultReputation} reputation</strong>. Taking a loan costs no action point.</p>
+        ${noteHtml(DATA.actions.find((a) => a.id === 'loan').factIds)}
+        <div class="dialog-actions"><button class="btn ghost" data-value="">Cancel</button><button class="btn primary" data-value="go" autofocus>Borrow ${C.gains.loan}ƒ</button></div></div>`, { label: 'Take a Loan', side: true });
+      return v === 'go' ? { type: 'loan' } : null;
+    }
+    if (id === 'deal') {
+      const items = state.players.filter((o) => o !== p).map((o) => {
+        const why = checkAction(state, { type: 'deal', partner: o.id });
+        return choiceBtn(String(o.id), `${crestSvg(o, 16)} ${esc(o.name)}`, `Posts: ${o.posts.map((c) => esc(CITIES[c].name)).join(', ')}`, why);
+      });
+      const v = await openDialog(`<div class="frame"><h2>🤝 Propose a Partnership</h2>
+        <p>Merchant ships linked the Italian cities with the Hanseatic League of the north. Offer another house a partnership until the end of next round: when either of you ships to a city where the other has a trading post, <strong>both earn ${C.gains.dealBonus}ƒ more</strong>.</p>
+        <p>They will accept or decline at the start of their next turn. Proposing costs no action point.</p>
+        <div class="choice-list">${items.join('')}</div>${noteHtml(DATA.actions.find((a) => a.id === 'deal').factIds)}
+        <div class="dialog-actions"><button class="btn ghost" data-value="">Cancel</button></div></div>`, { label: 'Propose a Partnership', side: true });
+      return v ? { type: 'deal', partner: Number(v) } : null;
     }
     if (id === 'charity') {
       const price = charityCost(state, p);
@@ -668,13 +765,15 @@ export function startGame(app, state, ui, { onExit, onEnd }) {
       floatText(svg, e.to, `+${e.profit}ƒ`, 'gain');
       if (e.infected) floatText(svg, e.from, 'Infected!', 'loss');
       const parts = e.parts.map((x) => `<li>${esc(x.label)}: ${x.value >= 0 ? '+' : ''}${x.value}</li>`).join('');
-      const infectedNote = e.infected ? `<p class="risk">Infected cargo! Profit halved and −${C.penalties.infectedCargoReputation} reputation. ${e.spread === 'early' ? `The plague reaches ${esc(cityName(e.to))} earlier than it really did.` : e.spread === 'worse' ? `The plague in ${esc(cityName(e.to))} grows worse.` : 'The infection dies out this time.'}</p>` : '';
+      const infectedNote = e.infected && e.offshore ? `<p class="risk">Infected cargo! Profit halved. The ship waited offshore, so the sickness showed before anyone landed: no reputation lost and the plague does not spread.</p>`
+        : e.infected ? `<p class="risk">Infected cargo! Profit halved and −${C.penalties.infectedCargoReputation} reputation. ${e.spread === 'early' ? `The plague reaches ${esc(cityName(e.to))} earlier than it really did.` : e.spread === 'worse' ? `The plague in ${esc(cityName(e.to))} grows worse.` : 'The infection dies out this time.'}</p>` : '';
       if (e.infected) sfx.plague(); else sfx.coin();
       await openDialog(`<div class="frame"><h2>${esc(cityName(e.from))} → ${esc(cityName(e.to))}</h2>
         <div class="dice-tray"><div class="dice-row">${dieHtml(e.profitDie, { gold: e.profitDie === C.fortune.drawOnProfitDie, label: e.profitDie === C.fortune.drawOnProfitDie ? 'Profit die: Fortune!' : 'Profit die' })}${e.contagionDie !== null ? dieHtml(e.contagionDie, { red: true, label: `Contagion die (infected on ≤${e.contagionRisk})` }) : ''}</div></div>
         <ul>${parts}<li>Profit die: +${e.profitDie}</li></ul>
-        <p style="font-size:1.25rem">${coinIcon(24)} Earned <strong>${e.profit}ƒ</strong>.</p>${infectedNote}
-        ${e.infected ? noteHtml(e.factIds) : ''}
+        <p style="font-size:1.25rem">${coinIcon(24)} Earned <strong>${e.profit}ƒ</strong>.${e.offshore ? ` <small>(Offshore wait: ${e.fee}ƒ paid.)</small>` : ''}</p>${infectedNote}
+        ${e.partner != null ? `<p>🤝 Your partner ${esc(state.players[e.partner].name)} also earns ${C.gains.dealBonus}ƒ.</p>` : ''}
+        ${e.infected || e.offshore ? noteHtml(e.factIds) : ''}
         <div class="dialog-actions"><button class="btn primary" data-value="ok" autofocus>Continue</button></div></div>`,
         { label: 'Shipment result', onMount: (d) => rollDice(d, 800) });
       if (e.spread === 'early') {
@@ -695,6 +794,10 @@ export function startGame(app, state, ui, { onExit, onEnd }) {
     }
     if (e.type === 'post') floatText(svg, e.city, 'New post!', 'gain');
     if (e.type === 'charity') floatText(svg, p.home, '+rep', 'gain');
+    if (e.type === 'marry') floatText(svg, e.city, '+1 family', 'gain');
+    if (e.type === 'land') floatText(svg, e.city, 'Land!', 'gain');
+    if (e.type === 'loan') floatText(svg, p.home, `+${C.gains.loan}ƒ`, 'gain');
+    if (e.type === 'gates') floatText(svg, e.city, 'Gates closed', 'loss');
     sfx.coin();
     toast(e.text, 4200);
   }

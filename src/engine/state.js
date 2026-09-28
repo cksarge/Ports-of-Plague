@@ -5,7 +5,7 @@ import { seedFrom, shuffle, roll } from './rng.js';
 
 export const C = DATA.config;
 export const ESTATE = 'estate';
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
 
 export const PLAYER_STYLES = [
   { color: '#0072B2', colorName: 'Lapis blue', crest: 'circle' },
@@ -104,7 +104,13 @@ export function createGame({ players, difficulty = 'chronicler', mode = 'standar
       nextShip: null,
       personalCosts: {},
       englishBlocked: false,
-      stats: { shipments: 0, infected: 0, earned: 0, fled: 0, protected: 0, charity: 0, spread: 0, fortune: 0 },
+      marriedThisTurn: 0,
+      proposedThisTurn: false,
+      land: [],
+      loan: null,
+      deal: null,
+      gates: null,
+      stats: { shipments: 0, infected: 0, earned: 0, fled: 0, protected: 0, charity: 0, spread: 0, fortune: 0, married: 0, land: 0, loans: 0, defaults: 0, deals: 0, gates: 0, offshore: 0 },
     });
   });
   for (const c of DATA.cities) {
@@ -180,6 +186,16 @@ export function isAftermath(state, cityId) {
 // A Safe city next to a Stricken one: shown on the map as a warning.
 export function isThreatened(state, cityId) {
   return state.cities[cityId].state === 'safe' && neighbors(cityId).some((n) => isStricken(state, n));
+}
+
+// The house (if any, other than `p`) whose closed gates turn strangers away from a city.
+export function gatesClosedBy(state, cityId, p = null) {
+  return state.players.find((o) => o !== p && o.gates?.city === cityId) ?? null;
+}
+
+// Half-year number at which something lasting `rounds` rounds (counting this one) ends.
+export function untilRound(state, rounds) {
+  return (state.roundEnd || state.round) + (state.span ?? 1) * (rounds - 1);
 }
 
 export function clampReputation(p) {

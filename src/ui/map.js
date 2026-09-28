@@ -188,6 +188,14 @@ function drawTokens(svg, state) {
       html += `<g transform="translate(${tx},${y + 33}) scale(1.3)">${banner(p.color, p.crest, familyAt(p, c.id))}</g>`;
     });
   }
+  // Closed gates: a small portcullis in the colour of the house that shut them.
+  for (const p of state.players) {
+    if (!p.gates) continue;
+    const [x, y] = POS[p.gates.city];
+    html += `<g class="gate-mark" transform="translate(${x + 12},${y - 22})"><title>Gates closed by ${esc(p.name)}</title>
+      <rect x="0" y="0" width="12" height="12" rx="1.5" fill="${p.color}" stroke="#2a1a0c" stroke-width="1.2"/>
+      <path d="M3 1v10M6 1v10M9 1v10M1 4h10M1 8h10" stroke="#2a1a0c" stroke-width="1"/></g>`;
+  }
   svg.querySelector('#tokens').innerHTML = html;
 }
 
