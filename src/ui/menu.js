@@ -1,7 +1,7 @@
 // Title screen (with a living map behind it) and the setup screen.
 import { DATA, CITIES, HOME_CITIES } from '../data.js';
 import { C, PLAYER_STYLES, validateSetup, createGame } from '../engine/state.js';
-import { esc, crestSvg, $, $$ } from './dom.js';
+import { esc, crestSvg, $, $$, isTyping } from './dom.js';
 import { showRules, showCredits } from './panels.js';
 import { loadGame } from './save.js';
 import { createMap, updateMap, startAmbient, redrawStains, animateStrike, POS } from './map.js';
@@ -72,7 +72,7 @@ export function renderMenu(app, { onNew, onContinue, onJoin }) {
         <button class="btn ${saved ? '' : 'primary'}" id="new">New game</button>
         <button class="btn" id="join">Join a game <small style="font-family:var(--serif);font-weight:400">(room code)</small></button>
         <button class="btn" id="rules">Rules <span class="key">R</span></button>
-        <button class="btn ghost" id="about">About &amp; credits</button>
+        <button class="btn" id="about">About &amp; credits</button>
         <div style="display:flex;gap:0.6rem;justify-content:center">
           <button class="btn small" id="menu-sound" aria-pressed="${!isMuted()}">${isMuted() ? '🔇 Sound off' : '🔊 Sound on'}</button>
           <button class="btn small" id="menu-music" aria-pressed="${isMusicOn()}">${isMusicOn() ? '🎵 Music on' : '🎵 Music off'}</button>
@@ -91,7 +91,7 @@ export function renderMenu(app, { onNew, onContinue, onJoin }) {
   $('#about', app).onclick = showCredits;
   if (saved) $('#continue', app).onclick = () => { stopTitleAnimation(); onContinue(saved); };
   $('#continue, #new', app)?.focus();
-  app.onkeydown = (e) => { if (e.key.toLowerCase() === 'r' && !document.querySelector('dialog')) showRules(); };
+  app.onkeydown = (e) => { if (!isTyping(e) && e.key.toLowerCase() === 'r' && !document.querySelector('dialog')) showRules(); };
 }
 
 const DEFAULT_NAMES = ['House of the Anchor', 'House of the Lion', 'House of the Rose', 'House of the Star', 'House of the Ship', 'House of the Sun'];

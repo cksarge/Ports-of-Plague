@@ -4,7 +4,7 @@
 // screen only draws the state it receives and sends requests back.
 import { DATA, CITIES, HOME_CITIES } from '../data.js';
 import { C, PLAYER_STYLES, currentPlayer, roundInfo, roundNumber, totalRounds, familyTotal, scorePlayer } from '../engine/index.js';
-import { $, $$, esc, openDialog, dialogOpen, toast, crestSvg } from './dom.js';
+import { $, $$, esc, openDialog, dialogOpen, closeAllDialogs, toast, crestSvg, isTyping } from './dom.js';
 import { housePanelHtml, actionsPanelHtml, hintFor, quickBlock, actionPrompt, decisionPrompt, endTurnPrompt } from './prompts.js';
 import { showRules, showJournal, showCity } from './panels.js';
 import { storyCard, storyHtml } from './stories.js';
@@ -16,11 +16,12 @@ import { netAvailable } from '../net/transport.js';
 import { isRoomCode, normalizeRoomCode, CODE_LENGTH, LOBBY, STATE, TOAST, REJECT, CLOSED, JOIN, ACT, DECIDE, END, NEXT } from '../net/protocol.js';
 
 export function renderJoin(app, { onBack, code: preset = '' }) {
+  app.onkeydown = null; // the title screen's R-for-Rules shortcut is not for this screen
   let conn = null;
   let screen = 'code';     // code → connecting → house → lobby → game
   let lobby = null;        // last LOBBY message
   let game = null;         // last STATE message
-  let closedNote = false;  // the big screen left the room
+  let hostGone = false;    // the big screen left: this device is on its way back to the menu
   let waiting = null;      // id of the request sent and not yet handled by the big screen
   let waitTimer = null;
   let asking = false;      // a choice dialog is open on this device
@@ -63,7 +64,7 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
     screen = 'connecting';
     app.innerHTML = `<section class="screen"><div class="frame join-box"><h1>Room ${esc(code)}</h1><p>Connecting…</p></div></section>`;
     try {
-      conn = await joinRoom(code, { onMessage });
+      conn = await joinRoom(code, { onMessage, onHostGone: () => hostLeft('lost') });
     } catch {
       error = 'Could not connect. Check the internet connection and try again.';
       drawCode();
@@ -83,14 +84,12 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
   function onMessage(m) {
     if (m.t === LOBBY) {
       lobby = m;
-      closedNote = false;
       if (me() >= 0) drawLobby();
       else if (screen !== 'house') drawHouse();
       else refreshTakenHomes();
     } else if (m.t === STATE) {
       const firstState = !game || screen !== 'game';
       game = m;
-      closedNote = false;
       if (waiting && (m.seats[me()]?.rid ?? 0) >= waiting) stopWaiting();
       if (nextSent !== null && m.view?.next?.id !== nextSent) nextSent = null;
       if (reader && reader.id !== m.view?.next?.id) reader.close?.();
@@ -102,9 +101,29 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
       error = m.reason;
       if (screen === 'game') drawRejoin(); else drawHouse();
     } else if (m.t === CLOSED) {
-      closedNote = true;
-      if (screen === 'game') drawGame(); else if (screen === 'lobby') drawLobby();
+      hostLeft('closed');
     }
+  }
+
+  // The big screen left (or stopped answering): a popup, then back to the menu.
+  // Anything this device had open is cancelled, not sent.
+  function hostLeft(why) {
+    if (hostGone || !conn) return;
+    hostGone = true;
+    const code = conn.code;
+    const inGame = screen === 'game' && game?.state?.phase !== 'ended';
+    conn.close({ leave: false });
+    conn = null;
+    stopWaiting();
+    document.removeEventListener('keydown', onKey);
+    closeAllDialogs();
+    const reason = why === 'closed'
+      ? (screen === 'game' ? 'The big screen has left the game.' : 'The big screen has closed the room.')
+      : 'The big screen stopped answering. It may have been closed, or lost its internet connection.';
+    const again = inGame ? `<p>If the big screen continues this saved game later, choose <em>Join a game</em> and type <strong>${esc(code)}</strong> again to get your house back.</p>` : '';
+    openDialog(`<div class="frame"><h2>The big screen left</h2><p>${reason}</p>${again}
+      <div class="dialog-actions"><button class="btn primary" data-value="menu" autofocus>Back to the menu</button></div></div>`,
+    { dismissable: false, label: 'The big screen left' }).then(() => onBack());
   }
 
   // ---------- Step 2: choose a house (before the game starts) ----------
@@ -164,7 +183,6 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
     app.innerHTML = `<section class="screen"><div class="frame join-box">
       <h1>Room ${esc(conn.code)}</h1>
       <p><strong>You are in!</strong> Waiting for the big screen to start the game…</p>
-      ${closedNote ? '<p class="error">The big screen closed the room. Stay on this page: it reconnects if the room opens again.</p>' : ''}
       ${o.mode ? `<p class="home-info">${esc(C.modes[o.mode]?.label ?? '')} · ${esc(C.difficulty[o.difficulty]?.label ?? '')}</p>` : ''}
       <div class="houses">${seats.map((s, i) => houseRow({ ...PLAYER_STYLES[i], name: s.name }, `${esc(CITIES[s.home].name)}${s.cid === conn.cid ? ' · you' : ''}`, s.online)).join('')}</div>
       <div class="setup-actions"><button class="btn ghost" id="back">Leave</button><button class="btn" id="edit">Change my house</button></div>
@@ -195,6 +213,7 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
 
   // ---------- Step 4: the game ----------
   function drawGame() {
+    if (hostGone) return;
     screen = 'game';
     const { state, view = {} } = game;
     const seat = me();
@@ -218,7 +237,6 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
         <button class="btn small" id="ctl-chronicle">Chronicle</button>
         <button class="btn small" id="ctl-map">Map</button>
       </nav>`);
-    if (closedNote) parts.push('<p class="ctl-banner error" role="alert">The big screen has left the game. Stay on this page: it reconnects when the game continues.</p>');
 
     if (state.phase === 'ended') {
       parts.push(`<section class="panel"><h2>Anno Domini 1353</h2><p>The game is over. Final Legacy scores:</p>
@@ -244,7 +262,10 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
         <p class="home-info">Anyone can press it once everyone has read the card.</p></section>`);
     }
 
+    // Two columns (side by side on wide screens, stacked on phones): what you
+    // can do now, then your house and the other houses.
     const main = [];
+    const side = [];
     if (myTurn && !next) {
       const hint = hintFor(state, p, view.hints);
       if (hint) main.push(`<div class="hint" role="note"><strong>Hint:</strong> ${hint}</div>`);
@@ -254,13 +275,13 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
       const what = cur ? `<strong>${esc(cur.name)}</strong> is taking their turn.` : state.phase === 'plague' ? 'The plague takes its toll. Watch the big screen.' : 'The chronicle unfolds. Watch the big screen.';
       main.push(`<section class="panel waiting-panel"><h2>Please wait</h2><p>${what}</p></section>`);
     }
-    main.push(housePanelHtml(state, p, { label: 'Your house' }));
-    main.push(`<section class="panel houses-panel" aria-label="All houses"><h2>Houses (turn order)</h2><div class="houses">${state.order.map((id, i) => {
+    side.push(housePanelHtml(state, p, { label: 'Your house' }));
+    side.push(`<section class="panel houses-panel" aria-label="All houses"><h2>Houses (turn order)</h2><div class="houses">${state.order.map((id, i) => {
       const h = state.players[id];
       const s = game.seats[id];
       return houseRow(h, `${h.florins}ƒ · rep ${h.reputation} · family ${familyTotal(h)} · Legacy ${scorePlayer(h).total}`, s?.online, cur?.id === id, `${i + 1}. `);
     }).join('')}</div></section>`);
-    parts.push(`<div class="ctl-main ${myTurn && !next ? 'my-turn' : ''}">${main.join('')}</div>`);
+    parts.push(`<div class="ctl-main ${main.length ? 'two' : ''}">${main.length ? `<div class="ctl-col">${main.join('')}</div>` : ''}<div class="ctl-col">${side.join('')}</div></div>`);
 
     const focused = document.activeElement?.id;
     app.innerHTML = `<div class="controller">${parts.join('')}</div>`;
@@ -342,6 +363,7 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
   }
 
   function pressNext() {
+    if (hostGone) return;
     const next = game?.view?.next;
     if (!next || nextSent === next.id) return;
     nextSent = next.id;
@@ -397,6 +419,7 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
   // Buttons stay disabled until the big screen reports this request as handled
   // (or after a while, in case the message was lost on a bad connection).
   function request(msg) {
+    if (hostGone) return;
     waiting = Date.now();
     conn.send({ ...msg, rid: waiting });
     clearTimeout(waitTimer);
@@ -410,7 +433,7 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
 
   function onKey(e) {
     if (screen !== 'game' || dialogOpen() || e.ctrlKey || e.metaKey || e.altKey) return;
-    if (e.target.matches?.('input, select, textarea')) return;
+    if (isTyping(e)) return;
     const k = e.key.toLowerCase();
     if (k === 'r') { e.preventDefault(); $('#ctl-rules', app)?.click(); return; }
     if (k === 'j') { e.preventDefault(); $('#ctl-journal', app)?.click(); return; }

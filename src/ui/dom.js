@@ -42,6 +42,7 @@ export function openDialog(html, { wide = false, side = false, dismissable = tru
       e.preventDefault();
       if (dismissable) close(null);
     });
+    d.addEventListener('force-close', () => close(null));
     if (dismissable) {
       d.addEventListener('click', (e) => { if (e.target === d) close(null); });
     }
@@ -57,6 +58,12 @@ export function openDialog(html, { wide = false, side = false, dismissable = tru
     if (scroller) scroller.scrollTop = 0;
     onMount?.(d, close);
   });
+}
+
+// Closes every open dialog as if it was cancelled (for example when the game
+// this device was playing has ended).
+export function closeAllDialogs() {
+  document.querySelectorAll('dialog').forEach((d) => d.dispatchEvent(new Event('force-close')));
 }
 
 export function toast(text, ms = 3200) {
@@ -75,6 +82,10 @@ export function announce(text) {
 }
 
 export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+// True while a key press is going into a text box (typing a name or a room
+// code), so single-letter shortcuts like R for Rules must not react to it.
+export const isTyping = (e) => !!(e.isComposing || e.target?.closest?.('input, textarea, select, [contenteditable]:not([contenteditable="false"])'));
+
 export const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
 // House crest as inline SVG (shape + color, so players can be told apart without color).

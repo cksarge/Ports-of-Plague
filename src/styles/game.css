@@ -234,7 +234,7 @@ a { color: var(--lapis); }
 .ap { display: flex; gap: 0.25rem; align-items: center; margin: 0.45rem 0 0.2rem; font-weight: 600; }
 .legacy-bar { display: flex; height: 12px; border-radius: 6px; overflow: hidden; margin: 0.3rem 0; background: #e6d6ae; }
 .legacy-bar i { display: block; }
-.actions { display: grid; gap: 0.45rem; }
+.actions { display: grid; gap: 0.7rem; }
 .action-btn { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 0.6rem; text-align: left; min-height: 56px; padding: 0.4rem 0.7rem; border: 2px solid #3b2413; border-radius: var(--radius); background: linear-gradient(#fffaf0, #efdcae); cursor: pointer; box-shadow: 0 2px 0 #8a6a36; transition: transform 0.08s, filter 0.2s; }
 .action-btn:hover:not(:disabled) { transform: translateX(3px); filter: brightness(1.05); }
 .action-btn:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
@@ -276,7 +276,7 @@ dialog.side::backdrop { background: rgba(10, 5, 0, 0.25); }
 @media (max-width: 980px) { dialog.side { margin: auto; } }
 dialog .frame { max-height: 90vh; }
 .dialog-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: flex-end; margin-top: 1rem; }
-.choice-list { display: grid; gap: 0.45rem; margin: 0.6rem 0; }
+.choice-list { display: grid; gap: 0.7rem; margin: 0.6rem 0; }
 .choice { display: grid; grid-template-columns: 1fr auto; gap: 0.6rem; align-items: center; text-align: left; padding: 0.55rem 0.75rem; min-height: 52px; border: 2px solid var(--parchment-3); border-left: 6px solid var(--lapis); border-radius: var(--radius); background: #fffdf6; cursor: pointer; transition: transform 0.08s, border-color 0.2s; }
 button.choice:hover:not(:disabled) { border-color: var(--gold-bright); border-left-color: var(--vermilion); transform: translateX(3px); background: #fff8e2; }
 .choice:disabled { opacity: 0.6; cursor: not-allowed; border-left-color: #b9ad92; }
@@ -417,7 +417,10 @@ button.choice:hover:not(:disabled) { border-color: var(--gold-bright); border-le
 .room-code { font-family: var(--caps); font-weight: 800; font-size: clamp(2.6rem, 11vw, 4.6rem); letter-spacing: 0.18em; line-height: 1; color: #fff6e0; text-shadow: 0 3px 0 #3a0806; }
 .join-box { max-width: 560px; width: 100%; }
 .join-box .house-card { margin: 0.6rem 0; }
-.code-input { font-family: var(--caps); font-size: 2.4rem !important; letter-spacing: 0.4em; text-align: center; min-height: 64px !important; }
+.code-input { font-family: var(--caps); font-size: 2.4rem !important; letter-spacing: 0.4em; text-indent: 0.4em; text-align: center; min-height: 64px !important; width: 100%; min-width: 0; }
+/* A form laid out as a field: one column that never grows wider than the card. */
+.join-box form.field { grid-template-columns: minmax(0, 1fr); }
+.join-box input, .join-box select { width: 100%; min-width: 0; }
 .controller { max-width: 680px; margin: 0 auto; padding: 0 16px 2.5rem; display: grid; gap: 0.8rem; }
 .ctl-bar { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 0.6rem; margin: 0 -16px; padding: 0.5rem 16px; color: #fbe9c0; background: linear-gradient(180deg, #8f1a12, #5c0d09); border-bottom: 3px solid var(--house, var(--gold-bright)); box-shadow: 0 3px 12px rgba(0,0,0,0.5); }
 .ctl-bar .crest { flex: none; background: #fff8e8; border-radius: 50%; padding: 2px; }
@@ -426,17 +429,17 @@ button.choice:hover:not(:disabled) { border-color: var(--gold-bright); border-le
 .ctl-name small { font-size: 0.85rem; }
 .ctl-room { font-family: var(--caps); font-size: 0.85rem; white-space: nowrap; }
 .ctl-bar .btn { color: var(--ink); }
-.ctl-banner { margin: 0; padding: 0.5rem 0.8rem; border-radius: var(--radius); background: #fff8e8; }
-.ctl-main { display: grid; gap: 0.8rem; align-content: start; }
+.ctl-main { display: grid; gap: 0.8rem; align-items: start; }
+.ctl-col { display: flex; flex-direction: column; gap: 0.8rem; min-width: 0; }
 .next-panel { text-align: center; }
+.next-panel #ctl-read { margin: 0.2rem 0 1rem; }
 .btn.big { width: 100%; min-height: 64px; font-size: 1.2rem; }
 .waiting-panel p { margin: 0.3rem 0; }
 .controller .action-btn { min-height: 60px; }
 /* Tablets and computers: the house beside the actions. */
 @media (min-width: 900px) {
   .controller { max-width: 1040px; }
-  .ctl-main.my-turn { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
-  .ctl-main.my-turn > .actions-panel { grid-row: span 3; }
+  .ctl-main.two { grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); }
 }
 /* Phones: a tighter frame so cards and choices fit the width. */
 @media (max-width: 560px) {
@@ -486,7 +489,7 @@ body.big-screen .plague-grid { display: grid; grid-template-columns: repeat(auto
 .ctl-tools { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.4rem; }
 @media (max-width: 420px) { .ctl-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .phone-map { flex: none; aspect-ratio: 1000 / 896; width: 100%; margin: 0.4rem 0; }
-.city-list { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.6rem; }
+.city-list { display: flex; flex-wrap: wrap; gap: 0.7rem 0.6rem; margin-top: 0.6rem; }
 .city-list .btn { flex: 1 1 9rem; min-height: 40px; justify-content: space-between; font-size: 0.85rem; }
 .city-list small { font-family: var(--serif); font-weight: 400; letter-spacing: 0; color: var(--ink-soft); }
 .ctl-tools .btn { min-width: 0; padding-inline: 0.35em; gap: 0.3em; letter-spacing: 0.01em; font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

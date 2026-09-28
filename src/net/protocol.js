@@ -20,12 +20,16 @@ export const TOAST = 'toast';   // { to, text }
 export const REJECT = 'reject'; // { to, reason }  join refused
 export const CLOSED = 'closed'; // the host left the room
 export const ROLL_CALL = 'roll-call'; // a (re)opened room asks every device to report in
+export const BEAT = 'beat';     // the big screen's heartbeat, so devices notice if it disappears
 // Host ↔ host: makes sure two big screens never share a room code.
 export const PROBE = 'probe';
 export const HOST_HERE = 'host-here';
 
 export const PING_EVERY_MS = 8000;
 export const OFFLINE_AFTER_MS = 25000;
+// A device treats the big screen as gone after this long without a message
+// (long enough for a big screen whose tab is briefly in the background).
+export const HOST_GONE_AFTER_MS = 60000;
 
 // Room codes are 4 letters and numbers. Letters and digits that are easy to
 // mix up (0/O, 1/I/L) are left out, and so are vowels (and Y), so a code never

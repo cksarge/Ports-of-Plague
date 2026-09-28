@@ -38,6 +38,7 @@ function join(code = '') {
 
 // A saved multi-device game reopens its room, so the players' devices can rejoin.
 async function resume(saved) {
+  app.onkeydown = null;
   const ui = saved.ui ?? {};
   if (!ui.room) { play(saved.state, ui); return; }
   const message = (html) => { app.innerHTML = `<section class="screen"><div class="frame join-box">${html}</div></section>`; };

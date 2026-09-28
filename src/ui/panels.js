@@ -63,6 +63,7 @@ export function showCredits() {
       <li><strong>Map:</strong> coastlines, rivers and lakes from Natural Earth (public domain).</li>
       <li><strong>Fonts:</strong> EB Garamond, Cinzel and UnifrakturMaguntia, all under the SIL Open Font License.</li>
       <li><strong>Sound and music:</strong> original, generated live in your browser; no recordings are used.</li>
+      <li><strong>Playing on several devices:</strong> the big screen and the players' phones, tablets or computers talk through Supabase Realtime (supabase.com), using the open-source libraries <em>@supabase/realtime-js</em> (© 2020 Supabase) and <em>@supabase/phoenix</em> (© 2014 Chris McCord), both under the MIT License. Only house names, home cities and game moves are sent; nothing is stored and there are no accounts.</li>
     </ul>
     <p>Content note: the game deals with mass death and with the persecution of Jewish communities. It treats these seriously and without graphic detail, and it states plainly that the accusations against Jews were false and the violence unjust.</p>
     <div class="dialog-actions"><button class="btn primary" data-value="close" autofocus>Close</button></div></div>`, { label: 'About' });
