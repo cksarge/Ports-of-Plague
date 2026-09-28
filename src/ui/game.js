@@ -7,7 +7,7 @@ import {
   scorePlayer, familyTotal, cardById,
   roundInfo, totalRounds, roundNumber, fortuneById,
 } from '../engine/index.js';
-import { $, $$, esc, openDialog, dialogOpen, toast, announce, crestSvg, isTyping } from './dom.js';
+import { $, $$, esc, openDialog, dialogOpen, toast, announce, crestSvg, isTyping, warnBeforeLeaving } from './dom.js';
 import { createMap, updateMap, animateShipment, animateStrike, redrawStains, startAmbient, floatText } from './map.js';
 import { noteHtml } from './notes.js';
 import { showRules, showJournal, showCity } from './panels.js';
@@ -121,9 +121,12 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
   if (remote) {
     document.body.classList.add('big-screen');
     window.addEventListener('resize', onResize);
+    // Closing the big screen's tab would end the game for every device: ask first.
+    warnBeforeLeaving(true);
   }
   const cleanup = () => {
     left = true;
+    warnBeforeLeaving(false);
     document.removeEventListener('keydown', onKey);
     document.body.classList.remove('big-screen');
     window.removeEventListener('resize', onResize);
