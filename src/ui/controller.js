@@ -4,7 +4,7 @@
 // screen only draws the state it receives and sends requests back.
 import { DATA, CITIES, HOME_CITIES } from '../data.js';
 import { C, PLAYER_STYLES, currentPlayer, roundInfo, roundNumber, totalRounds, familyTotal, scorePlayer } from '../engine/index.js';
-import { $, $$, esc, openDialog, dialogOpen, closeAllDialogs, toast, crestSvg, isTyping } from './dom.js';
+import { $, $$, esc, openDialog, dialogOpen, closeAllDialogs, toast, crestSvg, isTyping, warnBeforeLeaving } from './dom.js';
 import { housePanelHtml, actionsPanelHtml, hintFor, quickBlock, actionPrompt, decisionPrompt, endTurnPrompt } from './prompts.js';
 import { showRules, showJournal, showCity } from './panels.js';
 import { storyCard, storyHtml } from './stories.js';
@@ -35,7 +35,7 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
     const seats = game?.seats ?? lobby?.seats ?? [];
     return conn ? seats.findIndex((s) => s.cid === conn.cid) : -1;
   };
-  const leave = () => { conn?.close(); conn = null; document.removeEventListener('keydown', onKey); onBack(); };
+  const leave = () => { warnBeforeLeaving(false); conn?.close(); conn = null; document.removeEventListener('keydown', onKey); onBack(); };
 
   // ---------- Step 1: the room code ----------
   function drawCode() {
@@ -110,6 +110,7 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
   function hostLeft(why) {
     if (hostGone || !conn) return;
     hostGone = true;
+    warnBeforeLeaving(false);
     const code = conn.code;
     const inGame = screen === 'game' && game?.state?.phase !== 'ended';
     conn.close({ leave: false });
@@ -217,7 +218,9 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
     screen = 'game';
     const { state, view = {} } = game;
     const seat = me();
-    if (seat < 0) { drawRejoin(); return; }
+    if (seat < 0) { warnBeforeLeaving(false); drawRejoin(); return; }
+    // Mid-game, closing this tab asks first (not before the game or after the results).
+    warnBeforeLeaving(state.phase !== 'ended');
     const p = state.players[seat];
     const cur = currentPlayer(state);
     const myTurn = cur?.id === p.id;

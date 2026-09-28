@@ -60,6 +60,18 @@ export function openDialog(html, { wide = false, side = false, dismissable = tru
   });
 }
 
+// The browser's own "Leave site?" question while a multi-device game is going
+// on (closing the tab would drop this device, or the big screen, out of the
+// game). Browsers show their own wording, and iPhones never show it.
+const askBeforeLeaving = (e) => { e.preventDefault(); e.returnValue = ''; };
+let leavingGuarded = false;
+export function warnBeforeLeaving(on) {
+  if (on === leavingGuarded) return;
+  leavingGuarded = on;
+  if (on) window.addEventListener('beforeunload', askBeforeLeaving);
+  else window.removeEventListener('beforeunload', askBeforeLeaving);
+}
+
 // Closes every open dialog as if it was cancelled (for example when the game
 // this device was playing has ended).
 export function closeAllDialogs() {
