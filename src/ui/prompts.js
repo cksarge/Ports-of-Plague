@@ -7,7 +7,7 @@ import { DATA, CITIES } from '../data.js';
 import {
   C, ESTATE, checkAction, shipQuote, scorePlayer, familyAt, familyTotal, familyLocations, isStricken, isThreatened,
   routesFrom, neighbors, cost, charityCost, CHARITY_KINDS, cardById, canAccept, severityName, actionPointsFor,
-  lastPlaceId, legalPosts, isAftermath, untilRound, dealPartner,
+  lastPlaceId, legalPosts, isAftermath, untilRound, dealPartner, apCost,
 } from '../engine/index.js';
 import { esc, crestSvg } from './dom.js';
 import { noteHtml } from './notes.js';
@@ -78,7 +78,7 @@ function ledgerNotes(state, p) {
 
 function actionCostText(state, id, p) {
   return {
-    ship: '1 AP', post: p.free.post ? 'free' : `1 AP · ${cost(state, 'openPost', p)}ƒ`, move: p.free.move || p.free.moveNoPenalty ? 'free' : '1 AP',
+    ship: '1 AP', post: p.free.post ? 'free' : `${apCost('post')} AP · ${cost(state, 'openPost', p)}ƒ`, move: p.free.move || p.free.moveNoPenalty ? 'free' : `${apCost('move')} AP`,
     prepare: p.free.prepare ? 'free' : `1 AP · ${cost(state, 'prepareHousehold')}ƒ`, physician: p.free.physician ? 'free' : `1 AP · ${cost(state, 'physician')}ƒ`,
     charity: `1 AP · ${charityCost(state, p)}ƒ`,
     marry: `1 AP · ${cost(state, 'marriage')}ƒ`, land: `1 AP · ${cost(state, 'buyLand')}ƒ`, loan: 'no AP', deal: 'no AP',
@@ -92,6 +92,7 @@ export function quickBlock(state, id, p, busy = false) {
   if (p.pending.length) return 'Answer the card first.';
   const free = NO_AP_ACTIONS.includes(id) || (id === 'move' && (p.free.move || p.free.moveNoPenalty)) || (id === 'prepare' && p.free.prepare) || (id === 'post' && p.free.post) || (id === 'physician' && p.free.physician);
   if (p.ap < 1 && !free) return 'No action points left.';
+  if (p.ap < apCost(id) && !free) return `Takes ${apCost(id)} action points.`;
   if (id === 'ship' && !p.posts.some((c) => routesFrom(c).some((r) => !checkAction(state, { type: 'ship', from: c, route: r.id })))) return 'All your posts have shipped this round.';
   if (id === 'post' && !p.free.post && p.florins < cost(state, 'openPost', p)) return `Needs ${cost(state, 'openPost', p)}ƒ.`;
   if (id === 'post' && p.posts.length >= C.limits.maxPosts) return 'Maximum number of posts.';

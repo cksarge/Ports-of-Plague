@@ -9,7 +9,7 @@
 ## 2. What the game is (0:30–1:15)
 - *Ports of Plague* is a board game played on one computer by 2–6 players, taking turns (hot seat). It has a painted map board, ships and carts sailing the trade routes, dice, cards and house banners, all animated.
 - Each player is a merchant family based in a real trading city (Marseille, Genoa, Venice, Florence, Barcelona, London, Bruges, Lübeck). A dice roll at the start sets the turn order for the whole game.
-- 12 rounds of half a year each (Late 1347 to Early 1353), or 6 rounds of a whole year in **Quick Play**. Three difficulties, from Apprentice to Great Mortality. About 30–60 minutes.
+- 12 rounds of half a year each (Late 1347 to Early 1353), or 6 rounds of a whole year in **Quick Play**. Three difficulties, from Apprentice to Great Mortality. About 27–60 minutes.
 - **Goal:** the highest *Legacy* in 1353 = Wealth + Family + Reputation, plus your weakest category again. **Balance beats greed.**
 
 ## 3. How it plays: strategy and chance (1:15–2:15)

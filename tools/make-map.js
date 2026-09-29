@@ -1,9 +1,9 @@
 // Builds data/map.json from the Natural Earth files in tools/map-source/.
 // Run with: npm run map
 import { readFileSync, writeFileSync } from 'node:fs';
-import { project, PROJECTION, MAP_HEIGHT } from '../src/projection.js';
+import { project, MAP_WIDTH, MAP_HEIGHT } from '../src/projection.js';
 
-const W = PROJECTION.width, H = MAP_HEIGHT, M = 420; // clip margin in px (land is drawn beyond the frame so wide screens show no hard edge)
+const W = MAP_WIDTH, H = MAP_HEIGHT, M = 420; // clip margin in px (land is drawn beyond the frame so wide screens show no hard edge)
 const src = (f) => JSON.parse(readFileSync(new URL(`./map-source/${f}`, import.meta.url)));
 
 // Sutherland–Hodgman polygon clipping against the padded map rectangle.

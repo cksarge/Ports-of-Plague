@@ -103,6 +103,9 @@ test('illegal moves are blocked with a reason', () => {
   const [first] = legalShipments(s, p);
   assert.ok(performAction(s, first).ok);
   assert.match(checkAction(s, first), /already shipped/);
+  // Opening a post takes 2 action points; only 1 is left after shipping.
+  assert.match(checkAction(s, { type: 'post', city: 'moscow' }), /takes 2 action points/);
+  p.ap = 2;
   // Not connected.
   assert.match(checkAction(s, { type: 'post', city: 'moscow' }), /not connected/);
   // Out of money.

@@ -277,6 +277,7 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
     } else if (!next) {
       const what = cur ? `<strong>${esc(cur.name)}</strong> is taking their turn.` : state.phase === 'plague' ? 'The plague takes its toll. Watch the big screen.' : 'The chronicle unfolds. Watch the big screen.';
       main.push(`<section class="panel waiting-panel"><h2>Please wait</h2><p>${what}</p></section>`);
+      main.push('<div id="wait-map-slot"></div>');
     }
     side.push(housePanelHtml(state, p, { label: 'Your house' }));
     side.push(`<section class="panel houses-panel" aria-label="All houses"><h2>Houses (turn order)</h2><div class="houses">${state.order.map((id, i) => {
@@ -289,6 +290,7 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
     const focused = document.activeElement?.id;
     app.innerHTML = `<div class="controller">${parts.join('')}</div>`;
     bindTools();
+    placeWaitMap(state);
     $('#ctl-next', app)?.addEventListener('click', pressNext);
     $('#ctl-read', app)?.addEventListener('click', readStory);
     $('#ctl-decide', app)?.addEventListener('click', () => askDecision());
@@ -327,6 +329,38 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
       });
   }
 
+  // While others take their turn, the map sits under "Please wait". It is
+  // built once and moved into each redraw, so zoom and pan survive updates.
+  let waitMap = null;
+  function placeWaitMap(state) {
+    const slot = $('#wait-map-slot', app);
+    if (!slot) return;
+    if (!waitMap) {
+      const el = document.createElement('section');
+      el.className = 'panel map-panel';
+      el.setAttribute('aria-label', 'Map');
+      el.innerHTML = '<h2>The Map</h2><div class="map-frame phone-map"></div>';
+      const frame = el.querySelector('.phone-map');
+      const svg = createMap(frame, { onCity: (id) => showCity(game.state, id) });
+      foldLegend(frame);
+      waitMap = { el, svg };
+    }
+    slot.replaceWith(waitMap.el);
+    updateMap(waitMap.svg, state);
+    redrawStains(waitMap.svg, state);
+  }
+
+  // Start with the legend folded (it would cover most of a small map); tap it to open.
+  function foldLegend(frame) {
+    const legend = frame.querySelector('.legend');
+    if (legend && !legend.classList.contains('collapsed')) {
+      legend.classList.add('collapsed');
+      const toggle = legend.querySelector('.legend-toggle');
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.querySelector('span').textContent = '▸';
+    }
+  }
+
   // The map as the big screen shows it; tap a city (or pick it from the list)
   // to read its history, its status and who trades there.
   function showMap() {
@@ -342,14 +376,7 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
       <div class="dialog-actions"><button class="btn primary" data-value="close" autofocus>Close</button></div></div>`,
     { wide: true, label: 'Map', onMount: (d) => {
       const svg = createMap(d.querySelector('#phone-map'), { onCity: (id) => showCity(state, id) });
-      // Start with the legend folded (it would cover most of a small map); tap it to open.
-      const legend = d.querySelector('#phone-map .legend');
-      if (legend && !legend.classList.contains('collapsed')) {
-        legend.classList.add('collapsed');
-        const toggle = legend.querySelector('.legend-toggle');
-        toggle.setAttribute('aria-expanded', 'false');
-        toggle.querySelector('span').textContent = '▸';
-      }
+      foldLegend(d.querySelector('#phone-map'));
       updateMap(svg, state);
       redrawStains(svg, state);
       d.querySelectorAll('.city-list [data-city]').forEach((b) => (b.onclick = () => showCity(state, b.dataset.city)));

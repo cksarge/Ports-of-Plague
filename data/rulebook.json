@@ -103,12 +103,12 @@
             ],
             [
               "**Open Trading Post** (2)",
-              "1 AP + {{costs.openPost}}ƒ",
+              "{{actionPointCosts.post}} AP + {{costs.openPost}}ƒ",
               "Open a post in a city connected by a route to one of your posts. It cannot be a Stricken city. You may own at most {{limits.maxPosts}} posts."
             ],
             [
               "**Move Family** (3)",
-              "1 AP",
+              "{{actionPointCosts.move}} AP",
               "Move up to {{limits.moveFamilyMax}} family members from one of your cities or your Country Estate to another. **Fleeing** (leaving a Stricken city) costs {{penalties.fleeReputation}} reputation. Family at the Estate is safe from the plague, but earns no family bonus."
             ],
             [
@@ -248,7 +248,7 @@
             "**Round:** Chronicle → Event → Actions ({{modes.standard.actionPoints}} AP each; {{modes.quick.actionPoints}} in Quick Play) → Plague & upkeep. Turn order never changes.",
             "**Ship:** route value + profit die + family {{gains.familyAtPostBonus}} + Aftermath destination {{gains.aftermathPriceBonus}} − Aftermath wage {{costs.wageAftermath}}. From a Stricken city: contagion die ≤ severity means infected (half profit, −{{penalties.infectedCargoReputation}} reputation, may spread). Profit die {{fortune.drawOnProfitDie}}: draw a Fortune card.",
             "**Survival:** mortality die (+{{plague.prepareBonus}} if prepared) ≤ severity means the family member dies. The last heir always survives. Each loss inherits {{gains.inheritance}}ƒ.",
-            "**Costs:** Post {{costs.openPost}}ƒ · Prepare {{costs.prepareHousehold}}ƒ · Physician {{costs.physician}}ƒ · Charity {{costs.charity}}ƒ · Protect {{costs.protectCommunity}}ƒ + 1 AP · Offshore +{{costs.holdOffshore}}ƒ · Marriage {{costs.marriage}}ƒ · Land {{costs.buyLand}}ƒ (+{{costs.landWage}}ƒ per half-year) · Loan +{{gains.loan}}ƒ now, {{costs.loanRepay}}ƒ next round · Gates −{{penalties.gatesReputation}} reputation.",
+            "**Costs:** Post {{costs.openPost}}ƒ + {{actionPointCosts.post}} AP · Move family {{actionPointCosts.move}} AP · Prepare {{costs.prepareHousehold}}ƒ · Physician {{costs.physician}}ƒ · Charity {{costs.charity}}ƒ · Protect {{costs.protectCommunity}}ƒ + 1 AP · Offshore +{{costs.holdOffshore}}ƒ · Marriage {{costs.marriage}}ƒ · Land {{costs.buyLand}}ƒ (+{{costs.landWage}}ƒ per half-year) · Loan +{{gains.loan}}ƒ now, {{costs.loanRepay}}ƒ next round · Gates −{{penalties.gatesReputation}} reputation.",
             "**Keys:** 1–6 actions · 7 marriage · 8 land · 9 loan · 0 partnership · G gates · E end turn · R rules · J journal · M sound · N music · Enter confirm · Esc cancel."
           ]
         }

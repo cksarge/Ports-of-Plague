@@ -2,7 +2,7 @@
 // They only use information a human player can see on screen: city states,
 // "threatened" warnings, scores and the cards in play. They never peek at
 // future historical arrival dates.
-import { C, ESTATE, currentPlayer, familyAt, familyLocations, familyTotal, isStricken, isThreatened, isAftermath, cost, routesFrom, neighbors } from './state.js';
+import { C, ESTATE, currentPlayer, familyAt, familyLocations, familyTotal, isStricken, isThreatened, isAftermath, cost, routesFrom, neighbors, apCost } from './state.js';
 import { shipQuote, legalShipments, legalPosts, performAction, checkAction, charityCost } from './actions.js';
 import { decide, endTurn, actionPointsFor } from './turn.js';
 import { scorePlayer } from './scoring.js';
@@ -232,7 +232,8 @@ function bestByLegacy(state, p) {
       const halvesLeft = C.rounds - state.roundEnd + 1;
       change = { florins: -cost(state, 'buyLand') - halvesLeft * C.costs.landWage, land: [...p.land, a.city] };
     }
-    const value = legacyOf(p, change) - base;
+    // Compare value per action point, so a 2-AP action must earn twice as much.
+    const value = (legacyOf(p, change) - base) / apCost(a.type);
     if (!best || value > best.value) best = { action: a, value };
   }
   return best && best.value > 0.05 ? best.action : null;
