@@ -74,7 +74,7 @@
           "items": [
             "**Chronicle.** The date advances. The plague reaches every city whose real arrival date falls in this round; each becomes Stricken and rolls severity. Then the round's dated Chronicle cards are read.",
             "**Event.** One Event card is drawn. If it offers a choice, each player decides at the start of their own turn.",
-            "**Actions.** Players take turns in the fixed order, each with **{{modes.standard.actionPoints}} action points (AP)** ({{modes.quick.actionPoints}} in Quick Play). A pass-the-device screen appears between turns.",
+            "**Actions.** Players take turns in the fixed order, each with **{{modes.standard.actionPoints}} action points (AP)** ({{modes.quick.actionPoints}} in Quick Play). Most actions take 1 AP, but **Open Trading Post** and **Move Family** take {{actionPointCosts.post}}. A pass-the-device screen appears between turns.",
             "**Plague & upkeep.** Family members in Stricken cities roll for survival. Cities Stricken for {{plague.strickenRounds}} half-years move to Aftermath. Land wages are paid, loans that are due are repaid, and partnerships and closed gates that have run their course end."
           ]
         },
@@ -88,6 +88,10 @@
       "id": "actions",
       "title": "Actions",
       "blocks": [
+        {
+          "type": "p",
+          "text": "Spend your action points on the actions below, in any order. Most take **1 AP**. **Open Trading Post** and **Move Family** are bigger undertakings and take **{{actionPointCosts.post}} AP**: in the standard game that is your whole turn, and in Quick Play it leaves 1 AP. Take a Loan and Propose a Partnership take no AP. A Fortune or Event card that makes an action free also means it takes no AP."
+        },
         {
           "type": "table",
           "head": [
@@ -246,9 +250,10 @@
           "type": "list",
           "items": [
             "**Round:** Chronicle → Event → Actions ({{modes.standard.actionPoints}} AP each; {{modes.quick.actionPoints}} in Quick Play) → Plague & upkeep. Turn order never changes.",
+            "**Action points:** 1 AP per action · Open Trading Post {{actionPointCosts.post}} AP · Move Family {{actionPointCosts.move}} AP · Loan and Partnership 0 AP.",
             "**Ship:** route value + profit die + family {{gains.familyAtPostBonus}} + Aftermath destination {{gains.aftermathPriceBonus}} − Aftermath wage {{costs.wageAftermath}}. From a Stricken city: contagion die ≤ severity means infected (half profit, −{{penalties.infectedCargoReputation}} reputation, may spread). Profit die {{fortune.drawOnProfitDie}}: draw a Fortune card.",
             "**Survival:** mortality die (+{{plague.prepareBonus}} if prepared) ≤ severity means the family member dies. The last heir always survives. Each loss inherits {{gains.inheritance}}ƒ.",
-            "**Costs:** Post {{costs.openPost}}ƒ + {{actionPointCosts.post}} AP · Move family {{actionPointCosts.move}} AP · Prepare {{costs.prepareHousehold}}ƒ · Physician {{costs.physician}}ƒ · Charity {{costs.charity}}ƒ · Protect {{costs.protectCommunity}}ƒ + 1 AP · Offshore +{{costs.holdOffshore}}ƒ · Marriage {{costs.marriage}}ƒ · Land {{costs.buyLand}}ƒ (+{{costs.landWage}}ƒ per half-year) · Loan +{{gains.loan}}ƒ now, {{costs.loanRepay}}ƒ next round · Gates −{{penalties.gatesReputation}} reputation.",
+            "**Costs:** Post {{costs.openPost}}ƒ · Prepare {{costs.prepareHousehold}}ƒ · Physician {{costs.physician}}ƒ · Charity {{costs.charity}}ƒ · Protect {{costs.protectCommunity}}ƒ + 1 AP · Offshore +{{costs.holdOffshore}}ƒ · Marriage {{costs.marriage}}ƒ · Land {{costs.buyLand}}ƒ (+{{costs.landWage}}ƒ per half-year) · Loan +{{gains.loan}}ƒ now, {{costs.loanRepay}}ƒ next round · Gates −{{penalties.gatesReputation}} reputation.",
             "**Keys:** 1–6 actions · 7 marriage · 8 land · 9 loan · 0 partnership · G gates · E end turn · R rules · J journal · M sound · N music · Enter confirm · Esc cancel."
           ]
         }

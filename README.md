@@ -7,6 +7,7 @@ Each player leads a merchant family in a real trading city. Ship goods along his
 - **Standard** game: 12 rounds of half a year (about 35 / 47 / 58 minutes for 2 / 3 / 4 players).
 - **Quick Play**: 6 rounds of a whole year (about 27–58 minutes for 2–6 players; recommended for 5–6 players).
 - Three difficulties: Apprentice, Chronicler and Great Mortality.
+- Each turn you have 2 action points (3 in Quick Play). Most actions take 1; opening a trading post or moving family takes 2.
 - A dice roll at the start sets a turn order that stays the same all game. Personal **Fortune cards** (drawn on a profit roll of 6 or when opening a trading post) make every player's game different.
 
 ---
