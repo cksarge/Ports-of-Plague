@@ -143,7 +143,7 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
         <div class="house-card" style="--house:${style.color}">
           <h3>${crestSvg({ color: style.color, crest: style.crest }, 26)} Your house <small style="font-family:var(--serif);font-weight:400">(${esc(style.colorName)})</small></h3>
           <div class="field"><label for="house-name">House name</label><input id="house-name" maxlength="24" autocomplete="off" enterkeyhint="done" value="${esc(form.name)}" placeholder="House of the …"></div>
-          <div class="field"><label for="house-home">Home city</label><select id="house-home">${HOME_CITIES.map((h) => `<option value="${h}" ${form.home === h ? 'selected' : ''} ${taken.includes(h) ? 'disabled' : ''}>${esc(CITIES[h].name)}${taken.includes(h) ? ' (taken)' : ''}</option>`).join('')}</select></div>
+          <div class="field"><label for="house-home">Home city</label><select id="house-home">${HOME_CITIES.map((h) => `<option value="${h}" ${form.home === h ? 'selected' : ''} ${taken.includes(h) ? 'disabled' : ''}>${esc(CITIES[h].modern)}${taken.includes(h) ? ' (taken)' : ''}</option>`).join('')}</select></div>
           <div class="home-info" id="home-info">${homeInfo(form.home)}</div>
         </div>
         <p class="error" role="alert">${esc(error)}</p>

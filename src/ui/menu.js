@@ -147,7 +147,7 @@ export function renderSetup(app, { onStart, onBack }) {
           <h3>${crestSvg(p, 26)} Player ${i + 1} <small style="font-family:var(--serif);font-weight:400">(${esc(p.colorName)}, ${p.crest})</small></h3>
           <div class="field"><label for="name-${i}">House name</label><input id="name-${i}" data-name="${i}" value="${esc(p.name)}" maxlength="24" autocomplete="off"></div>
           <div class="field"><label for="home-${i}">Home city</label>
-            <select id="home-${i}" data-home="${i}">${HOME_CITIES.map((h) => `<option value="${h}" ${p.home === h ? 'selected' : ''}>${esc(CITIES[h].name)}</option>`).join('')}</select></div>
+            <select id="home-${i}" data-home="${i}">${HOME_CITIES.map((h) => `<option value="${h}" ${p.home === h ? 'selected' : ''}>${esc(CITIES[h].modern)}</option>`).join('')}</select></div>
           <div class="home-info" id="info-${i}">${homeInfo(p.home)}</div>
         </div>`).join('')}</div>`}
       <div class="option-grid">

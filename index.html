@@ -712,7 +712,7 @@ Suggested solution: ${e.workaround}`),new Error(n)}static isWebSocketSupported()
           <h3>${Q(E,26)} Player ${O+1} <small style="font-family:var(--serif);font-weight:400">(${d(E.colorName)}, ${E.crest})</small></h3>
           <div class="field"><label for="name-${O}">House name</label><input id="name-${O}" data-name="${O}" value="${d(E.name)}" maxlength="24" autocomplete="off"></div>
           <div class="field"><label for="home-${O}">Home city</label>
-            <select id="home-${O}" data-home="${O}">${Te.map(J=>`<option value="${J}" ${E.home===J?"selected":""}>${d(C[J].name)}</option>`).join("")}</select></div>
+            <select id="home-${O}" data-home="${O}">${Te.map(J=>`<option value="${J}" ${E.home===J?"selected":""}>${d(C[J].modern)}</option>`).join("")}</select></div>
           <div class="home-info" id="info-${O}">${s(E.home)}</div>
         </div>`).join("")}</div>`}
       <div class="option-grid">
@@ -904,7 +904,7 @@ Suggested solution: ${e.workaround}`),new Error(n)}static isWebSocketSupported()
         <div class="house-card" style="--house:${I.color}">
           <h3>${Q({color:I.color,crest:I.crest},26)} Your house <small style="font-family:var(--serif);font-weight:400">(${d(I.colorName)})</small></h3>
           <div class="field"><label for="house-name">House name</label><input id="house-name" maxlength="24" autocomplete="off" enterkeyhint="done" value="${d(g.name)}" placeholder="House of the \u2026"></div>
-          <div class="field"><label for="house-home">Home city</label><select id="house-home">${Te.map(Y=>`<option value="${Y}" ${g.home===Y?"selected":""} ${R.includes(Y)?"disabled":""}>${d(C[Y].name)}${R.includes(Y)?" (taken)":""}</option>`).join("")}</select></div>
+          <div class="field"><label for="house-home">Home city</label><select id="house-home">${Te.map(Y=>`<option value="${Y}" ${g.home===Y?"selected":""} ${R.includes(Y)?"disabled":""}>${d(C[Y].modern)}${R.includes(Y)?" (taken)":""}</option>`).join("")}</select></div>
           <div class="home-info" id="home-info">${O(g.home)}</div>
         </div>
         <p class="error" role="alert">${d(p)}</p>
