@@ -206,6 +206,11 @@ export function cost(state, key, p = null) {
   return Math.max(0, C.costs[key] + (state.effects.costs[key] ?? 0) + (p?.personalCosts?.[key] ?? 0));
 }
 
+// Action points an action takes (1 unless config.json says otherwise).
+export function apCost(type) {
+  return C.actionPointCosts[type] ?? 1;
+}
+
 export function difficultyOf(state) {
   return C.difficulty[state.difficulty] ?? C.difficulty.chronicler;
 }

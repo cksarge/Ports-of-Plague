@@ -106,9 +106,15 @@ export function createMap(container, { onCity, decorative = false } = {}) {
     <div class="row"><svg width="26" height="26" viewBox="-6 -20 22 28">${banner('#888', 'circle', 2)}</svg> Trading post (number = family)</div>
     <div class="row"><svg width="26" height="10"><line x1="1" y1="5" x2="25" y2="5" stroke="#10375c" stroke-width="2.5" stroke-dasharray="1 4" stroke-linecap="round"/></svg> Sea route <svg width="26" height="10"><line x1="1" y1="5" x2="25" y2="5" stroke="#6b4423" stroke-width="2.5" stroke-dasharray="6 4"/></svg> Land</div>
   </div>`}
-  <div class="map-credit">${esc(mapData.credit)}</div>`;
+  <div class="map-credit">${esc(mapData.credit)}</div>
+  ${decorative ? '' : `<div class="map-zoom" role="group" aria-label="Map zoom">
+    <button class="zoom-in" aria-label="Zoom in" title="Zoom in (or scroll / pinch)">+</button>
+    <button class="zoom-out" aria-label="Zoom out" title="Zoom out">−</button>
+    <button class="zoom-reset" aria-label="Show the whole map" title="Show the whole map">⤢</button>
+  </div>`}`;
 
   const svg = container.querySelector('svg');
+  container.style.setProperty('--map-aspect', `${W} / ${H}`);
   const vals = svg.querySelector('#route-values');
   for (const r of DATA.routes) {
     const path = svg.querySelector(`#route-${CSS.escape(r.id)}`);
@@ -132,6 +138,7 @@ export function createMap(container, { onCity, decorative = false } = {}) {
     try { open = localStorage.getItem('ports-of-plague-legend') !== '0'; } catch { /* ignore */ }
     setLegend(open);
     toggle.onclick = () => setLegend(legend.classList.contains('collapsed'));
+    enableZoom(container, svg, W, H);
     svg.querySelector('#cities').addEventListener('click', (e) => {
       const g = e.target.closest('.city');
       if (g) onCity?.(g.dataset.city);
@@ -144,6 +151,111 @@ export function createMap(container, { onCity, decorative = false } = {}) {
     });
   }
   return svg;
+}
+
+// ---------- Zoom and pan ----------
+// Wheel or trackpad pinch zooms around the pointer, dragging pans, two
+// fingers pinch on touch screens, and the +/−/⤢ buttons do the same. The
+// view is the SVG viewBox, sized to the frame so nothing is letterboxed.
+const MAX_ZOOM = 5;
+function enableZoom(container, svg, W, H) {
+  const xs = Object.values(POS).map((p) => p[0]);
+  const homeX = Math.max(W / 2, (Math.min(...xs) - 70 + Math.max(...xs) + 100) / 2); // centre on the cities, not the empty Atlantic
+  let z = 1, cx = homeX, cy = H / 2;
+  const base = () => {
+    const a = (container.clientWidth || W) / (container.clientHeight || H);
+    return a > W / H ? [H * a, H] : [W, W / a];
+  };
+  const clampAxis = (c, view, extent) => {
+    const lo = Math.min(view / 2, extent - view / 2), hi = Math.max(view / 2, extent - view / 2);
+    return Math.min(hi, Math.max(lo, c));
+  };
+  const apply = () => {
+    const [bw, bh] = base();
+    const vw = bw / z, vh = bh / z;
+    if (z === 1) { cx = homeX; cy = H / 2; }
+    cx = clampAxis(cx, vw, W);
+    cy = clampAxis(cy, vh, H);
+    svg.setAttribute('viewBox', `${(cx - vw / 2).toFixed(1)} ${(cy - vh / 2).toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}`);
+    svg.style.touchAction = z > 1 ? 'none' : 'pan-y';
+    container.classList.toggle('zoomed', z > 1);
+    container.querySelector('.zoom-in').disabled = z >= MAX_ZOOM;
+    container.querySelector('.zoom-out').disabled = container.querySelector('.zoom-reset').disabled = z <= 1;
+  };
+  // Map point under a screen point, for the current view.
+  const toMap = (px, py) => {
+    const r = svg.getBoundingClientRect();
+    const [bw, bh] = base();
+    return [cx - bw / z / 2 + ((px - r.left) / r.width) * (bw / z), cy - bh / z / 2 + ((py - r.top) / r.height) * (bh / z)];
+  };
+  const zoomAt = (px, py, factor) => {
+    const [mx, my] = toMap(px, py);
+    const nz = Math.min(MAX_ZOOM, Math.max(1, z * factor));
+    const k = z / nz;
+    cx = mx + (cx - mx) * k;
+    cy = my + (cy - my) * k;
+    z = nz;
+    apply();
+  };
+  const zoomCentre = (factor) => {
+    const r = svg.getBoundingClientRect();
+    zoomAt(r.left + r.width / 2, r.top + r.height / 2, factor);
+  };
+
+  svg.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+    zoomAt(e.clientX, e.clientY, Math.exp(-dy * (e.ctrlKey ? 0.01 : 0.002)));
+  }, { passive: false });
+
+  const pointers = new Map();
+  let dragged = false, pinch = null;
+  svg.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY });
+    if (pointers.size === 1) dragged = false;
+    if (pointers.size === 2) {
+      const [a, b] = [...pointers.values()];
+      pinch = { d: Math.hypot(a.x - b.x, a.y - b.y) || 1 };
+    }
+  });
+  svg.addEventListener('pointermove', (e) => {
+    const p = pointers.get(e.pointerId);
+    if (!p) return;
+    const dx = e.clientX - p.x, dy = e.clientY - p.y;
+    p.x = e.clientX; p.y = e.clientY;
+    if (pointers.size === 2 && pinch) {
+      const [a, b] = [...pointers.values()];
+      const d = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+      zoomAt((a.x + b.x) / 2, (a.y + b.y) / 2, d / pinch.d);
+      pinch.d = d;
+      dragged = true;
+      return;
+    }
+    if (!dragged && Math.hypot(e.clientX - p.sx, e.clientY - p.sy) < 6) return;
+    if (z === 1) return; // nothing to pan: let the page scroll instead
+    if (!dragged) { dragged = true; svg.setPointerCapture?.(e.pointerId); container.classList.add('panning'); }
+    const r = svg.getBoundingClientRect();
+    const [bw] = base();
+    const s = bw / z / r.width;
+    cx -= dx * s; cy -= dy * s;
+    apply();
+  });
+  const up = (e) => {
+    pointers.delete(e.pointerId);
+    if (pointers.size < 2) pinch = null;
+    if (!pointers.size) container.classList.remove('panning');
+  };
+  svg.addEventListener('pointerup', up);
+  svg.addEventListener('pointercancel', up);
+  // A drag or pinch that ends over a city must not also select it.
+  svg.addEventListener('click', (e) => { if (dragged) { e.stopPropagation(); e.preventDefault(); dragged = false; } }, true);
+
+  container.querySelector('.zoom-in').onclick = () => zoomCentre(1.5);
+  container.querySelector('.zoom-out').onclick = () => zoomCentre(1 / 1.5);
+  container.querySelector('.zoom-reset').onclick = () => { z = 1; apply(); };
+  new ResizeObserver(apply).observe(container);
+  apply();
 }
 
 export function updateMap(svg, state, { selectable = null, selected = null, highlightRoutes = [] } = {}) {

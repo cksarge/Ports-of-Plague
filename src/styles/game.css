@@ -217,6 +217,14 @@ a { color: var(--lapis); }
 .legend { position: absolute; left: 10px; bottom: 10px; background: rgba(251, 245, 228, 0.95); border: 2px solid var(--gold-bright); border-radius: 10px; padding: 0.45rem 0.65rem; font-size: 0.82rem; line-height: 1.35; max-width: 270px; box-shadow: var(--shadow); }
 .legend h3 { font-size: 0.8rem; margin: 0 0 0.2rem; color: var(--vermilion); }
 .legend .row { display: flex; align-items: center; gap: 0.4rem; }
+.map-zoom { position: absolute; top: 10px; right: 10px; display: flex; flex-direction: column; gap: 4px; }
+.map-zoom button { width: 36px; height: 36px; display: grid; place-items: center; font: 700 1.25rem/1 var(--serif); color: var(--ink); background: rgba(251, 245, 228, 0.95); border: 2px solid var(--gold-bright); border-radius: 8px; box-shadow: var(--shadow); cursor: pointer; }
+.map-zoom button:hover:not(:disabled) { background: #fffaf0; }
+.map-zoom button:disabled { opacity: 0.45; cursor: default; }
+.map-zoom button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.map-frame:not(.zoomed) .map-zoom .zoom-out, .map-frame:not(.zoomed) .map-zoom .zoom-reset { display: none; }
+.map-frame.zoomed > svg { cursor: grab; }
+.map-frame.panning > svg { cursor: grabbing; }
 .map-credit { position: absolute; right: 8px; bottom: 4px; font-size: 0.7rem; color: var(--ink-soft); background: rgba(251, 245, 228, 0.8); padding: 0 4px; border-radius: 4px; }
 
 /* ---------- Sidebar panels (parchment with coloured ribbons) ---------- */
@@ -488,7 +496,7 @@ body.big-screen .aftermath-list p { break-inside: avoid; }
 body.big-screen .plague-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); column-gap: 0.8rem; }
 .ctl-tools { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.4rem; }
 @media (max-width: 420px) { .ctl-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-.phone-map { flex: none; aspect-ratio: 1000 / 896; width: 100%; margin: 0.4rem 0; }
+.phone-map { flex: none; aspect-ratio: var(--map-aspect, 1164 / 896); width: 100%; margin: 0.4rem 0; }
 .city-list { display: flex; flex-wrap: wrap; gap: 0.7rem 0.6rem; margin-top: 0.6rem; }
 .city-list .btn { flex: 1 1 9rem; min-height: 40px; justify-content: space-between; font-size: 0.85rem; }
 .city-list small { font-family: var(--serif); font-weight: 400; letter-spacing: 0; color: var(--ink-soft); }

@@ -4,7 +4,7 @@
 import { DATA, CITIES } from '../data.js';
 import {
   C, ESTATE, ROUTES, addLog, clampReputation, cost, currentPlayer, familyAt, familyTotal, isAftermath,
-  isStricken, neighbors, otherEnd, routesFrom, difficultyOf, gatesClosedBy, untilRound,
+  isStricken, neighbors, otherEnd, routesFrom, difficultyOf, gatesClosedBy, untilRound, apCost,
 } from './state.js';
 import { drawFortune } from './fortune.js';
 import { ENGLISH_CITIES } from './events.js';
@@ -18,7 +18,9 @@ function baseChecks(state, p, apNeeded = 1) {
   if (state.phase !== 'actions') return 'It is not the action phase.';
   if (!p) return 'No player is taking a turn.';
   if (p.pending.length) return 'First answer the card waiting for you.';
-  if (p.ap < apNeeded) return 'You have no action points left. End your turn.';
+  if (p.ap < apNeeded) {
+    return p.ap < 1 ? 'You have no action points left. End your turn.' : `This action takes ${apNeeded} action points; you have ${p.ap} left.`;
+  }
   return null;
 }
 
@@ -134,7 +136,7 @@ function doShip(state, p, { from, route, offshore = false }) {
 // ---------- Open Trading Post ----------
 export function checkPost(state, p, { city }) {
   const free = !!p.free.post;
-  const why = baseChecks(state, p, free ? 0 : 1);
+  const why = baseChecks(state, p, free ? 0 : apCost('post'));
   if (why) return why;
   if (!CITIES[city]) return 'Choose a city.';
   if (p.posts.includes(city)) return `You already have a trading post in ${cityName(city)}.`;
@@ -164,7 +166,7 @@ function doPost(state, p, { city }) {
 // ---------- Move Family ----------
 export function checkMove(state, p, { from, to, count }) {
   const free = !!(p.free.move || p.free.moveNoPenalty);
-  const why = baseChecks(state, p, free ? 0 : 1);
+  const why = baseChecks(state, p, free ? 0 : apCost('move'));
   if (why) return why;
   if (from === to) return 'Choose two different places.';
   const validPlace = (loc) => loc === ESTATE || p.posts.includes(loc);
@@ -397,7 +399,7 @@ export function performAction(state, action) {
   if (reason) return { ok: false, reason };
   const out = TABLE[action.type][1](state, p, action);
   const entry = out.entry ?? out;
-  if (!out.free) p.ap -= 1;
+  if (!out.free) p.ap -= apCost(action.type);
   return { ok: true, entry };
 }
 
