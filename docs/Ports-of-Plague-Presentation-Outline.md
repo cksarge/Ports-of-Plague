@@ -13,7 +13,7 @@
 - **Goal:** the highest *Legacy* in 1353 = Wealth + Family + Reputation, plus your weakest category again. **Balance beats greed.**
 
 ## 3. How it plays: strategy and chance (1:15–2:15)
-- On your turn you spend 2 action points (3 in Quick Play): ship goods, open trading posts, move or protect your family, consult a physician, or give to charity.
+- On your turn you spend 2 action points (3 in Quick Play): ship goods, open trading posts, move or protect your family, consult a physician, or give to charity. Most actions take 1 point, but opening a trading post or moving your family takes 2, so expanding or fleeing means giving up other things that turn.
 - **Merchant's Ledger:** once the plague has passed a city, you can arrange a marriage or buy abandoned land there. You can also take a loan, propose a partnership to another house, or close your city's gates to rivals. [SO-12, EC-02, EC-01, TR-04, SO-11]
 - **Fortune cards:** roll a 6 on the profit die or open a trading post and you draw a personal card (spice cargoes, extra actions, warnings of where the plague goes next, but also illness and nervous creditors), so no two players' games are the same.
 - **Chance:** a profit die, a contagion die (infected cargo), a severity die for each stricken city, and survival dice for family members.

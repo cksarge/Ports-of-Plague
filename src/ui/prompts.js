@@ -138,10 +138,13 @@ export function hintFor(state, p, hintsOn) {
   if (p.pending.length) return 'A card needs your decision first.';
   const danger = familyLocations(p).find((l) => l !== ESTATE && (isStricken(state, l) || isThreatened(state, l)));
   if (p.ap === 0) return 'You are out of action points. Press <span class="key">E</span> to end your turn and pass the device.';
-  if (danger && isStricken(state, danger)) return `Your family in ${esc(CITIES[danger].name)} is in a Stricken city. They will roll for survival at the end of the round. Consider <span class="key">3</span> Move Family (fleeing costs ${C.penalties.fleeReputation} reputation) or <span class="key">4</span> Prepare Household.`;
+  if (danger && isStricken(state, danger)) {
+    const canMove = p.ap >= apCost('move') || p.free.move || p.free.moveNoPenalty;
+    return `Your family in ${esc(CITIES[danger].name)} is in a Stricken city. They will roll for survival at the end of the round. Consider ${canMove ? `<span class="key">3</span> Move Family (${apCost('move')} AP; fleeing costs ${C.penalties.fleeReputation} reputation) or ` : ''}<span class="key">4</span> Prepare Household.`;
+  }
   if (danger) return `${esc(CITIES[danger].name)} is next to a Stricken city (spinning orange ring). The plague may arrive soon.`;
   if (p.shipped.length === 0) return `Start with <span class="key">1</span> Ship Goods: pick a route from one of your trading posts. Sea routes pay more. Roll a ${C.fortune.drawOnProfitDie} on the profit die and you draw a Fortune card!`;
-  if (p.posts.length < 2 && p.florins >= cost(state, 'openPost', p)) return `A second trading post (<span class="key">2</span>, ${cost(state, 'openPost', p)}ƒ) lets you ship from two places, and opening it draws a Fortune card.`;
+  if (p.posts.length < 2 && p.florins >= cost(state, 'openPost', p) && p.ap >= apCost('post')) return `A second trading post (<span class="key">2</span>, ${cost(state, 'openPost', p)}ƒ and ${apCost('post')} AP) lets you ship from two places, and opening it draws a Fortune card.`;
   const after = p.posts.find((c) => isAftermath(state, c));
   if (after && !p.land.length && familyTotal(p) < C.start.family) return `${esc(CITIES[after].name)} is in Aftermath: you can now <span class="key">7</span> Arrange a Marriage or <span class="key">8</span> Buy Abandoned Land there.`;
   return 'Tip: click any city on the map to read its history. Your weakest Legacy category counts twice, so keep all three healthy.';

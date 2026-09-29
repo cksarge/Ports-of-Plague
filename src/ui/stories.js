@@ -39,7 +39,7 @@ const BUILDERS = {
       ${noteHtml(e.factIds)}` })}
       ${hints ? `<section class="hint" style="margin-top:1rem"><strong>How to play in one minute</strong><ol style="margin:0.3rem 0 0;padding-left:1.2rem">
         <li><strong>Each round</strong>, the plague reaches new cities (the dates are real), and Chronicle and Event cards are read aloud.</li>
-        <li><strong>On your turn</strong> you have ${modeOf(state).actionPoints} action points. Press <span class="key">1</span> Ship Goods to earn florins; sea routes pay more, but cargo from a Stricken city may be infected.</li>
+        <li><strong>On your turn</strong> you have ${modeOf(state).actionPoints} action points. Most actions take 1; opening a trading post or moving family takes ${C.actionPointCosts.post}. Press <span class="key">1</span> Ship Goods to earn florins; sea routes pay more, but cargo from a Stricken city may be infected.</li>
         <li><strong>Fortune cards:</strong> roll a ${C.fortune.drawOnProfitDie} when shipping, or open a new trading post, and you draw a personal Fortune card.</li>
         <li><strong>Protect your family:</strong> family in a Stricken city rolls for survival at the end of the round. Move them away (<span class="key">3</span>) or prepare your household (<span class="key">4</span>).</li>
         <li><strong>Win</strong> with the highest Legacy in 1353: Wealth + Family + Reputation, plus your weakest one again. Balance beats greed.</li>
