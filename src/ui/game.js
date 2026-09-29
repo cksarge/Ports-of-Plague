@@ -3,11 +3,11 @@
 // their choices on their own devices and the requests arrive here.
 import { DATA, CITIES } from '../data.js';
 import {
-  C, advance, endTurn, decide, currentPlayer, performAction, checkAction,
+  C, advance, endTurn, timeUp, decide, currentPlayer, performAction, checkAction,
   scorePlayer, familyTotal, cardById,
-  roundInfo, totalRounds, roundNumber, fortuneById,
+  roundInfo, totalRounds, roundNumber, fortuneById, botMove,
 } from '../engine/index.js';
-import { $, $$, esc, openDialog, dialogOpen, toast, announce, crestSvg, isTyping, warnBeforeLeaving } from './dom.js';
+import { $, $$, esc, openDialog, dialogOpen, closeAllDialogs, toast, announce, crestSvg, isTyping, warnBeforeLeaving, sleep } from './dom.js';
 import { createMap, updateMap, animateShipment, animateStrike, redrawStains, startAmbient, floatText } from './map.js';
 import { noteHtml } from './notes.js';
 import { showRules, showJournal, showCity } from './panels.js';
@@ -16,10 +16,11 @@ import { music } from './music.js';
 import { saveGame } from './save.js';
 import { heraldicBanner } from './art.js';
 import { housePanelHtml, actionsPanelHtml, hintFor, quickBlock, actionPrompt, decisionPrompt, endTurnPrompt } from './prompts.js';
-import { validateIntent, ACT, DECIDE, END, NEXT } from '../net/protocol.js';
+import { validateIntent, sitOutChoice, ACT, DECIDE, END, NEXT } from '../net/protocol.js';
 import { JOIN_ADDRESS } from '../net/config.js';
 import { zoomToFit, fitsHeight, fitsWidth } from './fit.js';
-import { storyCard, storyHtml } from './stories.js';
+import { storyCard, storyHtml, chroniclePages } from './stories.js';
+import { createClock, showClockPill, hideClockPill } from './clock.js';
 
 // Keeps the big screen from going dark during a multi-device game (where the
 // browser supports it; the lock is dropped whenever the tab is hidden).
@@ -49,6 +50,17 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
   let storySeq = 0;
   let pushTimer = null;
   let left = false; // this screen was closed (menu or end of game)
+  // Turn timer (when switched on): runs during a house's turn, stops while a
+  // card is on screen or an action is being shown.
+  let turnOn = false;
+  let storyDepth = 0;
+  let resolving = false;
+  let botPlaying = false; // a computer house is taking its turn
+  let expiring = false;
+  const clock = createClock({
+    onTick: (l) => { const p = player(); if (turnOn && p) showClockPill(p, l, { paused: !clock.running }); },
+    onExpire: () => { expireTurn(); },
+  });
 
   const save = () => { saveGame(state, ui); push(); };
   const player = () => currentPlayer(state);
@@ -132,6 +144,7 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
     window.removeEventListener('resize', onResize);
     stopAmbient();
     wake?.release();
+    stopTurnClock();
     if (remote) room.onIntent = room.onChange = () => {};
   };
 
@@ -140,7 +153,8 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
   // for Next (if any), and whether the big screen is busy.
   function view() {
     const top = stories.at(-1);
-    return { next: top ? { id: top.id, label: top.label, title: top.title, kind: top.kind, data: top.data } : null, busy, hints: !!ui.hints, note: ui.lastNote };
+    const timer = turnOn ? { left: Math.round(clock.left * 10) / 10, running: clock.running } : null;
+    return { next: top ? { id: top.id, label: top.label, title: top.title, kind: top.kind, data: top.data } : null, busy, hints: !!ui.hints, note: ui.lastNote, timer };
   }
   function push() {
     if (!remote || left) return;
@@ -149,11 +163,25 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
   }
   // A story card (see stories.js). On multiple devices, Next on any player's
   // device closes it too, and every device can open the same card to read it.
-  function story(kind, data, { after } = {}) {
+  // The turn timer stops while it is open.
+  function story(kind, data, options) {
+    storyDepth++;
+    syncClock();
+    return showStory(kind, data, options).finally(() => { storyDepth--; syncClock(); });
+  }
+  function showStory(kind, data, { after } = {}) {
     const card = storyCard(state, kind, data, { hints: !!ui.hints, big: remote });
     const html = storyHtml(card, `<button class="btn primary" data-value="ok" autofocus>${esc(card.button)}</button>`);
-    const mount = (d) => { const done = card.mount?.(d); if (after) Promise.resolve(done).then(after); };
-    if (!remote) return openDialog(html, { ...card.opts, onMount: mount });
+    let autoClose = null;
+    const mount = (d, close) => {
+      const done = card.mount?.(d);
+      if (after) Promise.resolve(done).then(after);
+      // Some cards close by themselves a moment after their dice land.
+      if (card.opts.autoClose) Promise.resolve(done).then(() => { autoClose = setTimeout(() => close('ok'), card.opts.autoClose); });
+      else if (botPlaying) autoContinue(d, close); // a bot's cards go on by themselves too
+    };
+    const clear = (v) => { clearTimeout(autoClose); return v; };
+    if (!remote) return openDialog(html, { ...card.opts, onMount: mount }).then(clear);
     const entry = { id: ++storySeq, title: card.opts.label ?? 'Continue', label: card.button, kind, data };
     return openDialog(html, {
       ...card.opts,
@@ -162,9 +190,9 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
         entry.fit = fitDialog(d);
         stories.push(entry);
         push();
-        mount(d);
+        mount(d, close);
       },
-    }).then((v) => {
+    }).then(clear).then((v) => {
       stories = stories.filter((s) => s !== entry);
       push();
       return v;
@@ -220,7 +248,7 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
       if (top?.id === msg.id) top.close('ok');
       return;
     }
-    if (busy || passing || stories.length) { room.toast(seat, 'Please wait…'); return; }
+    if (busy || passing || expiring || stories.length) { room.toast(seat, 'Please wait…'); return; }
     const p = player();
     if (msg.t === ACT) await runAction(p, msg.action);
     else if (msg.t === DECIDE) {
@@ -230,12 +258,114 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
   }
   if (remote) {
     room.onIntent = (msg) => {
-      handleRequest(msg).catch((err) => console.error(err)).finally(() => { room.handled(msg); refresh(); });
+      handleRequest(msg).catch((err) => console.error(err)).finally(() => { room.handled(msg); refresh(); skipSoon(); });
     };
     room.onChange = () => {
       if (ui.room) ui.room.seats = room.savedSeats();
       refresh();
+      skipSoon();
     };
+  }
+  // A house whose player left the game sits out: when its turn comes (or it
+  // leaves during its turn), its cards are answered with sitOutChoice and the
+  // turn ends. Waits until no card or action is in progress.
+  const hasLeft = (p) => remote && !!p && !!room.seats[p.id]?.left;
+  let skipping = false;
+  const skipSoon = () => { if (remote) setTimeout(skipLeftTurn, 0); };
+  async function skipLeftTurn() {
+    const p = player();
+    if (left || skipping || busy || passing || expiring || stories.length || !hasLeft(p)) return;
+    skipping = true;
+    try {
+      busy = true;
+      try {
+        while (p.pending.length && hasLeft(p)) await applyDecision(p, p.pending[0], sitOutChoice(p.pending[0]));
+      } finally { busy = false; }
+      if (!hasLeft(p) || player() !== p) return;
+      notify(`${p.name} has left the game: their turn is skipped.`, 3500);
+      await finishTurn();
+    } finally {
+      skipping = false;
+    }
+  }
+
+  // ---------- Bot houses ----------
+  // A computer house plays on screen like a person: a short pause to
+  // "think" before each move, then the same animations and cards a human's
+  // move gets. Cards shown during its turn go on by themselves after a few
+  // seconds (anyone can press Next sooner).
+  async function playBotTurn(p) {
+    botPlaying = true;
+    refresh();
+    try {
+      for (let guard = 0; guard < 40; guard++) {
+        await sleep(C.bots.thinkSeconds * 1000);
+        if (left || player() !== p) return;
+        const move = botMove(state);
+        if (move.type === 'end') break;
+        if (move.type === 'act') { await runAction(p, move.action); continue; }
+        busy = true;
+        try { await applyDecision(p, p.pending[0], move.choice); } finally { busy = false; }
+      }
+    } finally {
+      botPlaying = false;
+    }
+    if (!left && player() === p) await finishTurn();
+  }
+  // Counts down on the card's button and presses it when time is up.
+  function autoContinue(d, close) {
+    const btn = d.querySelector('[data-value="ok"]');
+    const label = btn?.innerHTML;
+    let secs = C.bots.cardSeconds;
+    const tick = () => {
+      if (!d.isConnected) { clearInterval(timer); return; }
+      if (secs <= 0) { clearInterval(timer); close('ok'); return; }
+      if (btn) btn.innerHTML = `${label} (${secs})`;
+      secs--;
+    };
+    const timer = setInterval(tick, 1000);
+    tick();
+  }
+  // True when only one person plays: there is no one to pass the device to.
+  const onePerson = () => state.players.filter((h) => !h.bot).length <= 1;
+
+  // ---------- Turn timer ----------
+  function startTurnClock() {
+    if (!state.turnSeconds || left || !player() || player().bot) return; // computer houses are never timed
+    turnOn = true;
+    clock.start(state.turnSeconds);
+    syncClock();
+  }
+  function stopTurnClock() {
+    turnOn = false;
+    clock.stop();
+    hideClockPill();
+  }
+  // Runs the clock only while the house can actually choose.
+  function syncClock() {
+    const p = player();
+    if (!turnOn || left || !p) return;
+    const hold = storyDepth > 0 || resolving || passing || hasLeft(p);
+    if (hold) clock.pause(); else clock.resume();
+    showClockPill(p, clock.left, { paused: hold });
+    push();
+  }
+  // Time is up: close any choice still open, answer waiting cards with their
+  // cautious default (see timeUp) and move on to the next house.
+  async function expireTurn() {
+    const p = player();
+    if (expiring || left || !p) return;
+    expiring = true;
+    stopTurnClock();
+    sfx.error();
+    closeAllDialogs();
+    while ((busy || passing || storyDepth) && !left) await sleep(50);
+    if (left || player() !== p) { expiring = false; return; }
+    const r = timeUp(state);
+    save();
+    notify(`Time is up for ${p.name}. The turn passes on.`, 3500);
+    expiring = false;
+    if (r.ok) await nextTurn(r);
   }
 
   // ---------- Rendering ----------
@@ -243,17 +373,22 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
     if (left) return;
     const info = roundInfo(state);
     const phaseName = { roundStart: 'Prologue', chronicle: 'Chronicle', event: 'Event', actions: 'Actions', plague: 'Plague & upkeep', ended: 'Game over' }[state.phase];
-    $('#date', app).innerHTML = info ? `${esc(info.label)} <small>${esc(info.months)} · Round ${roundNumber(state)} of ${totalRounds(state)} · ${phaseName}</small>` : `1346 <small>Prologue</small>`;
-    // One circle per round: 12 half-years, or 6 whole years in Quick Play.
+    $('#date', app).innerHTML = info ? `${esc(info.label)} <small>${esc(info.months)} · ${info.pre ? 'Before the plague · ' : ''}Round ${roundNumber(state)} of ${totalRounds(state)} · ${phaseName}</small>` : `1346 <small>Prologue</small>`;
+    // One mark per round: 12 half-years, or 4 rounds of a year and a half in
+    // Quick Play, after an anchor for each pre-plague round.
     const span = state.span ?? 1;
-    $('#timeline', app).innerHTML = DATA.timeline.rounds.filter((r) => (r.round - 1) % span === 0).map((r) => {
-      const last = DATA.timeline.rounds[r.round + span - 2] ?? r;
-      const cls = r.round < state.round ? 'done' : r.round === state.round ? 'now' : '';
-      const title = span > 1 ? `${r.label} – ${last.label}` : r.label;
-      return `<span class="${cls}" title="${esc(title)}">${span > 1 ? '✦' : r.season === 'warm' ? '☀' : '❄'}</span>`;
+    const preSize = state.preRounds ? (1 - (state.firstHalf ?? 1)) / state.preRounds : 1;
+    const pre = DATA.timeline.prePlague.filter((r) => state.preRounds && r.round >= (state.firstHalf ?? 1) && (r.round - state.firstHalf) % preSize === 0)
+      .map((r) => ({ r, last: DATA.timeline.prePlague.find((x) => x.round === r.round + preSize - 1) ?? r, icon: '⚓' }));
+    const main = DATA.timeline.rounds.filter((r) => (r.round - 1) % span === 0)
+      .map((r) => ({ r, last: DATA.timeline.rounds[Math.min(r.round + span - 2, C.rounds - 1)] ?? r, icon: span > 1 ? '✦' : r.season === 'warm' ? '☀' : '❄' }));
+    $('#timeline', app).innerHTML = [...pre, ...main].map(({ r, last, icon }) => {
+      const cls = last.round < state.round ? 'done' : r.round <= state.round && state.round <= last.round ? 'now' : '';
+      const title = last !== r ? `${r.label} – ${last.label}` : r.label;
+      return `<span class="${cls}${icon === '⚓' ? ' pre' : ''}" title="${esc(title)}">${icon}</span>`;
     }).join('');
     const p = player();
-    $('#turn', app).innerHTML = p ? `${crestSvg(p, 20)} ${esc(p.name)}'s turn` : esc(phaseName);
+    $('#turn', app).innerHTML = p ? `${crestSvg(p, 20)} ${esc(p.name)}'s turn${p.bot ? ' <small>(bot)</small>' : ''}` : esc(phaseName);
     updateMap(svg, state, mapSel);
     renderSidebar();
     push();
@@ -266,13 +401,16 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
     if (remote) parts.push(`<div class="room-chip">Room <strong>${esc(room.code)}</strong> <span>· join at ${esc(JOIN_ADDRESS)}</span></div>`);
     if (p) {
       parts.push(housePanelHtml(state, p));
-      const hint = remote ? null : hintFor(state, p, ui.hints);
+      const hint = remote || p.bot ? null : hintFor(state, p, ui.hints);
       if (hint) parts.push(`<div class="hint" role="note"><strong>Hint:</strong> ${hint}</div>`);
-      if (remote) {
+      if (p.bot) {
+        parts.push(`<section class="panel actions-panel waiting-panel" aria-label="Waiting"><h2>Actions</h2>
+          <p><strong>${esc(p.name)}</strong> is a computer player (${esc(C.bots.skills[p.skill]?.label ?? '')}). It is taking its turn<span class="thinking" aria-hidden="true">…</span></p></section>`);
+      } else if (remote) {
         const seat = room.seats[p.id];
         parts.push(`<section class="panel actions-panel waiting-panel" aria-label="Waiting"><h2>Actions</h2>
-          <p><strong>${esc(p.name)}</strong> is choosing on their own device.</p>
-          ${seat?.online ? '' : `<p class="error">This device is not connected. Open ${esc(JOIN_ADDRESS)} and join room <strong>${esc(room.code)}</strong> with the house name “${esc(p.name)}”.</p>`}</section>`);
+          ${seat?.left ? `<p><strong>${esc(p.name)}</strong> has left the game. Their turn is skipped.</p>` : `<p><strong>${esc(p.name)}</strong> is choosing on their own device.</p>`}
+          ${seat?.online || seat?.left ? '' : `<p class="error">This device is not connected. Open ${esc(JOIN_ADDRESS)} and join room <strong>${esc(room.code)}</strong> with the house name “${esc(p.name)}”.</p>`}</section>`);
       } else {
         parts.push(actionsPanelHtml(state, p, { busy }));
       }
@@ -284,7 +422,8 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
       ${state.order.map((id, i) => {
         const h = state.players[id];
         const sc = scorePlayer(h);
-        const link = remote ? `<span class="link-dot ${room.seats[id]?.online ? 'on' : ''}" title="${room.seats[id]?.online ? 'Device connected' : 'Device not connected'}"></span>` : '';
+        const seat = remote ? room.seats[id] : null;
+        const link = h.bot ? ` <small class="bot-tag">Bot · ${esc(C.bots.skills[h.skill]?.label ?? '')}</small>` : !remote ? '' : seat?.left ? ' <small class="left-tag">(left)</small>' : `<span class="link-dot ${seat?.online ? 'on' : ''}" title="${seat?.online ? 'Device connected' : 'Device not connected'}"></span>`;
         return `<div class="house-row ${p && p.id === id ? 'current' : ''}" style="--house:${h.color}">${crestSvg(h, 20)}
           <span><strong>${i + 1}. ${esc(h.name)}</strong>${link}<br><small>${h.florins}ƒ · rep ${h.reputation} · family ${familyTotal(h)} · ${h.posts.length} post${h.posts.length > 1 ? 's' : ''}</small></span>
           <span title="Legacy score"><strong>${sc.total}</strong></span></div>`;
@@ -319,6 +458,17 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
         for (let i = idx + 1; i < state.log.length && ['arrival', 'arrivalAlready'].includes(state.log[i].type); i++) group.push(state.log[i]);
         await showRoundStart(group);
         markSeen(group.at(-1).seq);
+      } else if (next.type === 'card' && next.deck === 'chronicle') {
+        // All of the round's Chronicle cards, a few to a page.
+        const groups = [];
+        let i = idx;
+        while (state.log[i]?.type === 'card' && state.log[i].deck === 'chronicle') {
+          const group = [state.log[i++]];
+          while (state.log[i]?.type === 'effect') group.push(state.log[i++]);
+          groups.push(group);
+        }
+        await showChronicle(groups);
+        markSeen(groups.at(-1).at(-1).seq);
       } else if (next.type === 'card') {
         const group = [next];
         for (let i = idx + 1; i < state.log.length && state.log[i].type === 'effect'; i++) group.push(state.log[i]);
@@ -329,7 +479,9 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
         const group = [];
         let i = idx;
         while (i < state.log.length && ['plague', 'mortality', 'aftermath', 'upkeep', 'loanRepaid', 'loanDefault', 'dealEnd', 'gatesOpen'].includes(state.log[i].type)) group.push(state.log[i++]);
-        await showPlague(group);
+        // Nothing for anyone to read or roll: a short message instead of a card.
+        const quiet = !group.some((e) => ['mortality', 'upkeep', 'loanRepaid', 'loanDefault', 'dealEnd', 'gatesOpen'].includes(e.type)) && state.roundEnd < C.rounds;
+        if (quiet) quietPlague(group); else await showPlague(group);
         markSeen(group.at(-1).seq);
       } else if (next.type === 'fortune') {
         await showFortune(next);
@@ -367,6 +519,14 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
     refresh();
   }
 
+  async function showChronicle(groups) {
+    const cards = groups.map((g) => cardById(g[0].card));
+    if (cards.some((c) => c.theme === 'persecution')) sfx.knell(); else sfx.page();
+    for (const page of chroniclePages(groups)) await story('chronicle', page);
+    setNote(cards.flatMap((c) => c.factIds));
+    refresh();
+  }
+
   async function showCard(group) {
     const card = cardById(group[0].card);
     if (card.theme === 'persecution') sfx.knell(); else sfx.page();
@@ -383,6 +543,14 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
     refresh();
   }
 
+  function quietPlague(group) {
+    const passed = group.filter((e) => e.type === 'aftermath').map((e) => CITIES[e.city].name);
+    const pre = group.every((e) => e.type !== 'plague' || e.pre);
+    toast(pre ? 'The year turns. No plague yet.' : `No family was in a Stricken city.${passed.length ? ` The plague passes from ${passed.join(', ')}.` : ''}`, 3500);
+    redrawStains(svg, state);
+    refresh();
+  }
+
   async function showPlague(group) {
     refresh();
     music.setMood('plague');
@@ -396,6 +564,12 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
   // ---------- Pass the device ----------
   function passDevice() {
     const p = player();
+    if (p.bot || (!remote && onePerson())) {
+      // A computer house needs no device, and one person keeps it all game.
+      announce(`${p.name}'s turn`);
+      if (!p.bot) { sfx.fanfare(); toast(`${p.name}: your turn.`, 2500); }
+      return Promise.resolve();
+    }
     if (remote) {
       // Everyone has their own device: just announce whose turn it is.
       sfx.fanfare();
@@ -428,7 +602,9 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
   // its request (see handleRequest).
   async function beginPlayerTurn() {
     refresh();
-    if (remote) return;
+    startTurnClock();
+    if (player().bot) { await playBotTurn(player()); return; }
+    if (remote) { skipSoon(); return; }
     const p = player();
     await answerPending(p);
     refresh();
@@ -436,7 +612,7 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
   }
 
   async function answerPending(p) {
-    while (p.pending.length) {
+    while (p.pending.length && !expiring && player() === p) {
       await askDecision(p, p.pending[0]);
       refresh();
     }
@@ -448,7 +624,10 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
   }
 
   async function applyDecision(p, d, choice) {
+    if (expiring && !hasLeft(p)) return; // time ran out while this card was open
     const r = decide(state, choice);
+    const fallback = d.kind === 'wageLaw' ? 'pay' : false;
+    if (!r.ok && p.bot && choice !== fallback) return applyDecision(p, d, fallback); // a bot that cannot accept declines
     if (!r.ok) { notify(r.reason); return; }
     save();
     markSeen(r.entry.seq);
@@ -473,7 +652,7 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
   // ---------- Actions ----------
   async function startAction(id) {
     const p = player();
-    if (!p || busy || passing || remote) return;
+    if (!p || busy || passing || remote || p.bot) return;
     const why = quickBlock(state, id, p, busy);
     if (why) { sfx.error(); toast(why); return; }
     busy = true;
@@ -483,12 +662,14 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
     } finally {
       busy = false;
     }
-    if (action) await runAction(p, action);
+    if (action && !expiring) await runAction(p, action);
     else { mapSel = {}; refresh(); }
   }
 
   async function runAction(p, action) {
     busy = true;
+    resolving = true;
+    syncClock();
     try {
       const reason = checkAction(state, action);
       if (reason) { sfx.error(); notify(reason, 4500); return; }
@@ -498,12 +679,15 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
       await showActionResult(res.entry, p);
       markSeen(res.entry.seq);
       await presentNew(); // Fortune cards drawn by this action
-      if (!remote) await answerPending(p); // Fortune offers must be answered straight away
+      if (!remote && !p.bot) await answerPending(p); // Fortune offers must be answered straight away (a bot answers in playBotTurn)
     } finally {
       busy = false;
+      resolving = false;
+      syncClock();
       mapSel = {};
       refresh();
-      if (!remote && p.ap === 0) $('#end-turn', app)?.focus();
+      skipSoon(); // the player may have left while this action's card was open
+      if (!remote && !p.bot && p.ap === 0) $('#end-turn', app)?.focus();
     }
   }
 
@@ -560,11 +744,11 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
 
   async function tryEndTurn() {
     const p = player();
-    if (!p || busy || passing || remote) return;
+    if (!p || busy || passing || remote || p.bot) return;
     if (p.pending.length) { toast('Answer the card first.'); return; }
     if (p.ap > 0) {
       const pr = endTurnPrompt(p);
-      if (!pr.parse(await openDialog(pr.html, pr.opts))) return;
+      if (!pr.parse(await openDialog(pr.html, pr.opts)) || expiring || player() !== p) return;
     }
     await finishTurn();
   }
@@ -575,6 +759,11 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
     save();
     busy = false;
     if (!r.ok) { notify(r.reason); return; }
+    stopTurnClock();
+    await nextTurn(r);
+  }
+
+  async function nextTurn(r) {
     if (r.next === 'turn') {
       refresh();
       await passDevice();

@@ -150,6 +150,7 @@ a { color: var(--lapis); }
 .timeline span { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--gold-bright); background: #3a0806; display: grid; place-items: center; font-size: 10px; color: var(--gold-light); }
 .timeline span.done { background: var(--gold); }
 .timeline span.now { background: var(--gold-light); color: #5c0d09; box-shadow: 0 0 10px var(--gold-light); transform: scale(1.2); }
+.timeline span.pre { border-style: dashed; }
 .turn-indicator { display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.9rem; border-radius: 999px; border: 2px solid var(--gold-bright); background: rgba(255, 248, 226, 0.95); color: var(--ink); font-weight: 600; white-space: nowrap; }
 .topbar .spacer { flex: 1; }
 .topbar .tools { display: flex; gap: 0.35rem; flex-wrap: nowrap; }
@@ -225,7 +226,7 @@ a { color: var(--lapis); }
 .map-frame:not(.zoomed) .map-zoom .zoom-out, .map-frame:not(.zoomed) .map-zoom .zoom-reset { display: none; }
 .map-frame.zoomed > svg { cursor: grab; }
 .map-frame.panning > svg { cursor: grabbing; }
-.map-credit { position: absolute; right: 8px; bottom: 4px; font-size: 0.7rem; color: var(--ink-soft); background: rgba(251, 245, 228, 0.8); padding: 0 4px; border-radius: 4px; }
+.map-credit { position: absolute; left: 50%; transform: translateX(-50%); white-space: nowrap; bottom: 4px; font-size: 0.7rem; color: var(--ink-soft); background: rgba(251, 245, 228, 0.8); padding: 0 4px; border-radius: 4px; }
 
 /* ---------- Sidebar panels (parchment with coloured ribbons) ---------- */
 .panel { position: relative; border-radius: var(--radius); background: linear-gradient(170deg, #fffaf0, var(--parchment)); padding: 0.7rem 0.85rem; box-shadow: var(--shadow), inset 0 0 0 2px var(--parchment-3); }
@@ -443,6 +444,12 @@ button.choice:hover:not(:disabled) { border-color: var(--gold-bright); border-le
 .next-panel #ctl-read { margin: 0.2rem 0 1rem; }
 .btn.big { width: 100%; min-height: 64px; font-size: 1.2rem; }
 .waiting-panel p { margin: 0.3rem 0; }
+/* Computer-played houses */
+.bot-tag { font-family: var(--serif); font-weight: 400; font-size: 0.78em; padding: 0 0.35em; margin-left: 0.3rem; border: 1px solid currentColor; border-radius: 0.6em; opacity: 0.8; white-space: nowrap; }
+.thinking { display: inline-block; animation: thinking 1.2s steps(4, end) infinite; overflow: hidden; vertical-align: bottom; width: 1.1em; }
+@keyframes thinking { from { width: 0; } to { width: 1.1em; } }
+@media (prefers-reduced-motion: reduce) { .thinking { animation: none; } }
+.house-card .seg { margin-top: 0.2rem; }
 .controller .action-btn { min-height: 60px; }
 /* Tablets and computers: the house beside the actions. */
 @media (min-width: 900px) {
@@ -507,3 +514,37 @@ body.big-screen .plague-grid { display: grid; grid-template-columns: repeat(auto
 .end-fit .end-grid { grid-template-columns: 1fr; }
 .end-fit .end-grid .note { columns: 2 420px; column-gap: 1.6rem; }
 .end-fit .end-grid .note .fact { break-inside: avoid; }
+
+/* ---------- Setup options (pre-plague rounds, turn timer, hints) ---------- */
+.option-checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 0.6rem; margin: 0.6rem 0; }
+.option-checks .check { display: flex; align-items: flex-start; gap: 0.55rem; padding: 0.5rem 0.65rem; border: 1px solid var(--parchment-3); border-radius: 10px; background: rgba(255, 250, 235, 0.6); cursor: pointer; }
+.option-checks .check input { width: 24px; height: 24px; flex: none; margin: 0.1rem 0 0; accent-color: var(--verdigris); }
+.option-checks .check strong { font-family: var(--caps); font-size: 0.9rem; display: block; }
+.option-checks .check small { display: block; color: var(--ink-soft); font-size: 0.85rem; line-height: 1.3; }
+
+/* ---------- Turn timer ---------- */
+.turn-clock {
+  position: fixed; inset: 5.3rem auto auto 1.2rem; margin: 0; z-index: 1000;
+  display: flex; align-items: center; gap: 0.45rem; padding: 0.3rem 0.9rem 0.35rem; border-radius: 999px;
+  border: 2px solid var(--house, var(--gold-bright)); color: var(--ink); font-weight: 600; white-space: nowrap;
+  background: linear-gradient(90deg, rgba(243, 210, 122, 0.95) calc(var(--frac, 1) * 100%), rgba(255, 248, 226, 0.97) 0);
+  box-shadow: var(--shadow); pointer-events: none; font-size: 1rem;
+}
+.turn-clock .secs { font-family: var(--caps); font-variant-numeric: tabular-nums; min-width: 3.4em; text-align: right; }
+.turn-clock .who { max-width: 40vw; overflow: hidden; text-overflow: ellipsis; }
+.turn-clock.paused { opacity: 0.8; }
+.turn-clock.urgent { border-color: var(--vermilion); color: #fff; background: linear-gradient(90deg, var(--vermilion) calc(var(--frac, 1) * 100%), var(--crimson) 0); animation: clock-pulse 1s ease-in-out infinite; }
+@keyframes clock-pulse { 50% { transform: scale(1.06); } }
+@media (prefers-reduced-motion: reduce) { .turn-clock.urgent { animation: none; } }
+.turn-clock[popover] { inset: 5.3rem auto auto 1.2rem; }
+
+/* ---------- Several Chronicle cards on one page ---------- */
+.chronicle-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.8rem; align-items: start; }
+.chronicle-grid.n2, .chronicle-grid.n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.chronicle-grid.n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 760px) { .chronicle-grid.n2, .chronicle-grid.n3, .chronicle-grid.n4 { grid-template-columns: 1fr; } }
+.chronicle-grid > * { margin: 0; }
+.chronicle-grid .card h2 { font-size: 1.25rem; }
+.chronicle-grid .card-band .illus { width: 52px; height: 52px; }
+.chronicle-grid .card-band .illus svg { width: 38px; height: 38px; }
+.chronicle-grid .card-body p { margin: 0.4rem 0; }

@@ -1085,6 +1085,146 @@
         "brit-diplomatics"
       ],
       "evidence": "Britannica: \"Seals were made of wax or of metal; if the latter, they were called bulls (hence, the use of this term for a certain group of papal documents).\""
+    },
+    {
+      "id": "TR-12",
+      "category": "trade",
+      "title": "Tana, on the Don",
+      "text": "Tana (today Azov, in Russia), at the mouth of the Don River, was an Italian trading post. Trade along the Don reached central Russia, and caravans linked Tana to Sarai and the Far East. After a brawl between Italians and Muslims in 1343, the Mongols besieged it and the Italians fled to Caffa. They were allowed to return in 1347.",
+      "when": "1343–1347",
+      "where": "Tana",
+      "sources": [
+        "wheelis"
+      ],
+      "evidence": "Wheelis: Caffa \"connected there to a coastal shipping industry to Tana (now Azov, Russia) on the Don River. Trade along the Don connected Tana to Central Russia, and overland caravan routes linked it to Sarai and thence to the Far East\"; \"In 1343 the Mongols under Janibeg ... besieged Caffa and the Italian enclave at Tana, following a brawl between Italians and Muslims in Tana. The Italian merchants in Tana fled to Caffa\"; \"in 1347 the Italians were allowed to reestablish their colony in Tana.\""
+    },
+    {
+      "id": "TL-13",
+      "category": "timeline",
+      "title": "The steppe, 1346",
+      "text": "Historian Ole Benedictow writes that the Black Death broke out in spring 1346 in the steppe lands of the Golden Horde, from the north-western shores of the Caspian Sea into southern Russia.",
+      "when": "1346",
+      "where": "Golden Horde",
+      "sources": [
+        "benedictow"
+      ],
+      "evidence": "Benedictow: the Black Death \"began in the spring of 1346 in the steppe region ... north-western shores of the Caspian Sea into southern Russia.\""
+    },
+    {
+      "id": "TL-14",
+      "category": "timeline",
+      "title": "The far north, 1350",
+      "text": "The Black Death reached the far north of England, Scotland, Scandinavia and the Baltic countries in 1350.",
+      "when": "1350",
+      "where": "Scotland",
+      "sources": [
+        "brit-black-death"
+      ],
+      "evidence": "Britannica: \"The Black Death reached the extreme north of England, Scotland, Scandinavia, and the Baltic countries in 1350.\""
+    },
+    {
+      "id": "CI-14",
+      "category": "cities",
+      "title": "Damascus prays together",
+      "text": "The traveller Ibn Battuta was in Damascus in late July 1348. The governor ordered three days of fasting. Then the whole city walked out together to pray for the plague to end: Muslims carrying the Qur’an, Jews with the Torah and Christians with the Gospels. He wrote that deaths in Damascus did not reach 2,000 a day.",
+      "when": "July 1348",
+      "where": "Damascus",
+      "sources": [
+        "ibn-battuta",
+        "brit-ibn-battuta"
+      ],
+      "evidence": "Ibn Battuta: \"during the great pestilence on my return journey through Damascus, in the latter part of July 1348. The viceroy Arghun Shah ordered ... that all the people should fast for three days\"; \"the Jews came with their Book of the Law and the Christians with their Gospel\"; \"the number of deaths in a single day at Damascus did not attain two thousand.\" Britannica: \"In Syria he witnessed the ravages of the Black Death of 1348.\""
+    },
+    {
+      "id": "CI-15",
+      "category": "cities",
+      "title": "Cairo empties",
+      "text": "When the plague struck Cairo, the sultan and his emirs left the city and stayed away from 25 September to 22 December 1348. Funeral processions filled the streets. Ibn Battuta wrote that in Cairo the deaths reached 24,000 in a single day.",
+      "when": "1348",
+      "where": "Cairo",
+      "sources": [
+        "dols",
+        "ibn-battuta"
+      ],
+      "evidence": "Dols: \"The sultan and his amirs also fled from Cairo to Siryaqus and remained there from the beginning of Rajab 749/25 September 1348 until the end of Ramadan/22 December\"; \"These processions from the mosques or homes to the cemeteries filled the streets of Cairo during the Black Death.\" Ibn Battuta: \"in Cairo and Old Cairo it reached the figure of twenty-four thousand a day.\"",
+      "debate": "Chroniclers’ death counts are often far too high (see CI-02)."
+    },
+    {
+      "id": "CI-16",
+      "category": "cities",
+      "title": "Bristol",
+      "text": "From Dorset the plague reached the port of Bristol almost at once, at the earliest on 24 June and at the latest on 1 August 1348. From there it spread quickly through the south-west of England.",
+      "when": "1348",
+      "where": "Bristol",
+      "sources": [
+        "brit-black-death",
+        "kelly-ireland"
+      ],
+      "evidence": "Britannica: \"It reached Bristol almost immediately and spread rapidly throughout the southwestern counties of England.\" Kelly: \"It had reached Bristol at the earliest on 24 June and at the latest on 1 August.\""
+    },
+    {
+      "id": "CI-17",
+      "category": "cities",
+      "title": "Ireland: \"hardly a house\"",
+      "text": "In Ireland the plague first appeared at Howth or Dalkey and reached Dublin and Drogheda by late July or early August 1348. It raged in Dublin from August to December. Friar John Clyn of Kilkenny wrote: \"There was hardly a house in which one only had died.\" He probably died of the plague himself soon after.",
+      "when": "1348–1349",
+      "where": "Dublin",
+      "sources": [
+        "kelly-ireland"
+      ],
+      "evidence": "Kelly: Clyn says \"it first appeared in Howth or Dalkey and spread to Dublin and Drogheda by late July or early August\"; \"The plague raged in Dublin between August and December\"; \"There was hardly a house in which one only had died\"; \"he died himself soon after, very likely of the plague.\""
+    },
+    {
+      "id": "CI-18",
+      "category": "cities",
+      "title": "Spain: how hard was it hit?",
+      "text": "Economic historians estimate that the population of Spain fell by about 18 percent between 1347 and the early 1400s, a milder blow than in most of Europe. The city of Valencia even grew after the plague of 1348, as people moved in from the countryside. Yet older accounts describe Aragon and Catalonia as very hard-hit.",
+      "when": "1348–1430s",
+      "where": "Valencia, Spain",
+      "sources": [
+        "alvarez-nogal",
+        "brit-black-death"
+      ],
+      "evidence": "Álvarez-Nogal et al.: \"the population would have fallen by 18 %, a relatively mild demographic impact\"; \"Valencia raised its population even after the waves that followed the plague of 1348.\" Britannica: \"Tuscany, Aragon, Catalonia, and Languedoc, were very hard-hit.\"",
+      "debate": "Regional studies disagree about how many died in Spain."
+    },
+    {
+      "id": "CI-19",
+      "category": "cities",
+      "title": "A king dies at Gibraltar",
+      "text": "Kings died too. Alfonso XI of Castile died of the plague at Gibraltar on 26 March 1350, during his war against the Marinid rulers of Morocco, who had seized the town. Eleanor, queen of Peter IV of Aragon, also died of the plague.",
+      "when": "1348–1350",
+      "where": "Gibraltar",
+      "sources": [
+        "brit-black-death",
+        "brit-alfonso"
+      ],
+      "evidence": "Britannica (\"Black Death\"): \"among royalty, Eleanor, queen of Peter IV of Aragon, and King Alfonso XI of Castile succumbed.\" Britannica (\"Alfonso XI\"): \"died March 26, 1350, Gibraltar\"; \"the Marinid kings of Morocco, who had seized Gibraltar.\""
+    },
+    {
+      "id": "ME-16",
+      "category": "medical",
+      "title": "Ibn al-Khatib and contagion",
+      "text": "In Granada, the scholar and statesman Ibn al-Khatib argued that the plague spread by contagion, from person to person. Historian Michael Dols found him to be the only Muslim writer of the time to argue this against the accepted view.",
+      "when": "1348–1350s",
+      "where": "Granada",
+      "sources": [
+        "dols"
+      ],
+      "evidence": "Dols: \"the Andalusian scholar Ibn al-Khatib has attracted European attention for his observation and forceful statement of the contagious nature of the Black Death\"; \"Ibn al-Khatib was the only Muslim writer to my knowledge to argue against the accepted interpretation of plague.\""
+    },
+    {
+      "id": "CH-10",
+      "category": "church",
+      "title": "York: prayers, then new priests",
+      "text": "In 1348, as the plague approached, Archbishop William Zouche of York ordered processions every Wednesday and Friday and a special prayer at every Mass. So many clergy then died that in October 1349 Pope Clement VI allowed him to ordain new priests at unusual times.",
+      "when": "1348–1349",
+      "where": "York",
+      "sources": [
+        "zouche",
+        "smith-york"
+      ],
+      "evidence": "Zouche: \"devout processions are to be held every Wednesday and Friday ... and that a special prayer be said in mass every day for allaying the plague and pestilence.\" Smith: \"Papal bull of Clement VI, dated at Avignon, 12 October 1349, authorising the Archbishop to hold ordinations at other than the prescribed times ... propter ministrorum ecclesiasticorum carentiam per mortalitatis pestem.\""
     }
   ]
 }

@@ -23,8 +23,8 @@ function menu() {
 function setup() {
   renderSetup(app, {
     onBack: menu,
-    onStart: ({ players, difficulty, mode, hints, room }) => {
-      const state = createGame({ players, difficulty, mode, seed: `${Date.now()}-${Math.random()}` });
+    onStart: ({ players, difficulty, mode, prePlague, timer, hints, room }) => {
+      const state = createGame({ players, difficulty, mode, prePlague, timer, seed: `${Date.now()}-${Math.random()}` });
       const ui = { hints, seenSeq: 0, room: room ? { code: room.code, seats: room.savedSeats() } : null };
       saveGame(state, ui);
       play(state, ui, room);

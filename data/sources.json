@@ -228,6 +228,54 @@
       "mla": "Fleisher, Chris. \"The Great Reset?\" *AEA Research Highlights*, American Economic Association, 4 Apr. 2022, www.aeaweb.org/research/guido-alfani-pandemics-impact-inequality. Accessed 25 Sept. 2026.",
       "url": "https://www.aeaweb.org/research/guido-alfani-pandemics-impact-inequality",
       "note": "Interview with economic historian Guido Alfani about his article \"Epidemics, Inequality, and Poverty in Preindustrial and Early Industrial Times,\" Journal of Economic Literature, 2022."
+    },
+    {
+      "id": "brit-alfonso",
+      "type": "encyclopedia",
+      "mla": "The Editors of Encyclopaedia Britannica. \"Alfonso XI.\" *Encyclopaedia Britannica*, www.britannica.com/biography/Alfonso-XI. Accessed 29 Sept. 2026.",
+      "url": "https://www.britannica.com/biography/Alfonso-XI"
+    },
+    {
+      "id": "brit-ibn-battuta",
+      "type": "encyclopedia",
+      "mla": "Hrbek, Ivan. \"Ibn Battuta.\" *Encyclopaedia Britannica*, www.britannica.com/biography/Ibn-Battuta. Accessed 29 Sept. 2026.",
+      "url": "https://www.britannica.com/biography/Ibn-Battuta"
+    },
+    {
+      "id": "ibn-battuta",
+      "type": "primary source",
+      "mla": "Ibn Battuta. \"The Plague (Black Death) in Damascus 1348.\" *Travels in Asia and Africa, 1325–1354*, translated by H. A. R. Gibb, 1929. *Internet Medieval Sourcebook*, edited by Paul Halsall, Fordham University, sourcebooks.web.fordham.edu/source/1354ibnbattuta-plague.asp. Accessed 29 Sept. 2026.",
+      "url": "https://sourcebooks.web.fordham.edu/source/1354ibnbattuta-plague.asp"
+    },
+    {
+      "id": "dols",
+      "type": "peer-reviewed article",
+      "mla": "Dols, Michael W. \"The Comparative Communal Responses to the Black Death in Muslim and Christian Societies.\" *Viator*, vol. 5, 1974. Course reading, Stanford University, web.stanford.edu/class/history13/Readings/MichaelDol.htm. Accessed 29 Sept. 2026.",
+      "url": "https://web.stanford.edu/class/history13/Readings/MichaelDol.htm"
+    },
+    {
+      "id": "kelly-ireland",
+      "type": "magazine article",
+      "mla": "Kelly, Maria. \"'Unheard-of Mortality' … The Black Death in Ireland.\" *History Ireland*, vol. 9, no. 4, Winter 2001, historyireland.com/unheard-of-mortality-the-black-death-in-ireland/. Accessed 29 Sept. 2026.",
+      "url": "https://historyireland.com/unheard-of-mortality-the-black-death-in-ireland/"
+    },
+    {
+      "id": "zouche",
+      "type": "primary source",
+      "mla": "Zouche, William. \"Letter from William Zouche, Archbishop of York, to His Official at York (1348).\" Translated in *The Black Death*, edited by Rosemary Horrox, Manchester UP. *Medieval Hollywood*, Fordham University, medievalhollywood.ace.fordham.edu/items/show/73. Accessed 29 Sept. 2026.",
+      "url": "https://medievalhollywood.ace.fordham.edu/items/show/73"
+    },
+    {
+      "id": "smith-york",
+      "type": "scholarly edition",
+      "mla": "Smith, David M., editor. *York Clergy Ordinations 1342–1352*. Borthwick Institute for Archives, University of York, 2021, www.york.ac.uk/media/borthwick/documents/publications/York%20Clergy%20Ordinations%201342-1352.pdf. Accessed 29 Sept. 2026.",
+      "url": "https://www.york.ac.uk/media/borthwick/documents/publications/York%20Clergy%20Ordinations%201342-1352.pdf"
+    },
+    {
+      "id": "alvarez-nogal",
+      "type": "peer-reviewed article",
+      "mla": "Álvarez-Nogal, Carlos, et al. \"Economic Effects of the Black Death: Spain in European Perspective.\" *Investigaciones de Historia Económica*, vol. 16, no. 4, 2020, pp. 35–48, doi.org/10.33231/j.ihe.2020.10.001. Accessed 29 Sept. 2026.",
+      "url": "https://doi.org/10.33231/j.ihe.2020.10.001"
     }
   ]
 }

@@ -7,7 +7,7 @@ import { currentPlayer } from '../engine/state.js';
 // Phone → host
 export const JOIN = 'join';     // { name, home }
 export const HELLO = 'hello';   // "I'm here" (on connect, reload or wake): host replies with the latest lobby or state
-export const LEAVE = 'leave';
+export const LEAVE = 'leave';   // before the game: give up the seat; during it: the house sits out
 export const PING = 'ping';     // heartbeat, so the host can show who is connected
 export const ACT = 'act';       // { action }  an action object for performAction
 export const DECIDE = 'decide'; // { choice }  true/false, or 'obey'/'pay' for wage laws
@@ -67,7 +67,7 @@ const CHOICES = [true, false, 'obey', 'pay'];
 // seats: [{ cid }] in player order (seat index = player id).
 export function validateIntent(state, seats, msg) {
   if (!msg || typeof msg !== 'object') return 'Unknown message.';
-  const seat = seats.findIndex((s) => s.cid === msg.from);
+  const seat = seats.findIndex((s) => s.cid === msg.from && !s.bot);
   if (seat < 0) return 'This device has not joined the game.';
   if (msg.t === NEXT) return typeof msg.id === 'number' ? null : 'Unknown card.';
   if (![ACT, DECIDE, END].includes(msg.t)) return 'Unknown message.';
@@ -86,6 +86,10 @@ export function validateIntent(state, seats, msg) {
   if (msg.t === END && p.pending.length) return 'First answer the card waiting for you.';
   return null;
 }
+
+// The answer given for a house whose player has left the game: offers are
+// turned down, and a wage law is obeyed (no inspection die to roll).
+export const sitOutChoice = (decision) => (decision.kind === 'wageLaw' ? 'obey' : false);
 
 // Checks a join request against the seats already taken.
 export function validateJoin(seats, { name, home }, { max, homes }) {

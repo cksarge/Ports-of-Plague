@@ -103,7 +103,7 @@ function doShip(state, p, { from, route, offshore = false }) {
     p.stats.infected++;
     const dest = state.cities[q.to];
     const arrivalRound = CITIES[q.to].arrival.round;
-    const end = state.roundEnd || state.round;
+    const end = state.roundEnd;
     if (dest.state === 'safe' && arrivalRound > end && arrivalRound - end <= C.plague.earlyArrivalWindow * (state.span ?? 1)) {
       spread = { type: 'early', entry: strikeCity(state, q.to, { early: true, by: p.id }) };
       p.stats.spread++;

@@ -7,3 +7,4 @@ export * from './actions.js';
 export * from './turn.js';
 export { roll, seedFrom } from './rng.js';
 export * from './fortune.js';
+export { botMove } from './bots.js';

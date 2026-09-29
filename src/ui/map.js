@@ -70,7 +70,7 @@ export function createMap(container, { onCity, decorative = false } = {}) {
   ].join('');
   container.innerHTML = `
   <svg viewBox="0 0 ${W} ${H}" role="img" aria-labelledby="map-title" preserveAspectRatio="xMidYMid meet" style="overflow:visible">
-    <title id="map-title">Painted map of Europe and the Mediterranean with 25 trading cities and their routes</title>
+    <title id="map-title">Painted map of Europe and the Mediterranean with ${DATA.cities.length} trading cities and their routes</title>
     <defs>
       <linearGradient id="seaGrad" x1="0" y1="0" x2="0.3" y2="1"><stop offset="0" stop-color="#1b5a6e"/><stop offset="0.55" stop-color="#26788a"/><stop offset="1" stop-color="#2f8a8f"/></linearGradient>
       <radialGradient id="landGrad" cx="0.45" cy="0.45" r="0.8"><stop offset="0" stop-color="#f6e7bd"/><stop offset="0.7" stop-color="#ead08e"/><stop offset="1" stop-color="#d9b56a"/></radialGradient>
@@ -132,10 +132,11 @@ export function createMap(container, { onCity, decorative = false } = {}) {
       legend.classList.toggle('collapsed', !open);
       toggle.setAttribute('aria-expanded', open);
       toggle.querySelector('span').textContent = open ? '▾' : '▸';
-      try { localStorage.setItem('ports-of-plague-legend', open ? '1' : '0'); } catch { /* ignore */ }
+      try { localStorage.setItem('ports-of-plague-legend-open', open ? '1' : '0'); } catch { /* ignore */ }
     };
-    let open = true;
-    try { open = localStorage.getItem('ports-of-plague-legend') !== '0'; } catch { /* ignore */ }
+    // Folded by default: open, it would cover the cities of southern Spain.
+    let open = false;
+    try { open = localStorage.getItem('ports-of-plague-legend-open') === '1'; } catch { /* ignore */ }
     setLegend(open);
     toggle.onclick = () => setLegend(legend.classList.contains('collapsed'));
     enableZoom(container, svg, W, H);

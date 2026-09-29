@@ -1,9 +1,9 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { HOME_CITIES } from '../src/data.js';
-import { C, createGame, advance, currentPlayer, decide } from '../src/engine/index.js';
+import { C, createGame, advance, currentPlayer, decide, endTurn } from '../src/engine/index.js';
 import { playBotGame } from '../src/engine/sim.js';
-import { makeRoomCode, isRoomCode, normalizeRoomCode, CODE_CHARS, makeClientId, trimState, validateIntent, validateJoin, LOG_KEPT, ACT, DECIDE, END, NEXT } from '../src/net/protocol.js';
+import { makeRoomCode, isRoomCode, normalizeRoomCode, CODE_CHARS, makeClientId, trimState, validateIntent, validateJoin, sitOutChoice, LOG_KEPT, ACT, DECIDE, END, NEXT } from '../src/net/protocol.js';
 
 const two = () => [{ name: 'Ada', home: 'venice' }, { name: 'Bo', home: 'london' }];
 const seats = [{ cid: 'aaa' }, { cid: 'bbb' }];
@@ -84,4 +84,22 @@ test('net: joining checks names, home cities and the player limit', () => {
   assert.match(validateJoin(taken, { name: 'x'.repeat(25), home: 'london' }, rules), /24/);
   const full = HOME_CITIES.slice(0, C.players.max).map((h, i) => ({ name: `H${i}`, home: h }));
   assert.match(validateJoin(full, { name: 'Late', home: HOME_CITIES.at(-1) }, rules), /full/);
+});
+
+test('net: houses whose players left can sit out a whole game', () => {
+  // Every house left: each turn only answers its cards with sitOutChoice and ends.
+  for (const mode of ['standard', 'quick']) {
+    const s = createGame({ players: two(), seed: 11, mode });
+    let answered = 0;
+    while (s.phase !== 'ended') {
+      if (s.phase !== 'actions') { advance(s); continue; }
+      const p = currentPlayer(s);
+      while (p.pending.length) { assert.ok(decide(s, sitOutChoice(p.pending[0])).ok); answered++; }
+      assert.ok(endTurn(s).ok);
+    }
+    assert.ok(answered > 0, `${mode}: some cards needed an answer`);
+    assert.equal(s.finalScores.length, 2);
+  }
+  assert.equal(sitOutChoice({ kind: 'wageLaw' }), 'obey');
+  assert.equal(sitOutChoice({ kind: 'offer' }), false);
 });
