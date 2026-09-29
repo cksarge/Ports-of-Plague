@@ -3,8 +3,8 @@ import { createGame } from './state.js';
 import { advance } from './turn.js';
 import { playTurn } from './bots.js';
 
-export function playBotGame({ players, seed, difficulty = 'chronicler', mode = 'standard' }) {
-  const state = createGame({ players, seed, difficulty, mode });
+export function playBotGame({ players, seed, difficulty = 'chronicler', mode = 'standard', prePlague = true }) {
+  const state = createGame({ players, seed, difficulty, mode, prePlague });
   let turns = 0;
   let guard = 0;
   while (state.phase !== 'ended' && guard++ < 1000) {

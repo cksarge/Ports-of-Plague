@@ -5,6 +5,7 @@ import {
   C, ESTATE, createGame, advance, endTurn, decide, currentPlayer, performAction, checkAction,
   scorePlayer, rankPlayers, mortalityPhase, advanceCities, familyTotal, shipQuote, legalShipments,
   applyCard, cardById, strikeCity, legalPosts, routesFrom, otherEnd,
+  timeUp, cost, roundInfo, roundNumber, totalRounds, isPrePlague,
 } from '../src/engine/index.js';
 import { playBotGame } from '../src/engine/sim.js';
 import { fillTemplate } from '../src/render/template.js';
@@ -241,7 +242,7 @@ test('full games finish with a winner, for 2 to 6 players, in both modes', () =>
         const { state, turns } = playBotGame({ seed, players, mode });
         assert.equal(state.phase, 'ended');
         assert.equal(state.roundEnd, C.rounds);
-        assert.equal(turns, (C.rounds / C.modes[mode].span) * n);
+        assert.equal(turns, (C.prePlague.rounds[mode] + C.rounds / C.modes[mode].span) * n);
         assert.ok(state.winner.length >= 1);
         for (const p of state.players) assert.ok(familyTotal(p) >= 1, 'no house is ever eliminated');
       }
@@ -249,17 +250,66 @@ test('full games finish with a winner, for 2 to 6 players, in both modes', () =>
   }
 });
 
-test('quick play: 6 rounds of a whole year, two plague rolls per round', () => {
+test('quick play: 4 rounds of a year and a half, three plague rolls per round', () => {
   const s = createGame({ players: four(), seed: 8, mode: 'quick' });
   advance(s);
   assert.equal(s.round, 1);
-  assert.equal(s.roundEnd, 2);
-  const expected = DATA.cities.filter((c) => c.arrival.round <= 2).map((c) => c.id).sort();
+  assert.equal(s.roundEnd, 3);
+  assert.equal(totalRounds(s), 4);
+  const expected = DATA.cities.filter((c) => c.arrival.round <= 3).map((c) => c.id).sort();
   const stricken = Object.entries(s.cities).filter(([, c]) => c.state === 'stricken').map(([id]) => id).sort();
-  assert.deepEqual(stricken, expected, 'both half-years are struck at once');
+  assert.deepEqual(stricken, expected, 'all three half-years are struck at once');
+  assert.equal(roundInfo(s).label, 'Late 1347 – Late 1348');
   toActions(s);
   for (let i = 0; i < 4; i++) { clearPending(s); assert.equal(currentPlayer(s).ap, C.modes.quick.actionPoints + (s.guildFavor === currentPlayer(s).id ? 1 : 0)); endTurn(s); }
-  assert.equal(s.log.filter((e) => e.type === 'plague' && e.round === 1).length, 2);
+  assert.equal(s.log.filter((e) => e.type === 'plague' && e.round === 1).length, 3);
+});
+
+test('pre-plague rounds: 2 in Standard, 1 in Quick Play; trade only, no plague phase', () => {
+  for (const [mode, n] of [['standard', 2], ['quick', 1]]) {
+    const s = createGame({ players: four(), seed: 5, mode, prePlague: true });
+    assert.equal(totalRounds(s), n + C.rounds / C.modes[mode].span);
+    toActions(s);
+    assert.ok(isPrePlague(s));
+    assert.equal(roundNumber(s), 1);
+    assert.equal(s.currentEvent, null, 'no Event card before the plague');
+    assert.ok(roundInfo(s).pre);
+    assert.equal(cost(s, 'openPost'), C.costs.openPost - C.prePlague.postDiscount);
+    const stricken = Object.entries(s.cities).filter(([, c]) => c.state === 'stricken').map(([id]) => id).sort();
+    assert.deepEqual(stricken, ['caffa', 'tana'], 'only the Black Sea is stricken before the plague sails');
+    const p = currentPlayer(s);
+    p.family.caffa = 2; // even family in Caffa does not roll before the game proper
+    for (let i = 0; i < n; i++) {
+      while (s.phase === 'actions') { clearPending(s); endTurn(s); }
+      assert.equal(s.log.filter((e) => e.type === 'mortality').length, 0);
+      assert.equal(s.cities.caffa.state, 'stricken', 'cities do not age before the plague');
+      if (i < n - 1) toActions(s);
+    }
+    advance(s);
+    assert.equal(s.round, 1, 'the plague years follow');
+    assert.ok(!isPrePlague(s));
+    assert.equal(roundNumber(s), n + 1);
+    assert.equal(cost(s, 'openPost'), C.costs.openPost);
+  }
+  const off = createGame({ players: four(), seed: 5, prePlague: false });
+  advance(off);
+  assert.equal(off.round, 1);
+  assert.equal(totalRounds(off), C.rounds);
+});
+
+test('turn timer: time up declines open cards and passes the turn', () => {
+  const s = toActions(createGame({ players: four(), seed: 9, timer: true }));
+  assert.equal(s.turnSeconds, C.turnTimer.seconds);
+  const p = currentPlayer(s);
+  p.pending.push({ kind: 'offer', offer: 'test', label: 'Buy it', decline: 'Walk away', cost: { florins: 2 }, gain: { reputation: 1 }, card: 'EV-wages' });
+  const florins = p.florins;
+  const r = timeUp(s);
+  assert.ok(r.ok);
+  assert.equal(p.pending.length, 0);
+  assert.equal(p.florins, florins, 'the offer was declined');
+  assert.notEqual(currentPlayer(s)?.id, p.id);
+  assert.ok(s.log.some((e) => e.type === 'timeUp' && e.player === p.id));
+  assert.equal(createGame({ players: four(), seed: 9 }).turnSeconds, 0, 'timer off by default in the engine');
 });
 
 test('Great Mortality raises severity and contagion', () => {

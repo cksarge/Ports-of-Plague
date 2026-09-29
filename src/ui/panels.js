@@ -1,7 +1,7 @@
 // Shared dialogs: Rules, Historian's Journal, city information, credits.
 import { DATA, CITIES, FACTS } from '../data.js';
 import { renderRulebook } from '../render/rulebook.js';
-import { routesFrom, otherEnd, familyAt, isThreatened } from '../engine/state.js';
+import { routesFrom, otherEnd, familyAt, isThreatened, halfInfo } from '../engine/state.js';
 import { severityName } from '../engine/plague.js';
 import { openDialog, esc, crestSvg } from './dom.js';
 import { factHtml, journalHtml, noteHtml } from './notes.js';
@@ -41,7 +41,7 @@ export function showCity(state, cityId) {
       <h2>${esc(c.name)}</h2>
       <p><em>${esc(c.modern)} · ${esc(c.region)}</em></p>
       <p>Status: ${status}${cs.unrest ? ` · <strong>Unrest</strong> (${cs.unrest} more round${cs.unrest > 1 ? 's' : ''})` : ''}</p>
-      <p>When the plague really arrived: <strong>${esc(c.arrival.dateText)}</strong>${c.arrival.round === 0 ? '' : ` (round: ${esc(DATA.timeline.rounds[c.arrival.round - 1].label)})`}</p>
+      <p>When the plague really arrived: <strong>${esc(c.arrival.dateText)}</strong>${c.arrival.round === 0 ? '' : ` (round: ${esc(halfInfo(c.arrival.round).label)})`}</p>
       ${houses.length ? `<p>Trading posts: ${houses.map((p) => `${crestSvg(p, 16)} ${esc(p.name)}${familyAt(p, cityId) ? ` (${familyAt(p, cityId)} family)` : ''}`).join(' · ')}</p>` : '<p>No house has a trading post here yet.</p>'}
       <h3>Routes</h3><ul>${routes}</ul>
       ${noteHtml([...c.arrival.factIds, ...c.factIds], `History of ${c.name}`)}

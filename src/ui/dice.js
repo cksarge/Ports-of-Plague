@@ -13,7 +13,7 @@ export function dieHtml(value, { red = false, gold = false, small = false, label
 }
 
 // Tumbles every .die inside root, then shows the final faces.
-export async function rollDice(root, ms = 900) {
+export async function rollDice(root, ms = 600) {
   const dice = [...root.querySelectorAll('.die')];
   if (!dice.length) return;
   if (reducedMotion()) return;

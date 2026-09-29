@@ -123,13 +123,19 @@
     }
   },
   "timing": {
-    "secondsPerAction": 20,
-    "secondsPerEventCard": 20,
-    "secondsPerChronicleCard": 15,
-    "secondsPerPass": 8,
-    "secondsPerPlaguePhase": 20,
-    "secondsPerDecision": 10,
-    "secondsPerFortuneCard": 12
+    "note": "Seconds for players at a decent pace (see tools/simulate.js).",
+    "secondsPerAction": 10,
+    "secondsPerShipResult": 3,
+    "secondsPerDecision": 6,
+    "secondsPerFortuneCard": 10,
+    "secondsPerTurnChange": 5,
+    "secondsPerRoundBanner": 10,
+    "secondsPerChroniclePage": 20,
+    "secondsPerEventCard": 15,
+    "secondsPerPlagueCard": 15,
+    "secondsPerQuietPlague": 2,
+    "secondsSetup": 60,
+    "shipResultAutoCloseMs": 2500
   },
   "keyboard": {
     "ship": "1",
@@ -162,9 +168,57 @@
     },
     "quick": {
       "label": "Quick Play",
-      "span": 2,
+      "span": 3,
       "actionPoints": 3,
-      "description": "6 rounds of a whole year each; the plague rolls twice per round."
+      "description": "4 rounds of a year and a half each; the plague rolls three times per round."
+    }
+  },
+  "prePlague": {
+    "halves": 2,
+    "rounds": {
+      "standard": 2,
+      "quick": 1
+    },
+    "postDiscount": 3
+  },
+  "turnTimer": {
+    "seconds": 30,
+    "warnAt": 10
+  },
+  "bots": {
+    "minHumans": 1,
+    "thinkSeconds": 1.2,
+    "cardSeconds": 8,
+    "skills": {
+      "easy": {
+        "label": "Easy",
+        "mistakes": 0.35,
+        "strategies": [
+          "greedy",
+          "cautious",
+          "charitable"
+        ],
+        "description": "Plays a simple style and often makes mistakes."
+      },
+      "medium": {
+        "label": "Medium",
+        "mistakes": 0.12,
+        "strategies": [
+          "greedy",
+          "cautious",
+          "charitable",
+          "balanced"
+        ],
+        "description": "A sensible merchant who sometimes slips."
+      },
+      "hard": {
+        "label": "Hard",
+        "mistakes": 0,
+        "strategies": [
+          "balanced"
+        ],
+        "description": "Weighs every choice by its Legacy points. Rarely beaten."
+      }
     }
   },
   "fortune": {
@@ -174,18 +228,18 @@
   "turnOrderDie": 6,
   "timeEstimates": {
     "standard": {
-      "2": 35,
-      "3": 47,
-      "4": 58,
-      "5": 69,
-      "6": 80
+      "2": 28,
+      "3": 36,
+      "4": 45,
+      "5": 52,
+      "6": 60
     },
     "quick": {
-      "2": 27,
-      "3": 35,
-      "4": 43,
-      "5": 51,
-      "6": 58
+      "2": 13,
+      "3": 17,
+      "4": 20,
+      "5": 24,
+      "6": 27
     }
   }
 }

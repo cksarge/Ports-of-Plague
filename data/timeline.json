@@ -8,6 +8,30 @@
       "TR-02"
     ]
   },
+  "prePlague": [
+    {
+      "round": -1,
+      "label": "Late 1346",
+      "months": "July–December 1346",
+      "season": "warm",
+      "headline": "The Golden Horde besieges Caffa, but the sea lanes stay open.",
+      "factIds": [
+        "TR-02",
+        "TR-12"
+      ]
+    },
+    {
+      "round": 0,
+      "label": "Early 1347",
+      "months": "January–June 1347",
+      "season": "cold",
+      "headline": "Merchants ready their ships for the sailing season.",
+      "factIds": [
+        "TR-04",
+        "EC-01"
+      ]
+    }
+  ],
   "rounds": [
     {
       "round": 1,

@@ -23,7 +23,7 @@ export function factUsage(DATA) {
   for (const card of DATA.fortune ?? []) {
     for (const id of card.factIds) add(id, `Fortune card: ${card.title}`);
   }
-  for (const r of DATA.timeline.rounds) {
+  for (const r of [...DATA.timeline.prePlague, ...DATA.timeline.rounds]) {
     for (const id of r.factIds) add(id, `Round banner: ${r.label}`);
   }
   for (const id of DATA.timeline.prologue.factIds) add(id, 'Prologue');

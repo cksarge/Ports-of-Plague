@@ -7,7 +7,7 @@ import { DATA, CITIES } from '../data.js';
 import {
   C, ESTATE, checkAction, shipQuote, scorePlayer, familyAt, familyTotal, familyLocations, isStricken, isThreatened,
   routesFrom, neighbors, cost, charityCost, CHARITY_KINDS, cardById, canAccept, severityName, actionPointsFor,
-  lastPlaceId, legalPosts, isAftermath, untilRound, dealPartner, apCost,
+  lastPlaceId, legalPosts, isAftermath, untilRound, dealPartner, apCost, halfInfo, roundNumber,
 } from '../engine/index.js';
 import { esc, crestSvg } from './dom.js';
 import { noteHtml } from './notes.js';
@@ -70,9 +70,9 @@ function freeNotes(p) {
 function ledgerNotes(state, p) {
   const notes = [];
   if (p.land.length) notes.push(`🌾 Land: ${p.land.map((c) => esc(CITIES[c].name)).join(', ')} (+${p.land.length * C.scoring.pointsPerLand} Wealth, ${p.land.length * C.costs.landWage}ƒ wages each half-year)`);
-  if (p.loan) notes.push(`📜 Debt: ${p.loan.owed}ƒ due ${esc(DATA.timeline.rounds[p.loan.due - 1].label)}`);
-  if (p.deal) notes.push(`🤝 Partner: ${esc(dealPartner(state, p).name)} until ${esc(DATA.timeline.rounds[p.deal.until - 1].label)}`);
-  if (p.gates) notes.push(`⛨ Gates closed: ${esc(CITIES[p.gates.city].name)} until ${esc(DATA.timeline.rounds[p.gates.until - 1].label)}`);
+  if (p.loan) notes.push(`📜 Debt: ${p.loan.owed}ƒ due ${esc(halfInfo(p.loan.due).label)}`);
+  if (p.deal) notes.push(`🤝 Partner: ${esc(dealPartner(state, p).name)} until ${esc(halfInfo(p.deal.until).label)}`);
+  if (p.gates) notes.push(`⛨ Gates closed: ${esc(CITIES[p.gates.city].name)} until ${esc(halfInfo(p.gates.until).label)}`);
   return notes.length ? `<div class="ledger-status">${notes.join('<br>')}</div>` : '';
 }
 
@@ -133,7 +133,7 @@ export function actionsPanelHtml(state, p, { busy = false } = {}) {
 }
 
 export function hintFor(state, p, hintsOn) {
-  const on = hintsOn && (state.round === 1 || state.difficulty === 'apprentice');
+  const on = hintsOn && (roundNumber(state) === 1 || state.difficulty === 'apprentice');
   if (!on) return null;
   if (p.pending.length) return 'A card needs your decision first.';
   const danger = familyLocations(p).find((l) => l !== ESTATE && (isStricken(state, l) || isThreatened(state, l)));
@@ -246,7 +246,7 @@ export function actionPrompt(state, p, id) {
     };
   }
   if (id === 'loan') {
-    const due = DATA.timeline.rounds[untilRound(state, 2) - 1].label;
+    const due = halfInfo(untilRound(state, 2)).label;
     return {
       html: `<div class="frame"><h2>📜 Take a Loan</h2>
         <p>Florence's great banks had collapsed just before the plague, so lenders were careful. A banker will lend you <strong>${C.gains.loan}ƒ</strong> now. You must repay <strong>${C.costs.loanRepay}ƒ</strong> in the plague phase of the next round (${esc(due)}).</p>

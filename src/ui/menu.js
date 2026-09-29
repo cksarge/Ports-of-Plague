@@ -1,6 +1,6 @@
 // Title screen (with a living map behind it) and the setup screen.
 import { DATA, CITIES, HOME_CITIES } from '../data.js';
-import { C, PLAYER_STYLES, validateSetup, createGame } from '../engine/state.js';
+import { C, PLAYER_STYLES, validateSetup, createGame, roundInfo } from '../engine/state.js';
 import { esc, crestSvg, $, $$, isTyping } from './dom.js';
 import { showRules, showCredits } from './panels.js';
 import { loadGame } from './save.js';
@@ -68,7 +68,7 @@ export function renderMenu(app, { onNew, onContinue, onJoin }) {
       <p class="subtitle">Trade, survival and conscience in the years of the Black Death, 1347–1353</p>
       <p class="drop-cap" style="text-align:left">In 1347 Italian merchant ships carried a deadly plague from the Black Sea into the ports of Europe. You lead a merchant house in one of the great trading cities. Grow rich from trade, but every ship may carry the plague. Protect your family, keep your good name, and face the same hard choices people faced six and a half centuries ago.</p>
       <div class="menu-buttons">
-        ${saved ? `<button class="btn primary" id="continue">Continue saved game<br><small style="font-family:var(--serif);font-weight:400">${esc(DATA.timeline.rounds[Math.max(0, saved.state.round - 1)]?.label ?? 'Start')} · ${saved.state.players.map((p) => esc(p.name)).join(', ')}</small></button>` : ''}
+        ${saved ? `<button class="btn primary" id="continue">Continue saved game<br><small style="font-family:var(--serif);font-weight:400">${esc(roundInfo(saved.state)?.label ?? 'Start')} · ${saved.state.players.map((p) => esc(p.name)).join(', ')}</small></button>` : ''}
         <button class="btn ${saved ? '' : 'primary'}" id="new">New game</button>
         <button class="btn" id="join">Join a game <small style="font-family:var(--serif);font-weight:400">(room code)</small></button>
         <button class="btn" id="rules">Rules <span class="key">R</span></button>
@@ -78,7 +78,7 @@ export function renderMenu(app, { onNew, onContinue, onJoin }) {
           <button class="btn small" id="menu-music" aria-pressed="${isMusicOn()}">${isMusicOn() ? '🎵 Music on' : '🎵 Music off'}</button>
         </div>
       </div>
-      <p class="menu-foot">${C.players.min}–${C.players.max} players on one device or each on their own · about ${C.timeEstimates.quick['2']}–60 minutes · touch, mouse or keyboard</p>
+      <p class="menu-foot">1–${C.players.max} players (bots can play any house) on one device or each on their own · about ${C.timeEstimates.quick['2']}–${C.timeEstimates.standard['6']} minutes · touch, mouse or keyboard</p>
     </div></section>`;
   stopTitle = titleBackdrop($('#title-map', app));
   music.setMood('menu');
@@ -105,7 +105,10 @@ export function renderSetup(app, { onStart, onBack }) {
     difficulty: 'chronicler',
     mode: 'standard',
     hints: true,
-    players: PLAYER_STYLES.map((s, i) => ({ name: DEFAULT_NAMES[i], home: DEFAULT_HOMES[i], ...s })),
+    prePlague: true,
+    timer: true,
+    // bot: a computer plays this house, at the chosen skill level.
+    players: PLAYER_STYLES.map((s, i) => ({ name: DEFAULT_NAMES[i], home: DEFAULT_HOMES[i], bot: false, skill: 'medium', ...s })),
   };
   let room = null;
   let roomError = '';
@@ -122,12 +125,37 @@ export function renderSetup(app, { onStart, onBack }) {
     mortality: 'Great Mortality: severity rolls are 1 higher and every shipment has +1 contagion risk. For experienced merchants.',
   };
   const devices = () => setup.where === 'devices';
+  const roomOptions = () => ({ mode: setup.mode, difficulty: setup.difficulty, prePlague: setup.prePlague, timer: setup.timer });
+  // The estimates in config.json assume the default options (pre-plague rounds and the timer on).
+  function estimateText() {
+    let est = C.timeEstimates[setup.mode][String(playerCount())];
+    if (!setup.prePlague) est -= Math.round(est * C.prePlague.rounds[setup.mode] / (C.prePlague.rounds[setup.mode] + C.rounds / C.modes[setup.mode].span));
+    return `About ${est} minutes for ${playerCount()} players${setup.timer ? '' : ' (longer without the turn timer)'}`;
+  }
+  const preText = () => {
+    const n = C.prePlague.rounds[setup.mode];
+    return `${n > 1 ? `${n} extra rounds` : 'One extra round'} before the plague arrives (from ${DATA.timeline.prePlague[0].label}): no Event card, no plague, and trading posts cost ${C.prePlague.postDiscount}ƒ less.`;
+  };
   // With a room open, this screen is the big screen: the room code and every
   // house must be visible without scrolling.
   const fitLobby = () => { const f = $('.setup', app); if (f) zoomToFit(f, pageFits, 0.5, { widen: true }); };
   const onResize = () => { if (devices()) fitLobby(); };
   window.addEventListener('resize', onResize);
   const leaveSetup = () => window.removeEventListener('resize', onResize);
+  // "Played by" switch and skill buttons for one house (i: its index).
+  const whoHtml = (i, p) => `
+    <div class="field"><span class="label" id="who-${i}">Played by</span>
+      <div class="seg" role="group" aria-labelledby="who-${i}">
+        <button class="btn small" data-bot="${i}" data-val="" aria-pressed="${!p.bot}">A person</button>
+        <button class="btn small" data-bot="${i}" data-val="1" aria-pressed="${!!p.bot}">A bot</button>
+      </div></div>
+    ${p.bot ? skillHtml(i, p.skill) : ''}`;
+  const skillHtml = (i, skill) => `
+    <div class="field"><span class="label" id="skill-${i}">Bot skill</span>
+      <div class="seg" role="group" aria-labelledby="skill-${i}">
+        ${Object.entries(C.bots.skills).map(([k, sk]) => `<button class="btn small" data-skill="${i}" data-val="${k}" aria-pressed="${skill === k}">${esc(sk.label)}</button>`).join('')}
+      </div>
+      <span class="home-info">${esc(C.bots.skills[skill]?.description ?? '')}</span></div>`;
   const playerCount = () => (devices() ? Math.max(room?.seats.length ?? 0, C.players.min) : setup.count);
   const draw = () => {
     const est = C.timeEstimates[setup.mode][String(playerCount())];
@@ -140,11 +168,13 @@ export function renderSetup(app, { onStart, onBack }) {
         </div>
         <span class="home-info">${devices() ? 'This screen shows the map for everyone. Each player joins on a phone, tablet or computer with the room code and takes their turn there.' : 'Players take turns on this device and pass it on.'}</span></div>
       ${devices() ? '<div id="lobby" class="lobby" aria-live="polite"></div>' : `
-      <div class="field"><span class="label" id="count-label">Number of players</span>
-        <div class="seg" role="group" aria-labelledby="count-label">${Array.from({ length: C.players.max - C.players.min + 1 }, (_, i) => i + C.players.min).map((n) => `<button class="btn small" data-count="${n}" aria-pressed="${setup.count === n}">${n} players</button>`).join('')}</div></div>
+      <div class="field"><span class="label" id="count-label">Number of houses</span>
+        <div class="seg" role="group" aria-labelledby="count-label">${Array.from({ length: C.players.max - C.players.min + 1 }, (_, i) => i + C.players.min).map((n) => `<button class="btn small" data-count="${n}" aria-pressed="${setup.count === n}">${n} houses</button>`).join('')}</div>
+        <span class="home-info">Any house can be played by a bot, so you can also play alone.</span></div>
       <div class="setup-grid">${setup.players.slice(0, setup.count).map((p, i) => `
         <div class="house-card" style="--house:${p.color}">
-          <h3>${crestSvg(p, 26)} Player ${i + 1} <small style="font-family:var(--serif);font-weight:400">(${esc(p.colorName)}, ${p.crest})</small></h3>
+          <h3>${crestSvg(p, 26)} ${p.bot ? 'Bot' : 'Player'} ${i + 1} <small style="font-family:var(--serif);font-weight:400">(${esc(p.colorName)}, ${p.crest})</small></h3>
+          ${whoHtml(i, p)}
           <div class="field"><label for="name-${i}">House name</label><input id="name-${i}" data-name="${i}" value="${esc(p.name)}" maxlength="24" autocomplete="off"></div>
           <div class="field"><label for="home-${i}">Home city</label>
             <select id="home-${i}" data-home="${i}">${HOME_CITIES.map((h) => `<option value="${h}" ${p.home === h ? 'selected' : ''}>${esc(CITIES[h].modern)}</option>`).join('')}</select></div>
@@ -155,7 +185,7 @@ export function renderSetup(app, { onStart, onBack }) {
           <div class="seg" role="group" aria-labelledby="mode-label">
             ${Object.entries(C.modes).map(([k, m]) => `<button class="btn small" data-mode="${k}" aria-pressed="${setup.mode === k}">${esc(m.label)}</button>`).join('')}
           </div>
-          <span class="home-info">${esc(C.modes[setup.mode].description)} ${C.modes[setup.mode].actionPoints} action points per turn.<br><span class="time-est">About ${est} minutes for ${playerCount()} players</span>${est > 60 && setup.mode === 'standard' ? ' · Quick Play is recommended for this many players.' : ''}</span>
+          <span class="home-info">${esc(C.modes[setup.mode].description)} ${C.modes[setup.mode].actionPoints} action points per turn.<br><span class="time-est">${estimateText()}</span>${est > 60 && setup.mode === 'standard' ? ' · Quick Play is recommended for this many players.' : ''}</span>
         </div>
         <div class="field"><span class="label" id="diff-label">Difficulty</span>
           <div class="seg" role="group" aria-labelledby="diff-label">
@@ -164,7 +194,11 @@ export function renderSetup(app, { onStart, onBack }) {
           <span class="home-info">${diffText[setup.difficulty]}</span>
         </div>
       </div>
-      <label class="field" style="display:flex;align-items:center;gap:0.5rem"><input type="checkbox" id="hints" ${setup.hints ? 'checked' : ''} style="width:24px;height:24px"> Show guided hints during the first round</label>
+      <div class="option-checks">
+        <label class="check"><input type="checkbox" id="pre-plague" ${setup.prePlague ? 'checked' : ''}> <span><strong>Pre-plague ${C.prePlague.rounds[setup.mode] > 1 ? 'rounds' : 'round'}</strong><small>${preText()}</small></span></label>
+        <label class="check"><input type="checkbox" id="timer" ${setup.timer ? 'checked' : ''}> <span><strong>Turn timer</strong><small>${C.turnTimer.seconds} seconds per turn; when time runs out, the next house plays. The clock stops while cards are shown.</small></span></label>
+        <label class="check"><input type="checkbox" id="hints" ${setup.hints ? 'checked' : ''}> <span><strong>Guided hints</strong><small>Tips on screen during the first round.</small></span></label>
+      </div>
       <p class="error" id="setup-error" role="alert"></p>
       <div class="setup-actions">
         <button class="btn ghost" id="back">← Back</button>
@@ -175,6 +209,11 @@ export function renderSetup(app, { onStart, onBack }) {
     $$('[data-count]', app).forEach((b) => (b.onclick = () => { setup.count = Number(b.dataset.count); fixHomes(); draw(); }));
     $$('[data-diff]', app).forEach((b) => (b.onclick = () => { setup.difficulty = b.dataset.diff; draw(); }));
     $$('[data-mode]', app).forEach((b) => (b.onclick = () => { setup.mode = b.dataset.mode; draw(); }));
+    $$('[data-bot]', app).forEach((b) => (b.onclick = () => { setup.players[b.dataset.bot].bot = !!b.dataset.val; draw(); }));
+    $$('[data-skill]', app).forEach((b) => (b.onclick = () => {
+      if (devices()) room?.setSkill(Number(b.dataset.skill), b.dataset.val);
+      else { setup.players[b.dataset.skill].skill = b.dataset.val; draw(); }
+    }));
     $$('[data-name]', app).forEach((inp) => (inp.oninput = () => { setup.players[inp.dataset.name].name = inp.value; }));
     $$('[data-home]', app).forEach((sel) => (sel.onchange = () => {
       const i = Number(sel.dataset.home);
@@ -182,10 +221,12 @@ export function renderSetup(app, { onStart, onBack }) {
       $(`#info-${i}`, app).innerHTML = homeInfo(sel.value);
     }));
     $('#hints', app).onchange = (e) => { setup.hints = e.target.checked; };
+    $('#pre-plague', app).onchange = (e) => { setup.prePlague = e.target.checked; draw(); };
+    $('#timer', app).onchange = (e) => { setup.timer = e.target.checked; draw(); };
     $('#back', app).onclick = () => { closeRoom(); leaveSetup(); onBack(); };
     $('#start', app).onclick = start;
     if (devices()) drawLobby();
-    if (room) { room.options = { mode: setup.mode, difficulty: setup.difficulty }; room.pushLobby(); }
+    if (room) { room.options = roomOptions(); room.pushLobby(); }
   };
 
   // ---------- Lobby (multi-device play) ----------
@@ -197,7 +238,7 @@ export function renderSetup(app, { onStart, onBack }) {
     try {
       room = await hostRoom({ joinRules: { max: C.players.max, homes: HOME_CITIES } });
       if (!devices()) { closeRoom(); return; }
-      room.options = { mode: setup.mode, difficulty: setup.difficulty };
+      room.options = roomOptions();
       room.onChange = () => { if (devices()) { drawLobby(); updateEstimate(); } };
       room.pushLobby();
     } catch {
@@ -229,37 +270,45 @@ export function renderSetup(app, { onStart, onBack }) {
       ${seats.length ? `<div class="setup-grid">${seats.map((s, i) => {
         const style = PLAYER_STYLES[i];
         return `<div class="house-card" style="--house:${style.color}">
-          <h3>${crestSvg(style, 26)} ${esc(s.name)} <span class="link-dot ${s.online ? 'on' : ''}" title="${s.online ? 'Connected' : 'Not connected'}"></span></h3>
+          <h3>${crestSvg(style, 26)} ${esc(s.name)} ${s.bot ? '<small class="bot-tag">Bot</small>' : `<span class="link-dot ${s.online ? 'on' : ''}" title="${s.online ? 'Connected' : 'Not connected'}"></span>`}</h3>
           <div class="home-info">${esc(CITIES[s.home].name)} · ${esc(style.colorName)}</div>
+          ${s.bot ? skillHtml(i, s.skill) : ''}
           <button class="btn small ghost" data-remove="${i}">Remove</button></div>`;
-      }).join('')}</div>` : `<p class="home-info">Waiting for players… Each player opens the game on their own device, chooses <em>Join a game</em> and types the code.</p>`}`;
+      }).join('')}</div>` : `<p class="home-info">Waiting for players… Each player opens the game on their own device, chooses <em>Join a game</em> and types the code.</p>`}
+      ${seats.length < C.players.max ? '<button class="btn small" id="add-bot">+ Add a bot</button> <span class="home-info">A computer house, played on this screen.</span>' : ''}`;
     $$('[data-remove]', el).forEach((b) => (b.onclick = () => room.removeSeat(Number(b.dataset.remove))));
+    $$('[data-skill]', el).forEach((b) => (b.onclick = () => room.setSkill(Number(b.dataset.skill), b.dataset.val)));
+    const add = $('#add-bot', el);
+    if (add) add.onclick = () => {
+      const home = HOME_CITIES.find((h) => !seats.some((s) => s.home === h));
+      const name = DEFAULT_NAMES.find((n) => !seats.some((s) => s.name === n)) ?? `Bot ${seats.length + 1}`;
+      room.addBot({ name, home, skill: 'medium' });
+    };
     fitLobby();
   }
   function updateEstimate() {
-    const est = C.timeEstimates[setup.mode][String(playerCount())];
     const t = $('.time-est', app);
-    if (t) t.textContent = `About ${est} minutes for ${playerCount()} players`;
+    if (t) t.textContent = estimateText();
   }
 
   function start() {
     if (devices()) {
       if (!room) { $('#setup-error', app).textContent = 'The room is not open yet.'; return; }
-      const players = room.seats.map((s) => ({ name: s.name, home: s.home }));
-      const problem = players.length < C.players.min ? `At least ${C.players.min} players must join first.` : validateSetup({ players });
+      const players = room.seats.map((s) => ({ name: s.name, home: s.home, bot: s.bot, skill: s.skill }));
+      const problem = players.length < C.players.min ? `At least ${C.players.min} houses are needed: wait for players to join, or add a bot.` : validateSetup({ players });
       if (problem) { $('#setup-error', app).textContent = problem; return; }
       room.started = true;
       const started = room;
       room = null;
       leaveSetup();
-      onStart({ players, difficulty: setup.difficulty, mode: setup.mode, hints: setup.hints || setup.difficulty === 'apprentice', room: started });
+      onStart({ players, difficulty: setup.difficulty, mode: setup.mode, prePlague: setup.prePlague, timer: setup.timer, hints: setup.hints || setup.difficulty === 'apprentice', room: started });
       return;
     }
     const players = setup.players.slice(0, setup.count).map((p) => ({ ...p, name: p.name.trim() }));
     const problem = validateSetup({ players });
     if (problem) { $('#setup-error', app).textContent = problem; return; }
     leaveSetup();
-    onStart({ players, difficulty: setup.difficulty, mode: setup.mode, hints: setup.hints || setup.difficulty === 'apprentice' });
+    onStart({ players, difficulty: setup.difficulty, mode: setup.mode, prePlague: setup.prePlague, timer: setup.timer, hints: setup.hints || setup.difficulty === 'apprentice' });
   }
   const fixHomes = () => {
     const used = new Set();

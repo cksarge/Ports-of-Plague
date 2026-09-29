@@ -21,7 +21,7 @@ export function cardById(id) {
 // Applies a card. Global effects change this round's modifiers; choices
 // become pending decisions each player answers at the start of their turn.
 export function applyCard(state, card) {
-  const entry = addLog(state, { type: 'card', card: card.id, deck: card.round ? 'chronicle' : 'event', text: card.text, factIds: card.factIds });
+  const entry = addLog(state, { type: 'card', card: card.id, deck: card.round !== undefined ? 'chronicle' : 'event', text: card.text, factIds: card.factIds });
   applyEffect(state, card, card.effect);
   return entry;
 }

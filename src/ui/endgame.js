@@ -25,7 +25,7 @@ export function renderEnd(app, state, { onAgain, onMenu, fit = false }) {
       const p = state.players[r.id];
       return `<div class="podium-row ${r.place === 1 ? 'first' : ''}" style="--house:${p.color}">
         <span class="place">${r.place}</span>${crestSvg(p, 30)}
-        <span><strong>${esc(p.name)}</strong> of ${esc(CITIES[p.home].name)}<br><span class="breakdown">Wealth ${r.wealth} (${p.florins}ƒ, ${p.posts.length} posts) + Family ${r.family} (${familyTotal(p)} alive) + Reputation ${r.reputation} (${p.reputation}) + Balance ${r.balance}</span>
+        <span><strong>${esc(p.name)}</strong>${p.bot ? ` <small class="bot-tag">Bot · ${esc(C.bots.skills[p.skill]?.label ?? '')}</small>` : ''} of ${esc(CITIES[p.home].name)}<br><span class="breakdown">Wealth ${r.wealth} (${p.florins}ƒ, ${p.posts.length} posts) + Family ${r.family} (${familyTotal(p)} alive) + Reputation ${r.reputation} (${p.reputation}) + Balance ${r.balance}</span>
         <br><span class="breakdown">${p.stats.shipments} shipments (${p.stats.infected} infected) · ${p.lostFamily} family lost · ${p.stats.fled} time${p.stats.fled === 1 ? '' : 's'} fled · ${p.stats.charity} charity · ${p.stats.fortune ?? 0} Fortune cards · ${p.stats.protected ? 'protected the persecuted community' : 'did not protect the persecuted community'}</span></span>
         <span class="total">${r.total}</span></div>`;
     }).join('')}</div>

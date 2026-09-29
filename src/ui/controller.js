@@ -9,6 +9,7 @@ import { housePanelHtml, actionsPanelHtml, hintFor, quickBlock, actionPrompt, de
 import { showRules, showJournal, showCity } from './panels.js';
 import { storyCard, storyHtml } from './stories.js';
 import { createMap, updateMap, redrawStains } from './map.js';
+import { showClockPill, hideClockPill } from './clock.js';
 import { noteHtml } from './notes.js';
 import { sfx } from './sound.js';
 import { joinRoom } from '../net/client.js';
@@ -25,6 +26,9 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
   let waiting = null;      // id of the request sent and not yet handled by the big screen
   let waitTimer = null;
   let asking = false;      // a choice dialog is open on this device
+  let askKey = null;       // the turn that choice belongs to (see turnKey)
+  let clockView = null;    // the turn timer as the big screen last reported it
+  let clockTimer = null;
   let nextSent = null;     // id of the story card we pressed Next on
   let lastTurnKey = null;
   let reader = null;       // the story card this device is reading: { id, close }
@@ -35,7 +39,28 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
     const seats = game?.seats ?? lobby?.seats ?? [];
     return conn ? seats.findIndex((s) => s.cid === conn.cid) : -1;
   };
-  const leave = () => { warnBeforeLeaving(false); conn?.close(); conn = null; document.removeEventListener('keydown', onKey); onBack(); };
+  const leave = () => { stopClock(); warnBeforeLeaving(false); conn?.close(); conn = null; document.removeEventListener('keydown', onKey); onBack(); };
+  // Which house's turn this is (changes when a turn ends, even by the timer).
+  const turnKey = (state) => { const cur = currentPlayer(state); return cur ? `${state.round}-${state.turn}-${cur.id}` : null; };
+
+  // The turn timer: the big screen runs it, this device counts down with it.
+  function tickClock() {
+    const cur = game && currentPlayer(game.state);
+    if (!clockView || !cur || hostGone) { hideClockPill(); return; }
+    const left = clockView.running ? clockView.left - (performance.now() - clockView.at) / 1000 : clockView.left;
+    showClockPill(cur, Math.max(0, left), { paused: !clockView.running });
+  }
+  function setClock(timer) {
+    clockView = timer ? { ...timer, at: performance.now() } : null;
+    if (clockView && !clockTimer) clockTimer = setInterval(tickClock, 250);
+    if (!clockView) stopClock(); else tickClock();
+  }
+  function stopClock() {
+    clockView = null;
+    clearInterval(clockTimer);
+    clockTimer = null;
+    hideClockPill();
+  }
 
   // ---------- Step 1: the room code ----------
   function drawCode() {
@@ -93,6 +118,9 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
       if (waiting && (m.seats[me()]?.rid ?? 0) >= waiting) stopWaiting();
       if (nextSent !== null && m.view?.next?.id !== nextSent) nextSent = null;
       if (reader && reader.id !== m.view?.next?.id) reader.close?.();
+      // The turn ended (the timer ran out) while a choice was open: drop it.
+      if (asking && askKey !== turnKey(m.state)) closeAllDialogs();
+      setClock(m.state.phase === 'ended' ? null : m.view?.timer);
       if (firstState) document.addEventListener('keydown', onKey);
       drawGame();
     } else if (m.t === TOAST) {
@@ -116,6 +144,7 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
     conn.close({ leave: false });
     conn = null;
     stopWaiting();
+    stopClock();
     document.removeEventListener('keydown', onKey);
     closeAllDialogs();
     const reason = why === 'closed'
@@ -184,8 +213,8 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
     app.innerHTML = `<section class="screen"><div class="frame join-box">
       <h1>Room ${esc(conn.code)}</h1>
       <p><strong>You are in!</strong> Waiting for the big screen to start the game…</p>
-      ${o.mode ? `<p class="home-info">${esc(C.modes[o.mode]?.label ?? '')} · ${esc(C.difficulty[o.difficulty]?.label ?? '')}</p>` : ''}
-      <div class="houses">${seats.map((s, i) => houseRow({ ...PLAYER_STYLES[i], name: s.name }, `${esc(CITIES[s.home].name)}${s.cid === conn.cid ? ' · you' : ''}`, s.online)).join('')}</div>
+      ${o.mode ? `<p class="home-info">${esc(C.modes[o.mode]?.label ?? '')} · ${esc(C.difficulty[o.difficulty]?.label ?? '')}${o.prePlague ? ' · pre-plague rounds' : ''}${o.timer ? ` · ${C.turnTimer.seconds}-second turns` : ''}</p>` : ''}
+      <div class="houses">${seats.map((s, i) => houseRow({ ...PLAYER_STYLES[i], name: s.name }, `${esc(CITIES[s.home].name)}${s.cid === conn.cid ? ' · you' : ''}${s.bot ? ` · bot (${esc(C.bots.skills[s.skill]?.label ?? '')})` : ''}`, s.online)).join('')}</div>
       <div class="setup-actions"><button class="btn ghost" id="back">Leave</button><button class="btn" id="edit">Change my house</button></div>
     </div></section>`;
     $('#back', app).onclick = leave;
@@ -239,6 +268,7 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
         <button class="btn small" id="ctl-journal" aria-label="Historian's Journal, ${state.journal?.length ?? 0} facts">Journal <span class="count">${state.journal?.length ?? 0}</span></button>
         <button class="btn small" id="ctl-chronicle">Chronicle</button>
         <button class="btn small" id="ctl-map">Map</button>
+        ${state.phase === 'ended' ? '' : '<button class="btn small ghost" id="ctl-quit">Leave game</button>'}
       </nav>`);
 
     if (state.phase === 'ended') {
@@ -275,7 +305,7 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
       if (p.pending.length) main.push(`<section class="panel"><h2>A card needs your decision</h2><button class="btn primary" id="ctl-decide">Read the card</button></section>`);
       main.push(actionsPanelHtml(state, p, { busy: !!waiting || !!view.busy }));
     } else if (!next) {
-      const what = cur ? `<strong>${esc(cur.name)}</strong> is taking their turn.` : state.phase === 'plague' ? 'The plague takes its toll. Watch the big screen.' : 'The chronicle unfolds. Watch the big screen.';
+      const what = cur ? `<strong>${esc(cur.name)}</strong> ${game.seats[cur.id]?.left ? 'has left the game. Their turn is skipped.' : cur.bot ? '(a bot) is taking its turn. Watch the big screen.' : 'is taking their turn.'}` : state.phase === 'plague' ? 'The plague takes its toll. Watch the big screen.' : 'The chronicle unfolds. Watch the big screen.';
       main.push(`<section class="panel waiting-panel"><h2>Please wait</h2><p>${what}</p></section>`);
       main.push('<div id="wait-map-slot"></div>');
     }
@@ -283,7 +313,7 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
     side.push(`<section class="panel houses-panel" aria-label="All houses"><h2>Houses (turn order)</h2><div class="houses">${state.order.map((id, i) => {
       const h = state.players[id];
       const s = game.seats[id];
-      return houseRow(h, `${h.florins}ƒ · rep ${h.reputation} · family ${familyTotal(h)} · Legacy ${scorePlayer(h).total}`, s?.online, cur?.id === id, `${i + 1}. `);
+      return houseRow(h, `${s?.left ? 'Left the game · ' : ''}${h.bot ? 'Bot · ' : ''}${h.florins}ƒ · rep ${h.reputation} · family ${familyTotal(h)} · Legacy ${scorePlayer(h).total}`, s?.online, cur?.id === id, `${i + 1}. `);
     }).join('')}</div></section>`);
     parts.push(`<div class="ctl-main ${main.length ? 'two' : ''}">${main.length ? `<div class="ctl-col">${main.join('')}</div>` : ''}<div class="ctl-col">${side.join('')}</div></div>`);
 
@@ -310,6 +340,19 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
     $('#ctl-journal', app).onclick = () => reopen(showJournal(game.state.journal ?? []));
     $('#ctl-chronicle', app).onclick = () => reopen(showChronicle());
     $('#ctl-map', app).onclick = () => reopen(showMap());
+    const quit = $('#ctl-quit', app);
+    if (quit) quit.onclick = () => reopen(confirmLeave());
+  }
+
+  // Leaving mid-game: the house stays on the board but sits out (the big
+  // screen skips its turns and turns down its cards) until this player rejoins.
+  function confirmLeave() {
+    const code = conn.code;
+    return openDialog(`<div class="frame"><h2>Leave the game?</h2>
+      <p>Your house stays on the board, but it sits out: its turns are skipped and card offers are turned down. The other players carry on without you.</p>
+      <p>To come back, choose <em>Join a game</em> and type <strong>${esc(code)}</strong> (and your house name if asked).</p>
+      <div class="dialog-actions"><button class="btn" data-value="stay" autofocus>Stay</button><button class="btn primary" data-value="leave">Leave game</button></div></div>`,
+    { label: 'Leave the game?' }).then((v) => { if (v === 'leave') { screen = 'left'; leave(); } });
   }
 
   // The card on the big screen, on this device (dice already rolled). It
@@ -412,9 +455,11 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
     const m = mine();
     if (!m || !m.p.pending.length || asking) return;
     asking = true;
+    askKey = turnKey(m.state);
     const pr = decisionPrompt(m.state, m.p, m.p.pending[0]);
     const choice = pr.parse(await openDialog(pr.html, pr.opts));
     asking = false;
+    if (askKey !== turnKey(game?.state)) { drawGame(); return; }
     request({ t: DECIDE, choice });
   }
 
@@ -426,9 +471,10 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
     const pr = actionPrompt(m.state, m.p, id);
     if (!pr) return;
     asking = true;
+    askKey = turnKey(m.state);
     const action = pr.parse(await openDialog(pr.html, pr.opts));
     asking = false;
-    if (action) request({ t: ACT, action });
+    if (action && askKey === turnKey(game?.state)) request({ t: ACT, action });
     else drawGame();
   }
 
@@ -439,9 +485,10 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
     if (m.p.ap > 0) {
       const pr = endTurnPrompt(m.p);
       asking = true;
+      askKey = turnKey(m.state);
       const ok = pr.parse(await openDialog(pr.html, pr.opts));
       asking = false;
-      if (!ok) return;
+      if (!ok || askKey !== turnKey(game?.state)) { drawGame(); return; }
     }
     request({ t: END });
   }

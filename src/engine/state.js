@@ -1,11 +1,11 @@
 // Game state creation and shared helpers. The whole game is one plain
 // JSON object, which makes save/restore and testing simple.
 import { DATA, CITIES, HOME_CITIES } from '../data.js';
-import { seedFrom, shuffle, roll } from './rng.js';
+import { seedFrom, shuffle, roll, nextRandom } from './rng.js';
 
 export const C = DATA.config;
 export const ESTATE = 'estate';
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 
 export const PLAYER_STYLES = [
   { color: '#0072B2', colorName: 'Lapis blue', crest: 'circle' },
@@ -43,13 +43,25 @@ export function validateSetup({ players }) {
     if (!HOME_CITIES.includes(p.home)) return `${p.home} is not one of the home cities.`;
     if (homes.has(p.home)) return `Two houses cannot share ${CITIES[p.home].name} as a home city.`;
     homes.add(p.home);
+    if (p.bot && !C.bots.skills[p.skill]) return `Choose a skill level for ${p.name.trim()}.`;
   }
+  if (players.filter((p) => !p.bot).length < C.bots.minHumans) return 'At least one house must be played by a person.';
   return null;
 }
 
-export function createGame({ players, difficulty = 'chronicler', mode = 'standard', seed = Date.now() }) {
+// A bot house's playing style: drawn from its skill level's list.
+function botStrategy(state, skill) {
+  const list = C.bots.skills[skill].strategies;
+  return list[Math.floor(nextRandom(state) * list.length)];
+}
+
+// Options: prePlague (true = the pre-plague rounds are played first) and
+// timer (true = each turn has a time limit, config.turnTimer.seconds).
+export function createGame({ players, difficulty = 'chronicler', mode = 'standard', seed = Date.now(), prePlague = false, timer = false }) {
   const problem = validateSetup({ players });
   if (problem) throw new Error(problem);
+  const preRounds = prePlague ? C.prePlague.rounds[mode] ?? 0 : 0;
+  const start = preRounds ? 1 - C.prePlague.halves : 1;
   const state = {
     version: SAVE_VERSION,
     title: C.title,
@@ -58,8 +70,13 @@ export function createGame({ players, difficulty = 'chronicler', mode = 'standar
     difficulty,
     mode,
     span: (C.modes[mode] ?? C.modes.standard).span,
-    round: 0,
-    roundEnd: 0,
+    // Half-years are numbered 1–12 (late 1347 to early 1353); the pre-plague
+    // rounds use 0 (early 1347) and −1 (late 1346).
+    firstHalf: start,
+    preRounds,
+    turnSeconds: timer ? C.turnTimer.seconds : 0,
+    round: start - 1,
+    roundEnd: start - 1,
     phase: 'roundStart',
     players: [],
     order: [],
@@ -87,7 +104,10 @@ export function createGame({ players, difficulty = 'chronicler', mode = 'standar
       colorName: p.colorName ?? style.colorName,
       crest: p.crest ?? style.crest,
       home: p.home,
-      strategy: p.strategy ?? null,
+      // bot: a computer plays this house (skill: 'easy', 'medium' or 'hard').
+      bot: !!p.bot,
+      skill: p.bot ? p.skill : null,
+      strategy: p.strategy ?? (p.bot ? botStrategy(state, p.skill) : null),
       florins: C.start.florins + (mode === 'quick' ? home.quickStartFlorins ?? home.startFlorins ?? 0 : home.startFlorins ?? 0),
       reputation: C.start.reputation + (home.startReputation ?? 0),
       family: { [p.home]: C.start.family },
@@ -195,7 +215,23 @@ export function gatesClosedBy(state, cityId, p = null) {
 
 // Half-year number at which something lasting `rounds` rounds (counting this one) ends.
 export function untilRound(state, rounds) {
-  return (state.roundEnd || state.round) + (state.span ?? 1) * (rounds - 1);
+  return state.roundEnd + (state.span ?? 1) * (rounds - 1);
+}
+
+// True during the pre-plague rounds (before the game's first half-year).
+export function isPrePlague(state) {
+  return state.round <= 0 && state.round >= firstHalf(state);
+}
+export function firstHalf(state) {
+  return state.firstHalf ?? 1;
+}
+// Half-years covered by each pre-plague round.
+export function preSpan(state) {
+  return state.preRounds ? (1 - firstHalf(state)) / state.preRounds : 1;
+}
+// The timeline entry of any half-year, including the pre-plague ones.
+export function halfInfo(h) {
+  return h >= 1 ? DATA.timeline.rounds[h - 1] : DATA.timeline.prePlague.find((r) => r.round === h);
 }
 
 export function clampReputation(p) {
@@ -203,7 +239,8 @@ export function clampReputation(p) {
 }
 
 export function cost(state, key, p = null) {
-  return Math.max(0, C.costs[key] + (state.effects.costs[key] ?? 0) + (p?.personalCosts?.[key] ?? 0));
+  const pre = key === 'openPost' && isPrePlague(state) ? -C.prePlague.postDiscount : 0;
+  return Math.max(0, C.costs[key] + pre + (state.effects.costs[key] ?? 0) + (p?.personalCosts?.[key] ?? 0));
 }
 
 // Action points an action takes (1 unless config.json says otherwise).
@@ -218,24 +255,30 @@ export function modeOf(state) {
   return C.modes[state.mode] ?? C.modes.standard;
 }
 export function totalRounds(state) {
-  return Math.ceil(C.rounds / (state.span ?? 1));
+  return (state.preRounds ?? 0) + Math.ceil(C.rounds / (state.span ?? 1));
 }
 export function roundNumber(state) {
-  return Math.ceil(state.round / (state.span ?? 1));
+  const pre = state.preRounds ?? 0;
+  if (state.round <= 0) return Math.max(1, Math.ceil((state.round - firstHalf(state) + 1) / preSpan(state)));
+  return pre + Math.ceil(state.round / (state.span ?? 1));
 }
 
-// Label for the current round. In Quick Play a round covers two half-years.
+// Label for the current round. In Quick Play a round covers several half-years.
 export function roundInfo(state) {
-  const first = DATA.timeline.rounds[state.round - 1];
+  if (state.round < firstHalf(state)) return null;
+  const halves = [];
+  for (let h = state.round; h <= Math.max(state.round, state.roundEnd); h++) halves.push(halfInfo(h));
+  const [first, last] = [halves[0], halves.at(-1)];
   if (!first) return null;
-  const last = DATA.timeline.rounds[(state.roundEnd || state.round) - 1] ?? first;
-  if (last === first) return first;
+  const pre = state.round <= 0;
+  if (halves.length === 1) return { ...first, pre };
   const year = (l) => l.label.split(' ')[1];
   return {
     round: first.round,
+    pre,
     label: year(first) === year(last) ? year(first) : `${first.label} – ${last.label}`,
     months: `${first.months.split('–')[0]} ${first.months.split(' ').at(-1)} – ${last.months.split('–')[1]}`,
-    headline: `${first.headline} ${last.headline}`,
-    factIds: [...first.factIds, ...last.factIds],
+    headline: halves.map((h) => h.headline).join(' '),
+    factIds: halves.flatMap((h) => h.factIds),
   };
 }

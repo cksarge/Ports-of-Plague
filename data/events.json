@@ -2,6 +2,34 @@
   "note": "Chronicle cards are dated history and always appear in their round. Event cards are shuffled; one is drawn each round. Fortune cards are a personal deck: a house draws one when it rolls a 6 on the profit die or opens a trading post. Every card lists the fact IDs its history comes from. Effects are carried out by src/engine/events.js and src/engine/fortune.js.",
   "chronicle": [
     {
+      "id": "CHR-banks",
+      "round": -1,
+      "theme": "economic",
+      "title": "The Great Banks Fall",
+      "text": "Hard times before the plague: Florence's great banking houses have collapsed one after another, and famine stalks Italy. Merchants who want to grow must look for new ports and partners.",
+      "factIds": [
+        "EC-01",
+        "EC-11"
+      ],
+      "effect": {
+        "type": "none"
+      }
+    },
+    {
+      "id": "CHR-tana",
+      "round": 0,
+      "theme": "trade",
+      "title": "Back to Tana",
+      "text": "The Mongol khan lets the Italian merchants return to their trading post at Tana on the Don. The sea lanes from the Black Sea to Bruges are busy, and trading posts are cheaper to open than they will ever be again.",
+      "factIds": [
+        "TR-12",
+        "TR-04"
+      ],
+      "effect": {
+        "type": "none"
+      }
+    },
+    {
       "id": "CHR-caffa",
       "round": 1,
       "theme": "trade",

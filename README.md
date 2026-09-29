@@ -1,11 +1,13 @@
 # Ports of Plague
 
-*An educational board game about the Black Death, 1347–1353, played in a web browser by 2–6 players, sharing one computer or each on their own phone, tablet or computer.*
+*An educational board game about the Black Death, 1347–1353, played in a web browser by 1–6 players (computer "bots" can play any house), sharing one computer or each on their own phone, tablet or computer.*
 
-Each player leads a merchant family in a real trading city. Ship goods along historical trade routes for profit, but every ship can carry the plague. The plague reaches each of the 25 cities on the map in the half-year it really did. Protect your family, keep your good name, and face the choices people faced then. The highest **Legacy** (Wealth + Family + Reputation + your weakest one again) in 1353 wins. The map zooms with the mouse wheel, a trackpad pinch, two fingers on a touch screen or the **+ / −** buttons, and you drag to move around it.
+Each player leads a merchant family in a real trading city. Ship goods along historical trade routes for profit, but every ship can carry the plague. The plague reaches each of the 35 cities on the map, from Dublin and Gibraltar to Cairo, Damascus and Tana, in the half-year it really did. Protect your family, keep your good name, and face the choices people faced then. The highest **Legacy** (Wealth + Family + Reputation + your weakest one again) in 1353 wins. The map zooms with the mouse wheel, a trackpad pinch, two fingers on a touch screen or the **+ / −** buttons, and you drag to move around it.
 
-- **Standard** game: 12 rounds of half a year (about 35 / 47 / 58 minutes for 2 / 3 / 4 players).
-- **Quick Play**: 6 rounds of a whole year (about 27–58 minutes for 2–6 players; recommended for 5–6 players).
+- **Standard** game: 12 rounds of half a year (about 28 / 36 / 45 minutes for 2 / 3 / 4 players).
+- **Quick Play**: 4 rounds of a year and a half (about 13 / 17 / 20 minutes for 2 / 3 / 4 players at a steady pace; recommended for 5–6 players).
+- **Pre-plague rounds** (on by default): 2 extra rounds in the standard game, 1 in Quick Play, set in 1346–47 before the plague sails west. No Event card, no plague, and trading posts cost 3ƒ less, so houses can set up their trade first.
+- **Turn timer** (on by default): 30 seconds per turn, paused while cards and dice are on screen. When it runs out, waiting cards are declined and the next house plays.
 - Three difficulties: Apprentice, Chronicler and Great Mortality.
 - Each turn you have 2 action points (3 in Quick Play). Most actions take 1; opening a trading post or moving family takes 2.
 - A dice roll at the start sets a turn order that stays the same all game. Personal **Fortune cards** (drawn on a profit roll of 6 or when opening a trading post) make every player's game different.
@@ -18,7 +20,8 @@ Each player leads a merchant family in a real trading city. Ship goods along his
 
 **Or offline:** download the repository and double-click `Ports-of-Plague.html`. It opens in any modern browser (Chrome, Edge, Firefox or Safari) and works completely offline, with no accounts and no internet.
 
-- Choose 2–6 players, house names, home cities, game length and difficulty, then press **Roll for turn order**.
+- Choose 2–6 houses, house names, home cities, game length and difficulty, then press **Roll for turn order**.
+- **Bots:** set any house to *Played by: A bot* and pick **Easy**, **Medium** or **Hard**. Bots take their turns on screen, one move at a time. With one person and the rest bots, you can play alone (no pass-the-device screens).
 - Pass the computer to whoever the screen names. Everything else (dice, plague spread, scoring, rules) is handled by the game.
 - Keys: **1–6** actions · **7** marriage · **8** land · **9** loan · **0** partnership · **G** close gates · **E** end turn · **R** rules · **J** Historian's Journal · **M** sound effects on/off · **N** music on/off · **Enter** confirm · **Esc** cancel.
 - The game saves itself in the browser after every move. Use **Continue saved game** on the menu to pick up where you left off.
@@ -27,9 +30,10 @@ Each player leads a merchant family in a real trading city. Ship goods along his
 
 1. On the big screen (a laptop or a projector), choose **New game → Play on: Everyone on their own device**. A **room code** of 4 letters and numbers appears (like `B7KX`).
 2. Each player opens https://cksarge.github.io/Ports-of-Plague/ on their own phone, tablet or computer, chooses **Join a game**, types the code, and picks a house name and home city.
-3. When everyone is in, press **Roll for turn order** on the big screen.
+3. To fill empty seats, press **Add a bot** in the lobby and choose its skill. Bots play on the big screen.
+4. When everyone is in, press **Roll for turn order** on the big screen.
 
-The big screen shows the map, the dice and every card, sized so nothing ever needs scrolling. On your turn your own device shows your house, the actions and your decision cards; while another house takes its turn, it shows the map under **Please wait**; on the story cards, **anyone** can press **Next**. Any time, each device can also open the **Rules**, the **Historian's Journal**, the **Chronicle** (recent events and the latest historical note), the **Map** (tap a city for its history) and **the card on the big screen** ("Read the card here"), so nobody has to walk up to the big screen. On a computer the keys are **R**, **J**, **C**, **M** and **Enter** for Next. A device that reloads or goes to sleep rejoins by itself. A player on a new device can take their place back by joining with the same code and typing their house name. If the big screen leaves (**Save & menu**, closing its tab, or losing its connection for a minute), every device shows a message and goes back to the menu. **Continue saved game** reopens the same code, and players join again with it to get their houses back. During a game, closing the tab of a player's device or of the big screen first asks "Leave site?" (on computers and some Android phones; iPhones and iPads never show it).
+The big screen shows the map, the dice and every card, sized so nothing ever needs scrolling. On your turn your own device shows your house, the actions and your decision cards; while another house takes its turn, it shows the map under **Please wait**; on the story cards, **anyone** can press **Next**. Any time, each device can also open the **Rules**, the **Historian's Journal**, the **Chronicle** (recent events and the latest historical note), the **Map** (tap a city for its history) and **the card on the big screen** ("Read the card here"), so nobody has to walk up to the big screen. On a computer the keys are **R**, **J**, **C**, **M** and **Enter** for Next. A device that reloads or goes to sleep rejoins by itself. A player on a new device can take their place back by joining with the same code and typing their house name. A player who has to go can press **Leave game** on their device: their house stays on the board but sits out (its turns are skipped and card offers are turned down), and they can come back by joining with the same code. If the big screen leaves (**Save & menu**, closing its tab, or losing its connection for a minute), every device shows a message and goes back to the menu. **Continue saved game** reopens the same code, and players join again with it to get their houses back. During a game, closing the tab of a player's device or of the big screen first asks "Leave site?" (on computers and some Android phones; iPhones and iPads never show it).
 
 Multi-device play needs an internet connection (the finished file still works offline for one-device play). It uses Supabase to pass messages between the devices; see *Supabase setup* below.
 
@@ -81,10 +85,10 @@ Printable Documents (PDF)/  ← Rule Book, Research Sheet, presentation outline
 data/                  ← single source of truth for the game's content
   facts.json           85 historical facts, each with sources and a supporting quote
   sources.json         37 sources with MLA citations and links
-  cities.json          25 cities: coordinates, real plague arrival dates, facts
+  cities.json          35 cities: coordinates, real plague arrival dates, facts
   routes.json          40 sea and land routes
   events.json          24 dated Chronicle cards, 34 Event cards, 22 Fortune cards
-  timeline.json        the 12 rounds (half-years), prologue and epilogue
+  timeline.json        the 12 rounds (half-years), 2 pre-plague half-years, prologue and epilogue
   actions.json         the 11 actions and the medieval remedies
   config.json          every rule number (costs, dice, scoring); used by the game AND the rule books
   rulebook.json        the rules text, used by BOTH the in-game Rules screen and the printed Rule Book

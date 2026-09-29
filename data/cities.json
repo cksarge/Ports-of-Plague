@@ -147,7 +147,7 @@
       "home": {
         "startFlorins": 10,
         "startReputation": 0,
-        "quickStartFlorins": 12
+        "quickStartFlorins": 9
       },
       "map": {
         "label": "above"
@@ -201,7 +201,7 @@
       ],
       "severityMod": 0,
       "home": {
-        "startFlorins": -10,
+        "startFlorins": -12,
         "startReputation": 0,
         "quickStartFlorins": 2
       },
@@ -284,9 +284,9 @@
       ],
       "severityMod": 1,
       "home": {
-        "startFlorins": 18,
+        "startFlorins": 21,
         "startReputation": 1,
-        "quickStartFlorins": 12
+        "quickStartFlorins": 15
       },
       "map": {
         "dx": 7,
@@ -314,7 +314,7 @@
       ],
       "severityMod": 1,
       "home": {
-        "startFlorins": 22,
+        "startFlorins": 24,
         "startReputation": 1,
         "quickStartFlorins": 14
       },
@@ -440,9 +440,9 @@
       ],
       "severityMod": 0,
       "home": {
-        "startFlorins": 12,
+        "startFlorins": 9,
         "startReputation": 0,
-        "quickStartFlorins": 6
+        "quickStartFlorins": 10
       },
       "map": {
         "label": "above"
@@ -472,7 +472,7 @@
       "home": {
         "startFlorins": 0,
         "startReputation": 0,
-        "quickStartFlorins": -4
+        "quickStartFlorins": -1
       },
       "map": {
         "label": "above"
@@ -592,9 +592,9 @@
       ],
       "severityMod": 0,
       "home": {
-        "startFlorins": 10,
+        "startFlorins": 13,
         "startReputation": 0,
-        "quickStartFlorins": 14
+        "quickStartFlorins": 10
       },
       "map": {
         "label": "right"
@@ -641,6 +641,232 @@
       ],
       "severityMod": 0,
       "map": {
+        "label": "right"
+      }
+    },
+    {
+      "id": "tana",
+      "name": "Tana",
+      "modern": "Azov, Russia",
+      "lat": 47.11,
+      "lon": 39.42,
+      "region": "Golden Horde (Italian trading post)",
+      "arrival": {
+        "round": 0,
+        "dateText": "1346 (in the steppe lands of the Golden Horde)",
+        "factIds": [
+          "TL-13"
+        ]
+      },
+      "factIds": [
+        "TR-12",
+        "TL-13"
+      ],
+      "severityMod": 0,
+      "map": {
+        "label": "left"
+      }
+    },
+    {
+      "id": "valencia",
+      "name": "Valencia",
+      "modern": "Valencia, Spain",
+      "lat": 39.47,
+      "lon": -0.38,
+      "region": "Kingdom of Valencia (Crown of Aragon)",
+      "arrival": {
+        "round": 2,
+        "dateText": "Spring 1348 (Spain's Mediterranean coast by March 1348)",
+        "factIds": [
+          "TL-06"
+        ]
+      },
+      "factIds": [
+        "CI-18",
+        "TL-06"
+      ],
+      "severityMod": 0,
+      "map": {
+        "label": "left"
+      }
+    },
+    {
+      "id": "granada",
+      "name": "Granada",
+      "modern": "Granada, Spain",
+      "lat": 37.18,
+      "lon": -3.6,
+      "region": "Emirate of Granada",
+      "arrival": {
+        "round": 3,
+        "dateText": "1348 (Spain and North Africa)",
+        "factIds": [
+          "TL-02"
+        ]
+      },
+      "factIds": [
+        "ME-16",
+        "TL-02"
+      ],
+      "severityMod": 0,
+      "map": {
+        "label": "above"
+      }
+    },
+    {
+      "id": "gibraltar",
+      "name": "Gibraltar",
+      "modern": "Gibraltar",
+      "lat": 36.14,
+      "lon": -5.35,
+      "region": "Strait of Gibraltar (Marinid-held)",
+      "arrival": {
+        "round": 6,
+        "dateText": "By March 1350 (King Alfonso XI of Castile dies there)",
+        "factIds": [
+          "CI-19"
+        ]
+      },
+      "factIds": [
+        "CI-19"
+      ],
+      "severityMod": 0,
+      "map": {
+        "label": "below"
+      }
+    },
+    {
+      "id": "bristol",
+      "name": "Bristol",
+      "modern": "Bristol, England",
+      "lat": 51.45,
+      "lon": -2.59,
+      "region": "Kingdom of England",
+      "arrival": {
+        "round": 3,
+        "dateText": "Between 24 June and 1 August 1348",
+        "factIds": [
+          "CI-16"
+        ]
+      },
+      "factIds": [
+        "CI-16",
+        "CI-10"
+      ],
+      "severityMod": 0,
+      "map": {
+        "label": "left"
+      }
+    },
+    {
+      "id": "dublin",
+      "name": "Dublin",
+      "modern": "Dublin, Ireland",
+      "lat": 53.35,
+      "lon": -6.26,
+      "region": "Lordship of Ireland",
+      "arrival": {
+        "round": 3,
+        "dateText": "Late July or early August 1348",
+        "factIds": [
+          "CI-17"
+        ]
+      },
+      "factIds": [
+        "CI-17"
+      ],
+      "severityMod": 0,
+      "map": {
+        "label": "left"
+      }
+    },
+    {
+      "id": "york",
+      "name": "York",
+      "modern": "York, England",
+      "lat": 53.96,
+      "lon": -1.08,
+      "region": "Kingdom of England",
+      "arrival": {
+        "round": 4,
+        "dateText": "1349 (clergy of the province of York die of the mortality)",
+        "factIds": [
+          "CH-10"
+        ]
+      },
+      "factIds": [
+        "CH-10",
+        "CH-03"
+      ],
+      "severityMod": 0,
+      "map": {
+        "label": "right"
+      }
+    },
+    {
+      "id": "edinburgh",
+      "name": "Edinburgh",
+      "modern": "Edinburgh, Scotland",
+      "lat": 55.95,
+      "lon": -3.19,
+      "region": "Kingdom of Scotland",
+      "arrival": {
+        "round": 6,
+        "dateText": "1350 (Scotland)",
+        "factIds": [
+          "TL-14"
+        ]
+      },
+      "factIds": [
+        "TL-14"
+      ],
+      "severityMod": 0,
+      "map": {
+        "label": "left"
+      }
+    },
+    {
+      "id": "damascus",
+      "name": "Damascus",
+      "modern": "Damascus, Syria",
+      "lat": 33.51,
+      "lon": 36.29,
+      "region": "Mamluk Sultanate (Syria)",
+      "arrival": {
+        "round": 3,
+        "dateText": "By July 1348 (seen by Ibn Battuta)",
+        "factIds": [
+          "CI-14"
+        ]
+      },
+      "factIds": [
+        "CI-14"
+      ],
+      "severityMod": 0,
+      "map": {
+        "label": "right"
+      }
+    },
+    {
+      "id": "cairo",
+      "name": "Cairo",
+      "modern": "Cairo, Egypt",
+      "lat": 30.04,
+      "lon": 31.24,
+      "region": "Mamluk Sultanate (Egypt)",
+      "arrival": {
+        "round": 3,
+        "dateText": "By September 1348 (the sultan leaves the city)",
+        "factIds": [
+          "CI-15"
+        ]
+      },
+      "factIds": [
+        "CI-15"
+      ],
+      "severityMod": 0,
+      "map": {
+        "dy": -6,
         "label": "right"
       }
     }

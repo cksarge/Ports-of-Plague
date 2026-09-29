@@ -16,7 +16,9 @@ function codeInUse(t) {
   });
 }
 
-// seats: [{ cid, name, home }] when reopening a saved game's room.
+// seats: [{ cid, name, home, left, bot, skill }] when reopening a saved game's room.
+// left: the player left the game on their device; the house sits out until they rejoin.
+// bot: a computer plays this house on the big screen (no device; always "connected").
 export async function hostRoom({ code = null, seats = [], started = false, joinRules }) {
   let t;
   for (let tries = 0; ; tries++) {
@@ -34,13 +36,13 @@ export async function hostRoom({ code = null, seats = [], started = false, joinR
   const room = {
     code,
     started,
-    seats: seats.map((s) => ({ cid: s.cid, name: s.name, home: s.home, online: false, lastSeen: 0, rid: 0 })),
+    seats: seats.map((s) => ({ cid: s.cid, name: s.name, home: s.home, left: !!s.left, bot: !!s.bot, skill: s.skill ?? null, online: !!s.bot, lastSeen: 0, rid: 0 })),
     options: {},
     onChange: () => {},
     onIntent: () => {},
     // rid: the last request from that device the game has finished handling.
-    publicSeats: () => room.seats.map(({ cid, name, home, online, rid }) => ({ cid, name, home, online, rid })),
-    savedSeats: () => room.seats.map(({ cid, name, home }) => ({ cid, name, home })),
+    publicSeats: () => room.seats.map(({ cid, name, home, left, bot, skill, online, rid }) => ({ cid, name, home, left, bot, skill, online, rid })),
+    savedSeats: () => room.seats.map(({ cid, name, home, left, bot, skill }) => ({ cid, name, home, left, bot, skill })),
     pushLobby() { t.send({ t: LOBBY, seats: room.publicSeats(), options: room.options }); },
     pushState(state, view) {
       last = { t: STATE, rev: ++rev, state: trimState(state), view, seats: room.publicSeats() };
@@ -52,6 +54,13 @@ export async function hostRoom({ code = null, seats = [], started = false, joinR
     },
     toast(seat, text) { const s = room.seats[seat]; if (s) t.send({ t: TOAST, to: s.cid, text }); },
     removeSeat(i) { room.seats.splice(i, 1); room.pushLobby(); room.onChange(); },
+    // A computer house, played on the big screen. Its id can never match a device's.
+    addBot({ name, home, skill }) {
+      room.seats.push({ cid: `bot:${name}`, name, home, bot: true, skill, left: false, online: true, lastSeen: 0, rid: 0 });
+      room.pushLobby();
+      room.onChange();
+    },
+    setSkill(i, skill) { if (room.seats[i]?.bot) { room.seats[i].skill = skill; room.pushLobby(); room.onChange(); } },
     close() {
       if (closed) return;
       closed = true;
@@ -67,13 +76,16 @@ export async function hostRoom({ code = null, seats = [], started = false, joinR
   t.onMessage((m) => {
     if (closed || !m || typeof m !== 'object') return;
     if (m.t === PROBE) { t.send({ t: HOST_HERE }); return; }
-    const i = room.seats.findIndex((s) => s.cid === m.from);
+    const i = room.seats.findIndex((s) => s.cid === m.from && !s.bot);
     const seat = room.seats[i];
-    if (seat) {
-      const wasOnline = seat.online;
+    if (seat && m.t !== LEAVE) {
+      // Any message from a house that had left (the same device joining the
+      // room again) brings it back into the game.
+      const changed = !seat.online || seat.left;
       seat.online = true;
+      seat.left = false;
       seat.lastSeen = Date.now();
-      if (!wasOnline) room.onChange();
+      if (changed) room.onChange();
     }
     switch (m.t) {
       case HELLO: resend(); break;
@@ -81,7 +93,7 @@ export async function hostRoom({ code = null, seats = [], started = false, joinR
       case JOIN: onJoin(m, i); break;
       case LEAVE:
         if (i >= 0 && !room.started) room.removeSeat(i);
-        else if (seat) { seat.online = false; room.onChange(); }
+        else if (seat) { seat.online = false; seat.left = true; room.onChange(); }
         break;
       case ACT: case DECIDE: case END: case NEXT:
         if (room.started) room.onIntent(m);
@@ -95,9 +107,9 @@ export async function hostRoom({ code = null, seats = [], started = false, joinR
     if (room.started) {
       // A device that lost its place (new browser, cleared data) takes its
       // house back by typing the same house name.
-      const j = room.seats.findIndex((s) => s.name.toLowerCase() === name.toLowerCase());
+      const j = room.seats.findIndex((s) => !s.bot && s.name.toLowerCase() === name.toLowerCase());
       if (j < 0) { t.send({ t: REJECT, to: m.from, reason: 'This game has already started. To rejoin, type your house name exactly as before.' }); return; }
-      Object.assign(room.seats[j], { cid: m.from, online: true, lastSeen: Date.now() });
+      Object.assign(room.seats[j], { cid: m.from, left: false, online: true, lastSeen: Date.now() });
       room.onChange();
       resend();
       return;
@@ -115,7 +127,7 @@ export async function hostRoom({ code = null, seats = [], started = false, joinR
   const watch = setInterval(() => {
     let changed = false;
     for (const s of room.seats) {
-      if (s.online && Date.now() - s.lastSeen > OFFLINE_AFTER_MS) { s.online = false; changed = true; }
+      if (s.online && !s.bot && Date.now() - s.lastSeen > OFFLINE_AFTER_MS) { s.online = false; changed = true; }
     }
     if (changed) { room.onChange(); if (!room.started) room.pushLobby(); }
   }, 4000);

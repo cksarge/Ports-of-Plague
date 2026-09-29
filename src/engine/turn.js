@@ -1,10 +1,12 @@
 // The round and turn sequence:
 //   roundStart → chronicle → event → actions (each player) → plague → next round … → ended
-// A round is half a year (Standard) or a whole year (Quick Play: two
-// half-years at once). The interface calls advance() after showing each
-// phase; players act with performAction(), decide(), and endTurn().
+// A round is half a year (Standard) or a year and a half (Quick Play: three
+// half-years at once). The optional pre-plague rounds come first: no event
+// card and no plague phase, only upkeep. The interface calls advance() after
+// showing each phase; players act with performAction(), decide(), endTurn()
+// and, when a turn timer runs out, timeUp().
 import { DATA } from '../data.js';
-import { C, addLog, emptyEffects, currentPlayer, roundInfo, modeOf, difficultyOf, clampReputation } from './state.js';
+import { C, addLog, emptyEffects, currentPlayer, roundInfo, modeOf, difficultyOf, clampReputation, isPrePlague, preSpan, halfInfo } from './state.js';
 import { CITIES } from '../data.js';
 import { applyCard, resolveDecision } from './events.js';
 import { historicalArrivals, mortalityPhase, advanceCities } from './plague.js';
@@ -54,7 +56,8 @@ export function halvesOfRound(state) {
 
 function startRound(state) {
   state.round = state.roundEnd + 1;
-  state.roundEnd = Math.min(C.rounds, state.round + (state.span ?? 1) - 1);
+  const span = state.round <= 0 ? preSpan(state) : state.span ?? 1;
+  state.roundEnd = Math.min(C.rounds, state.round + span - 1);
   state.effects = emptyEffects();
   state.currentEvent = null;
   state.persecution = null;
@@ -70,7 +73,7 @@ function startRound(state) {
   addLog(state, { type: 'round', text: `${info.label} (${info.months}): ${info.headline}`, factIds: info.factIds });
   const cards = [];
   for (const h of halvesOfRound(state)) {
-    historicalArrivals(state, h);
+    if (h >= 1) historicalArrivals(state, h);
     cards.push(...DATA.chronicle.filter((c) => c.round === h));
   }
   state.currentChronicle = cards.map((c) => c.id);
@@ -80,7 +83,8 @@ function startRound(state) {
 
 function eventPhase(state) {
   state.phase = 'event';
-  const perRound = difficultyOf(state).eventsPerRound;
+  // No Event card before the plague: the deck is about the plague years.
+  const perRound = isPrePlague(state) ? 0 : difficultyOf(state).eventsPerRound;
   for (let i = 0; i < perRound; i++) {
     if (!state.deck.length) state.deck = shuffle(state, DATA.deck.map((d) => d.id));
     const id = state.deck.shift();
@@ -113,6 +117,16 @@ export function decide(state, choice) {
   return resolveDecision(state, p, choice);
 }
 
+// The turn timer ran out: open decisions get their cautious answer (offers
+// are declined, wage laws obeyed) and the next house takes its turn.
+export function timeUp(state) {
+  const p = currentPlayer(state);
+  if (!p) return { ok: false, reason: 'It is not a player’s turn.' };
+  while (p.pending.length) resolveDecision(state, p, p.pending[0].kind === 'wageLaw' ? 'obey' : false);
+  addLog(state, { type: 'timeUp', player: p.id, text: `${p.name} runs out of time. The turn passes on.` });
+  return endTurn(state);
+}
+
 export function endTurn(state) {
   const p = currentPlayer(state);
   if (!p) return { ok: false, reason: 'It is not a player’s turn.' };
@@ -127,12 +141,17 @@ export function endTurn(state) {
   return { ok: true, next: 'plague' };
 }
 
-// Mortality and ageing happen once per half-year: twice per round in Quick Play.
-// Turn order never changes.
+// Mortality and ageing happen once per half-year: three times per round in
+// Quick Play. Before the plague there is only upkeep. Turn order never changes.
 function plaguePhase(state) {
   state.phase = 'plague';
   for (const h of halvesOfRound(state)) {
-    const label = DATA.timeline.rounds[h - 1].label;
+    const label = halfInfo(h).label;
+    if (h <= 0) {
+      addLog(state, { type: 'plague', half: h, pre: true, text: `End of ${label}: no plague has reached the trading cities yet.` });
+      payLandWages(state);
+      continue;
+    }
     addLog(state, { type: 'plague', half: h, text: `Plague phase (${label}): family members in Stricken cities roll for survival.` });
     mortalityPhase(state);
     payLandWages(state);

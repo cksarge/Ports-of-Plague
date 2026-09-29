@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DATA } from '../src/data.js';
 import { playBotGame } from '../src/engine/sim.js';
-import { storyCard, storyHtml } from '../src/ui/stories.js';
+import { storyCard, storyHtml, chroniclePages } from '../src/ui/stories.js';
 
 const homes = ['venice', 'london', 'lubeck', 'genoa', 'bruges', 'florence'];
 const game = (n, mode, seed) => playBotGame({ players: homes.slice(0, n).map((home, i) => ({ name: `House ${i + 1}`, home })), mode, seed }).state;
@@ -17,7 +17,12 @@ function storiesOf(state) {
     if (e.type === 'prologue') out.push(['prologue', { e }]);
     else if (e.type === 'orderRoll') out.push(['order', { e }]);
     else if (e.type === 'round') out.push(['round', { group: run(['arrival', 'arrivalAlready']) }]);
-    else if (e.type === 'card') out.push(['card', { group: run(['effect']) }]);
+    else if (e.type === 'card' && e.deck === 'chronicle') {
+      // All of a round's Chronicle cards, in pages (as the big screen shows them).
+      const groups = [run(['effect'])];
+      while (log[i + 1]?.type === 'card' && log[i + 1].deck === 'chronicle') { i++; groups.push([log[i], ...run(['effect']).slice(1)]); }
+      for (const page of chroniclePages(groups)) out.push(['chronicle', page]);
+    } else if (e.type === 'card') out.push(['card', { group: run(['effect']) }]);
     else if (e.type === 'plague') out.push(['plague', { group: run(['plague', 'mortality', 'aftermath', 'upkeep', 'loanRepaid', 'loanDefault', 'dealEnd', 'gatesOpen']) }]);
     else if (e.type === 'fortune') out.push(['fortune', { e }]);
     else if (e.type === 'ship') out.push(['ship', { e }]);
@@ -43,7 +48,7 @@ test('stories: every card of whole games can be drawn from its data alone (as a 
       kinds.add(kind);
     }
   }
-  for (const k of ['prologue', 'order', 'round', 'card', 'plague', 'fortune', 'ship']) assert.ok(kinds.has(k), `tested a ${k} card`);
+  for (const k of ['prologue', 'order', 'round', 'chronicle', 'card', 'plague', 'fortune', 'ship']) assert.ok(kinds.has(k), `tested a ${k} card`);
 });
 
 test('stories: a device shows the turn order result straight away; unknown kinds are ignored', () => {
@@ -54,7 +59,7 @@ test('stories: a device shows the turn order result straight away; unknown kinds
   assert.equal(storyCard(state, 'nonsense', {}), null);
 });
 
-test('stories: all eleven kinds of card render, including rare ones', () => {
+test('stories: all twelve kinds of card render, including rare ones', () => {
   const state = game(4, 'standard', 6);
   const stories = new Map(storiesOf(state).map(([k, d]) => [k, d]));
   const arrival = state.log.find((x) => x.type === 'arrival');
@@ -65,7 +70,7 @@ test('stories: all eleven kinds of card render, including rare ones', () => {
     wage: { entry: { die: 2, text: 'The inspectors fine your house.' } },
     reveal: { cardId: DATA.deck.find((c) => c.effect.type === 'offer').id, entry: decision },
   };
-  const all = ['prologue', 'order', 'round', 'card', 'fortune', 'plague', 'ship', 'spread', 'physician', 'wage', 'reveal'];
+  const all = ['prologue', 'order', 'round', 'chronicle', 'card', 'fortune', 'plague', 'ship', 'spread', 'physician', 'wage', 'reveal'];
   for (const kind of all) {
     const data = stories.get(kind) ?? extra[kind];
     assert.ok(data, `found data for ${kind}`);

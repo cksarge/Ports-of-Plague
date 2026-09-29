@@ -177,3 +177,50 @@
 - S brit-florin — Britannica, "Fiorino d'oro": "Regular weight (about 3.50 grams, 54 grains) and fineness won the fiorino universal fame and wide imitation." First minted 1252 in Florence.
 - S brit-diplomatics — Britannica, "Diplomatics: Physical appearance of documents": "Seals were made of wax or of metal; if the latter, they were called bulls (hence, the use of this term for a certain group of papal documents)."
 - S aea-alfani — Fleisher, Chris. "The Great Reset?" AEA Research Highlights, 4 Apr. 2022 (interview with Guido Alfani, JEL 2022): inheritance reshuffling left people "inheriting more property than they want to have"; "wealthy elites losing a significant share of the overall wealth to the advantage of all other strata of society"; low-inequality phase lasted until ~1400–1450.
+
+## Added 2026-09-29 (new cities: Spain, the British Isles and the east)
+Read in a browser on 29 Sept. 2026. Quotes copied from the pages.
+
+## S-BRIT-BD (again) — Britannica, "Black Death"
+- "It reached Bristol almost immediately and spread rapidly throughout the southwestern counties of England."
+- "The Black Death reached the extreme north of England, Scotland, Scandinavia, and the Baltic countries in 1350."
+- "among royalty, Eleanor, queen of Peter IV of Aragon, and King Alfonso XI of Castile succumbed"
+
+## S-BRIT-ALFONSO — Britannica, "Alfonso XI" https://www.britannica.com/biography/Alfonso-XI
+- "died March 26, 1350, Gibraltar"; "the Marinid kings of Morocco, who had seized Gibraltar and routed the Castilian fleet at Algeciras in 1340"
+
+## S-BRIT-IBN-BATTUTA — Hrbek, Ivan. Britannica, "Ibn Battuta" https://www.britannica.com/biography/Ibn-Battuta
+- "In Syria he witnessed the ravages of the Black Death of 1348, visited again many towns there and in Egypt"
+
+## S-IBN-BATTUTA — Ibn Battuta, "The Plague (Black Death) in Damascus 1348," trans. Gibb (1929), Internet Medieval Sourcebook https://sourcebooks.web.fordham.edu/source/1354ibnbattuta-plague.asp
+- "during the great pestilence on my return journey through Damascus, in the latter part of July 1348"; the viceroy Arghun Shah ordered three days' fast
+- "the Jews came with their Book of the Law and the Christians with their Gospel"
+- "the number of deaths in a single day at Damascus did not attain two thousand, while in Cairo and Old Cairo it reached the figure of twenty-four thousand a day."
+- The Mosque of the Footprints lies "alongside the main highway which leads to the Hijaz, Jerusalem, and Egypt."
+
+## S-DOLS — Dols, Michael W. "The Comparative Communal Responses to the Black Death in Muslim and Christian Societies." Viator 5 (1974). Stanford course reading https://web.stanford.edu/class/history13/Readings/MichaelDol.htm
+- "The sultan and his amirs also fled from Cairo to Siryaqus and remained there from the beginning of Rajab 749/25 September 1348 until the end of Ramadan/22 December."
+- "These processions from the mosques or homes to the cemeteries filled the streets of Cairo during the Black Death."
+- "the Andalusian scholar Ibn al-Khatib has attracted European attention for his observation and forceful statement of the contagious nature of the Black Death"; "Ibn al-Khatib was the only Muslim writer to my knowledge to argue against the accepted interpretation of plague"
+- Cyprus: Christian Cypriots "feared that it was the end of the world" (al-Maqrizi) — not used (no arrival date found).
+
+## S-KELLY — Kelly, Maria. "'Unheard-of Mortality' … The Black Death in Ireland." History Ireland 9.4 (Winter 2001) https://historyireland.com/unheard-of-mortality-the-black-death-in-ireland/
+- Clyn: "it first appeared in Howth or Dalkey and spread to Dublin and Drogheda by late July or early August. It had reached Bristol at the earliest on 24 June and at the latest on 1 August."
+- "The plague raged in Dublin between August and December"; "There was hardly a house in which one only had died"; Clyn "died himself soon after, very likely of the plague."
+- the plague was "probably from the region of Bordeaux" brought directly from the continent.
+
+## S-ZOUCHE — Letter of Archbishop William Zouche of York (1348), trans. in Horrox, The Black Death; Medieval Hollywood, Fordham https://medievalhollywood.ace.fordham.edu/items/show/73
+- "devout processions are to be held every Wednesday and Friday ... and that a special prayer be said in mass every day for allaying the plague and pestilence"
+
+## S-SMITH-YORK — Smith, David M., ed. York Clergy Ordinations 1342–1352. Borthwick Institute, University of York, 2021 (PDF)
+- "Papal bull of Clement VI, dated at Avignon, 12 October 1349, authorising the Archbishop to hold ordinations at other than the prescribed times" — "propter ministrorum ecclesiasticorum carentiam per mortalitatis pestem"
+
+## S-ALVAREZ-NOGAL — Álvarez-Nogal, Prados de la Escosura and Santiago-Caballero. "Economic effects of the Black Death: Spain in European perspective." Investigaciones de Historia Económica 16.4 (2020): 35–48. doi:10.33231/j.ihe.2020.10.001
+- "the population would have fallen by 18 %, a relatively mild demographic impact"
+- "Valencia raised its population even after the waves that followed the plague of 1348 (Rubio Vela, 1987, p. 109)."
+
+## S-WHEELIS (again)
+- Caffa "connected there to a coastal shipping industry to Tana (now Azov, Russia) on the Don River. Trade along the Don connected Tana to Central Russia, and overland caravan routes linked it to Sarai and thence to the Far East"
+- "In 1343 the Mongols under Janibeg ... besieged Caffa and the Italian enclave at Tana, following a brawl between Italians and Muslims in Tana. The Italian merchants in Tana fled to Caffa"; "in 1347 the Italians were allowed to reestablish their colony in Tana."
+
+Not found with a usable source (so not added): Lisbon/Portugal, Palma de Mallorca, Seville, Trebizond, Cyprus arrival dates.

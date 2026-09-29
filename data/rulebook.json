@@ -23,7 +23,7 @@
       "blocks": [
         {
           "type": "p",
-          "text": "A standard game lasts **{{rounds}} rounds** of half a year each, from Late 1347 to Early 1353; **Quick Play** covers the same years in 6 rounds of a whole year. When it ends, the house with the highest **Legacy score** wins. Legacy combines **Wealth**, **Family** and **Reputation**, plus a **Balance bonus** equal to your weakest of the three. A balanced house usually beats a greedy one. No one is ever knocked out of the game."
+          "text": "A standard game lasts **{{rounds}} rounds** of half a year each, from Late 1347 to Early 1353; **Quick Play** covers the same years in 4 rounds of a year and a half. With **pre-plague rounds** switched on (the default), the game starts earlier: {{prePlague.rounds.standard}} extra rounds in the standard game (Late 1346 and Early 1347) and {{prePlague.rounds.quick}} in Quick Play, to set up trade before the plague arrives. When it ends, the house with the highest **Legacy score** wins. Legacy combines **Wealth**, **Family** and **Reputation**, plus a **Balance bonus** equal to your weakest of the three. A balanced house usually beats a greedy one. No one is ever knocked out of the game."
         }
       ]
     },
@@ -34,7 +34,7 @@
         {
           "type": "list",
           "items": [
-            "**The map**: 25 real cities joined by sea routes (solid lines) and land routes (dashed lines). Each route shows its base value.",
+            "**The map**: 35 real cities, from Dublin and Edinburgh to Gibraltar, Cairo, Damascus and Tana, joined by sea routes (solid lines) and land routes (dashed lines). Each route shows its base value.",
             "**City markers**: *Safe* (plain). *Safe* cities can also be *Threatened* (dashed orange ring: a neighbouring city is Stricken). *Stricken* cities have a red ring, a hatched centre and 1–3 severity pips; *Aftermath* cities have a grey ring and a ❦ mark.",
             "**House crests**: each player has a color and a shape (circle, square, triangle, diamond, hexagon or star). A banner by a city is a trading post; the number on it shows how many family members live there.",
             "**Dice**: turn-order, profit, contagion, severity and mortality dice, all rolled by the computer with animation.",
@@ -54,8 +54,10 @@
             "Choose {{players.min}}–{{players.max}} players. Each picks a house name and a different home city (Venice, Genoa, Florence, Marseille, Barcelona, London, Bruges or Lübeck). Colors and crests are assigned by seat.",
             "Each house starts with **{{start.florins}} florins**, **{{start.family}} family members** in the home city, **{{start.reputation}} reputation** and **one trading post** in the home city. To balance their routes and plague dates, home cities start with slightly different amounts of money, shown on the setup screen.",
             "Choose **Standard** or **Quick Play**, and a difficulty: **Apprentice** (gentler plague, hints all game), **Chronicler** (standard) or **Great Mortality** (severity rolls +1, contagion risk +1).",
-            "Caffa begins Stricken. Each house rolls a die: the highest goes first and tied houses roll again. **This turn order stays the same all game.**",
-            "**Playing on several devices (optional):** choose *Everyone on their own device*. The big screen shows the map, the dice and every card, plus a room code. Each player joins on a phone, tablet or computer with *Join a game* and the code, and takes their turn there. On a card, anyone can press *Next*. Each device can also show the rules, the Journal, the map and the current card."
+            "Two options, both on unless you switch them off: **Pre-plague rounds** (see *How a Round Works*) and the **turn timer**: each house has **{{turnTimer.seconds}} seconds** per turn. The clock stops while cards and dice are on screen. When time runs out, any card still waiting is declined (a wage law is obeyed) and the next house plays.",
+            "**Bots (optional):** any house can be played by a computer. Set *Played by* to *A bot* on the setup screen (on several devices, press *Add a bot* in the lobby) and choose its skill: **Easy** (a simple style, often makes mistakes), **Medium** (sometimes slips) or **Hard** (weighs every choice by Legacy points). At least one house must be played by a person, so you can play alone against bots. A bot plays by the same rules and sees only what a person sees on screen. Its moves are shown one at a time, and cards during its turn go on by themselves after {{bots.cardSeconds}} seconds.",
+            "Caffa and Tana begin Stricken. Each house rolls a die: the highest goes first and tied houses roll again. **This turn order stays the same all game.**",
+            "**Playing on several devices (optional):** choose *Everyone on their own device*. The big screen shows the map, the dice and every card, plus a room code. Each player joins on a phone, tablet or computer with *Join a game* and the code, and takes their turn there. On a card, anyone can press *Next*. Each device can also show the rules, the Journal, the map and the current card. A player who has to go can press *Leave game*: their house sits out (turns skipped, card offers turned down) until they join again with the same code."
           ]
         }
       ]
@@ -80,7 +82,11 @@
         },
         {
           "type": "note",
-          "text": "Quick Play: each round covers two half-years at once, so arrivals and Chronicle cards for both are read, and the plague phase happens twice (two survival rolls)."
+          "text": "Quick Play: each round covers three half-years at once, so arrivals and Chronicle cards for all three are read, and the plague phase happens three times (three survival rolls)."
+        },
+        {
+          "type": "note",
+          "text": "Pre-plague rounds: in 1346 and early 1347 the plague has only reached Caffa and Tana on the Black Sea {{fact:TR-02}} {{fact:TL-13}}. There is no Event card and no survival roll, only upkeep, and opening a trading post costs {{prePlague.postDiscount}}ƒ less, so houses can set up their trade before the plague sails west."
         }
       ]
     },
@@ -250,6 +256,7 @@
           "type": "list",
           "items": [
             "**Round:** Chronicle → Event → Actions ({{modes.standard.actionPoints}} AP each; {{modes.quick.actionPoints}} in Quick Play) → Plague & upkeep. Turn order never changes.",
+            "**Timer:** {{turnTimer.seconds}} seconds per turn (optional; paused while cards are shown). **Pre-plague rounds** (optional): no Event card, no survival rolls, posts {{prePlague.postDiscount}}ƒ cheaper.",
             "**Action points:** 1 AP per action · Open Trading Post {{actionPointCosts.post}} AP · Move Family {{actionPointCosts.move}} AP · Loan and Partnership 0 AP.",
             "**Ship:** route value + profit die + family {{gains.familyAtPostBonus}} + Aftermath destination {{gains.aftermathPriceBonus}} − Aftermath wage {{costs.wageAftermath}}. From a Stricken city: contagion die ≤ severity means infected (half profit, −{{penalties.infectedCargoReputation}} reputation, may spread). Profit die {{fortune.drawOnProfitDie}}: draw a Fortune card.",
             "**Survival:** mortality die (+{{plague.prepareBonus}} if prepared) ≤ severity means the family member dies. The last heir always survives. Each loss inherits {{gains.inheritance}}ƒ.",

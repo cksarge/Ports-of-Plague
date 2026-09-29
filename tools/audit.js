@@ -55,9 +55,11 @@ for (const card of DATA.fortune) {
   if (!FORTUNE_EFFECTS.includes(card.effect.type)) err(`Fortune card "${card.title}" uses unknown effect type "${card.effect.type}"`);
 }
 for (const card of DATA.chronicle) {
-  if (!(card.round >= 1 && card.round <= DATA.config.rounds)) err(`Chronicle card "${card.title}" has round out of range`);
+  if (!(card.round >= 1 - DATA.config.prePlague.halves && card.round <= DATA.config.rounds)) err(`Chronicle card "${card.title}" has round out of range`);
 }
-for (const r of DATA.timeline.rounds) checkRefs(r.factIds, `Round banner ${r.label}`);
+for (const r of [...DATA.timeline.prePlague, ...DATA.timeline.rounds]) checkRefs(r.factIds, `Round banner ${r.label}`);
+if (DATA.timeline.prePlague.length !== DATA.config.prePlague.halves) err('timeline.json prePlague count does not match config.prePlague.halves');
+for (const [mode, n] of Object.entries(DATA.config.prePlague.rounds)) if (DATA.config.prePlague.halves % n) err(`Pre-plague rounds for ${mode} must divide the ${DATA.config.prePlague.halves} pre-plague half-years evenly`);
 checkRefs(DATA.timeline.epilogue.factIds, 'End-of-game summary');
 for (const a of DATA.actions) checkRefs(a.factIds, `Action ${a.name}`);
 for (const r of DATA.remedies) checkRefs(r.factIds, `Remedy ${r.name}`);
@@ -168,7 +170,7 @@ const lines = [
   '',
   '| City | Round | Date given in sources | Fact |',
   '|---|---|---|---|',
-  ...DATA.cities.map((c) => `| ${c.name} | ${c.arrival.round === 0 ? 'Start' : DATA.timeline.rounds[c.arrival.round - 1].label} | ${c.arrival.dateText} | ${c.arrival.factIds.join(', ')} |`),
+  ...DATA.cities.map((c) => `| ${c.name} | ${c.arrival.round === 0 ? 'Start (1346)' : DATA.timeline.rounds[c.arrival.round - 1].label} | ${c.arrival.dateText} | ${c.arrival.factIds.join(', ')} |`),
   '',
   '## Manual checks still recommended',
   '- Spot-check a sample of facts against the linked sources (each fact stores its supporting quote in `evidence`).',
