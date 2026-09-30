@@ -194,14 +194,32 @@ let unlocked = false;   // the browser allows sound once the player has clicked 
 // straight from a file cannot do that, so it fades the element itself.
 const useGraph = typeof location !== 'undefined' && /^https?:$/.test(location.protocol);
 
+// Phones and tablets get the small versions of the tracks (less data, same
+// music); computers get the full-quality files.
+export function wantsSmallMusic(nav = typeof navigator !== 'undefined' ? navigator : {}) {
+  if (nav.connection?.saveData) return true; // the user asked the browser to save data
+  if (nav.userAgentData?.mobile) return true;
+  const ua = nav.userAgent ?? '';
+  if (/Android|iPhone|iPad|iPod|Mobile|Silk|Kindle/i.test(ua)) return true;
+  // iPads report themselves as Macs: a Mac with a touch screen is an iPad.
+  return /Macintosh/.test(ua) && (nav.maxTouchPoints ?? 0) > 1;
+}
+const small = wantsSmallMusic();
+
 function player(id) {
   if (players[id]) return players[id];
   const el = new Audio();
   el.loop = true;
   el.preload = 'metadata';
   el.volume = useGraph ? 1 : 0;
-  el.addEventListener('error', () => { failed.add(id); if (current === id) { current = null; apply(); } });
-  el.src = TRACKS[id].file;
+  // If the small file will not load, try the full one; if that fails too,
+  // the generated music takes over.
+  el.addEventListener('error', () => {
+    if (el.src.endsWith(TRACKS[id].mobileFile)) { el.src = TRACKS[id].file; if (current === id) el.play().catch(() => {}); return; }
+    failed.add(id);
+    if (current === id) { current = null; apply(); }
+  });
+  el.src = small ? TRACKS[id].mobileFile : TRACKS[id].file;
   if (useGraph) {
     const au = audioContext();
     if (au) {
@@ -285,7 +303,7 @@ export const music = {
   // For tests: which recording is playing (null = none or the generated music).
   status() {
     const el = current && players[current];
-    return { mood, track: current, playing: !!el && !el.paused, time: el ? Math.round(el.currentTime) : 0, failed: [...failed], generated: !!state };
+    return { mood, track: current, playing: !!el && !el.paused, time: el ? Math.round(el.currentTime) : 0, file: el ? el.src.split('/').slice(-2).join('/') : null, small, failed: [...failed], generated: !!state };
   },
 };
 

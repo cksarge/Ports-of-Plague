@@ -7,7 +7,7 @@
 - "Our game asks: if you were a merchant then, would you keep trading?"
 
 ## 2. What the game is (0:30–1:15)
-- *Ports of Plague* is a board game for 2–6 players, played in a web browser: everyone shares one computer and takes turns, or each player uses their own phone while a big screen shows the map. Computer-controlled houses can fill empty seats. It has a painted map board, ships and carts sailing the trade routes, dice, cards and house banners, all animated.
+- *Ports of Plague* is a board game for 1–6 players, played in a web browser: everyone shares one computer and takes turns, or each player uses their own phone while a big screen shows the map. Computer-controlled houses (Easy, Medium or Hard) can fill the other seats, so even one person can play. It has a painted map board, ships and carts sailing the trade routes, dice, cards and house banners, all animated.
 - Each player is a merchant family based in a real trading city (Marseille, Genoa, Venice, Florence, Barcelona, London, Bruges, Lübeck). A dice roll at the start sets the turn order for the whole game.
 - 12 rounds of half a year each (Late 1347 to Early 1353), or 4 rounds of a year and a half in **Quick Play** (about 20 minutes for 4 players), plus optional pre-plague rounds and a 30-second turn timer. Three difficulties, from Apprentice to Great Mortality. About 13–60 minutes.
 - **Goal:** the highest *Legacy* in 1353 = Wealth + Family + Reputation, plus your weakest category again. **Balance beats greed.**

@@ -51,7 +51,7 @@
         {
           "type": "list",
           "items": [
-            "Choose {{players.min}}–{{players.max}} players. Each picks a house name and a different home city (Venice, Genoa, Florence, Marseille, Barcelona, London, Bruges or Lübeck). Colors and crests are assigned by seat.",
+            "Choose {{players.min}}–{{players.max}} houses, each played by a person or a bot (see *Bots* below; at least {{bots.minHumans}} person). Each house picks a house name and a different home city (Venice, Genoa, Florence, Marseille, Barcelona, London, Bruges or Lübeck). Colors and crests are assigned by seat.",
             "Each house starts with **{{start.florins}} florins**, **{{start.family}} family members** in the home city, **{{start.reputation}} reputation** and **one trading post** in the home city. To balance their routes and plague dates, home cities start with slightly different amounts of money, shown on the setup screen.",
             "Choose **Standard** or **Quick Play**, and a difficulty: **Apprentice** (gentler plague, hints all game), **Chronicler** (standard) or **Great Mortality** (severity rolls +1, contagion risk +1).",
             "Two options, both on unless you switch them off: **Pre-plague rounds** (see *How a Round Works*) and the **turn timer**: each house has **{{turnTimer.seconds}} seconds** per turn. The clock stops while cards and dice are on screen. When time runs out, any card still waiting is declined (a wage law is obeyed) and the next house plays.",

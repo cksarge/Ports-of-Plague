@@ -12,7 +12,8 @@
     "docs": "node tools/build-docs.js",
     "audit": "node tools/audit.js",
     "all": "npm run audit && npm run build && npm run docs && npm test",
-    "map": "node tools/make-map.js"
+    "map": "node tools/make-map.js",
+    "music": "node tools/compress-music.js"
   },
   "devDependencies": {
     "esbuild": "^0.28.2"
