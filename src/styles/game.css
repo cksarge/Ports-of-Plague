@@ -548,3 +548,5 @@ body.big-screen .plague-grid { display: grid; grid-template-columns: repeat(auto
 .chronicle-grid .card-band .illus { width: 52px; height: 52px; }
 .chronicle-grid .card-band .illus svg { width: 38px; height: 38px; }
 .chronicle-grid .card-body p { margin: 0.4rem 0; }
+.music-credits { padding-left: 1.2rem; }
+.music-credits li { margin-bottom: 0.35rem; }

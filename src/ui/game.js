@@ -12,7 +12,7 @@ import { createMap, updateMap, animateShipment, animateStrike, redrawStains, sta
 import { noteHtml } from './notes.js';
 import { showRules, showJournal, showCity } from './panels.js';
 import { sfx, isMuted, setMuted, isMusicOn, setMusicOn } from './sound.js';
-import { music } from './music.js';
+import { music, tradeMood } from './music.js';
 import { saveGame } from './save.js';
 import { heraldicBanner } from './art.js';
 import { housePanelHtml, actionsPanelHtml, hintFor, quickBlock, actionPrompt, decisionPrompt, endTurnPrompt } from './prompts.js';
@@ -94,7 +94,7 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
   $('#btn-journal', app).onclick = () => showJournal(state.journal);
   $('#btn-mute', app).onclick = toggleMute;
   $('#btn-music', app).onclick = toggleMusic;
-  music.setMood('calm');
+  music.setMood(state.round >= (state.firstHalf ?? 1) ? tradeMood(state.round) : 'menu');
   $('#btn-menu', app).onclick = () => { save(); cleanup(); onExit(); };
 
   function toggleMute() {
@@ -509,6 +509,7 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
 
   async function showRoundStart(group) {
     const [head, ...arrivals] = group;
+    music.setMood(tradeMood(state.round)); // the music darkens as the years pass
     refresh();
     sfx.bell();
     setTimeout(() => sfx.stamp(), 250);
@@ -553,10 +554,11 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
 
   async function showPlague(group) {
     refresh();
-    music.setMood('plague');
+    const pre = group.every((e) => e.type !== 'plague' || e.pre);
+    if (!pre) music.setMood('plague');
     if (group.some((e) => e.deaths > 0)) setTimeout(() => sfx.knell(), 1000); else sfx.low();
     await story('plague', { group });
-    music.setMood('calm');
+    if (state.roundEnd < C.rounds) music.setMood(tradeMood(state.round));
     redrawStains(svg, state);
     refresh();
   }
@@ -802,7 +804,7 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
           continue;
         case 'ended':
           if (remote) { clearTimeout(pushTimer); room.pushState(state, view()); }
-          music.setMood('menu');
+          music.setMood('ending');
           cleanup();
           onEnd(state);
           return;

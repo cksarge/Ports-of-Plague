@@ -1,0 +1,71 @@
+{
+  "note": "Background music. The same list drives the music player (src/ui/music.js) and the credits (About screen, Research Sheet). Credits copied from assets/licenses/music-credits.txt.",
+  "tracks": [
+    {
+      "id": "menu",
+      "file": "assets/music/menu.mp3",
+      "title": "The Britons",
+      "author": "Kevin MacLeod",
+      "site": "incompetech.com",
+      "siteUrl": "https://incompetech.com",
+      "license": "Creative Commons: By Attribution 4.0",
+      "licenseUrl": "http://creativecommons.org/licenses/by/4.0/",
+      "plays": "Title and setup screens"
+    },
+    {
+      "id": "trade-1",
+      "file": "assets/music/trade-1.mp3",
+      "title": "Lord of the Land",
+      "author": "Kevin MacLeod",
+      "site": "incompetech.com",
+      "siteUrl": "https://incompetech.com",
+      "license": "Creative Commons: By Attribution 4.0",
+      "licenseUrl": "http://creativecommons.org/licenses/by/4.0/",
+      "plays": "Pre-plague and early rounds, 1346–1348"
+    },
+    {
+      "id": "trade-2",
+      "file": "assets/music/trade-2.mp3",
+      "title": "Ancient Rite",
+      "author": "Kevin MacLeod",
+      "site": "incompetech.com",
+      "siteUrl": "https://incompetech.com",
+      "license": "Creative Commons: By Attribution 4.0",
+      "licenseUrl": "http://creativecommons.org/licenses/by/4.0/",
+      "plays": "Middle rounds, 1349–1350"
+    },
+    {
+      "id": "trade-3",
+      "file": "assets/music/trade-3.mp3",
+      "title": "The Pyre",
+      "author": "Kevin MacLeod",
+      "site": "incompetech.com",
+      "siteUrl": "https://incompetech.com",
+      "license": "Creative Commons: By Attribution 4.0",
+      "licenseUrl": "http://creativecommons.org/licenses/by/4.0/",
+      "plays": "Late rounds, 1351–1353"
+    },
+    {
+      "id": "plague",
+      "file": "assets/music/plague.mp3",
+      "title": "Rites",
+      "author": "Kevin MacLeod",
+      "site": "incompetech.com",
+      "siteUrl": "https://incompetech.com",
+      "license": "Creative Commons: By Attribution 4.0",
+      "licenseUrl": "http://creativecommons.org/licenses/by/4.0/",
+      "plays": "Plague phases"
+    },
+    {
+      "id": "ending",
+      "file": "assets/music/ending.mp3",
+      "title": "Teller of the Tales",
+      "author": "Kevin MacLeod",
+      "site": "incompetech.com",
+      "siteUrl": "https://incompetech.com",
+      "license": "Creative Commons: By Attribution 4.0",
+      "licenseUrl": "http://creativecommons.org/licenses/by/4.0/",
+      "plays": "Final scores"
+    }
+  ]
+}

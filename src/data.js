@@ -10,6 +10,7 @@ import timeline from '../data/timeline.json' with { type: 'json' };
 import events from '../data/events.json' with { type: 'json' };
 import rulebook from '../data/rulebook.json' with { type: 'json' };
 import actions from '../data/actions.json' with { type: 'json' };
+import music from '../data/music.json' with { type: 'json' };
 
 export const DATA = {
   config,
@@ -26,6 +27,7 @@ export const DATA = {
   rulebook,
   actions: actions.actions,
   remedies: actions.remedies,
+  music: music.tracks,
 };
 
 export const FACTS = Object.fromEntries(DATA.facts.map((f) => [f.id, f]));
