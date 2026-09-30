@@ -74,7 +74,7 @@
           "type": "list",
           "ordered": true,
           "items": [
-            "**Chronicle.** The date advances. The plague reaches every city whose real arrival date falls in this round; each becomes Stricken and rolls severity. Then the round's dated Chronicle cards are read.",
+            "**Chronicle.** The date advances. The plague reaches every city whose real arrival date falls in this round; each becomes Stricken and rolls severity. Then the round's dated Chronicle cards are read (up to four to a page).",
             "**Event.** One Event card is drawn. If it offers a choice, each player decides at the start of their own turn.",
             "**Actions.** Players take turns in the fixed order, each with **{{modes.standard.actionPoints}} action points (AP)** ({{modes.quick.actionPoints}} in Quick Play). Most actions take 1 AP, but **Open Trading Post** and **Move Family** take {{actionPointCosts.post}}. A pass-the-device screen appears between turns.",
             "**Plague & upkeep.** Family members in Stricken cities roll for survival. Cities Stricken for {{plague.strickenRounds}} half-years move to Aftermath. Land wages are paid, loans that are due are repaid, and partnerships and closed gates that have run their course end."
@@ -187,7 +187,7 @@
             "**Survival.** In the Plague phase, each family member in a Stricken city rolls the mortality die, adding +{{plague.prepareBonus}} if the household was prepared. If the result is equal to or lower than the severity, that family member dies.",
             "**The last heir.** A house's last family member never dies; a distant cousin inherits. No one is eliminated.",
             "**Inheritance.** For each family member lost, the house inherits {{gains.inheritance}}ƒ. Survivors really did inherit the property of the dead {{fact:EC-10}}.",
-            "**Aftermath.** After {{plague.strickenRounds}} rounds a Stricken city enters Aftermath. Workers are scarce and prices are high {{fact:EC-03}} {{fact:EC-04}}: shipping *from* it costs a wage, and shipping *to* it earns a bonus."
+            "**Aftermath.** After {{plague.strickenRounds}} half-years a Stricken city enters Aftermath. Workers are scarce and prices are high {{fact:EC-03}} {{fact:EC-04}}: shipping *from* it costs a wage, and shipping *to* it earns a bonus."
           ]
         }
       ]
@@ -200,7 +200,7 @@
           "type": "list",
           "items": [
             "**Chronicle cards** are real, dated history and always appear in their round, for example the Ordinance of Labourers in Early 1349 {{fact:EC-05}} and the Jubilee of 1350 {{fact:CH-08}}.",
-            "**Event cards** are drawn one per round from a shuffled deck of 34, so each game is different. Some affect every house; some fall on one house chosen at random.",
+            "**Event cards** are drawn one per round from a shuffled deck of 34 (none in the pre-plague rounds), so each game is different. Some affect every house; some fall on one house chosen at random.",
             "**Fortune cards** are personal. You draw one whenever you roll a {{fortune.drawOnProfitDie}} on the profit die or open a new trading post: spice cargoes, extra action points, free posts, warnings of where the plague goes next, but also demanding workers, illness and nervous creditors.",
             "**Offers** (\"Buy a Book of Hours?\") are accepted or declined at the start of your turn (Fortune offers at once). Some offers are traps from history: the remedy seller's cure does nothing.",
             "**Wage laws.** If you own a post in London or Melcombe Regis, choose: **Obey** (+{{wageLaw.obeyReputation}} reputation, but your English posts cannot ship this round, because workers refuse the old wages) or **Pay market wages** (roll a die: on 1–{{wageLaw.fineMaxRoll}} you are fined {{wageLaw.fine}}ƒ). The real laws failed to hold wages down {{fact:EC-07}}.",

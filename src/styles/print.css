@@ -24,6 +24,8 @@ th, td { border: 0.5pt solid #b99a5b; padding: 2.5pt 4pt; text-align: left; vert
 thead th { background: #efe2bf; font-family: 'Cinzel', serif; font-size: 8.5pt; }
 tr { break-inside: avoid; }
 .fact-ref { color: var(--gold); font-size: 7pt; }
+/* File names and commands use the document's own typeface, not the browser's code font. */
+code { font-family: inherit; font-size: inherit; color: inherit; }
 .rules-note { font-style: italic; }
 .rules-defs div { display: grid; grid-template-columns: 7.8em 1fr; gap: 0.4em; margin-bottom: 0.12em; }
 .rules-defs dt { font-weight: 600; }

@@ -90,7 +90,8 @@ function researchSheet() {
   <p><strong>Rats or people?</strong> The traditional explanation is fleas carried by black rats. A 2018 study in <em>PNAS</em> found that human fleas and body lice fit death records from nine outbreaks better. Ancient DNA has confirmed that the bacterium <em>Yersinia pestis</em> caused the Black Death, but scientists still disagree about how it passed from person to person. <span class="fact-ref">ME-10 ME-01</span></p>
   <p><strong>The siege of Caffa.</strong> The story that attackers threw plague corpses over the walls comes from one writer, Gabriele de' Mussi. A modern analysis finds it plausible, but concludes the siege was only one of several routes out of the Black Sea. <span class="fact-ref">TR-03</span></p>
   <p><strong>Dates and places.</strong> Sources disagree by weeks or months on when the plague reached some cities (Genoa: November 1347 or January 1348; Melcombe Regis: June or August 1348). Old maps also wrongly showed regions like the Low Countries as "spared" because of gaps in the evidence. <span class="fact-ref">TL-04 TR-08 CI-12</span></p>
-  <p><strong>Chroniclers' numbers.</strong> Medieval writers often exaggerated. For Florence alone they give 60,000 or 100,000 deaths, or three in five people. Numbers like these are treated as rough impressions, not counts. <span class="fact-ref">CI-02</span></p>
+  <p><strong>How hard was Spain hit?</strong> Britannica calls Aragon and Catalonia very hard-hit, but a 2020 study by economic historians estimates that Spain's population fell by only about 18 percent overall, and the city of Valencia even grew after 1348. <span class="fact-ref">CI-18 CI-06</span></p>
+  <p><strong>Chroniclers' numbers.</strong> Medieval writers often exaggerated. For Florence alone they give 60,000 or 100,000 deaths, or three in five people; Ibn Battuta wrote that 24,000 died in a single day in Cairo. Numbers like these are treated as rough impressions, not counts. <span class="fact-ref">CI-02 CI-15</span></p>
   <p><strong>Anachronisms the game avoids.</strong> Formal quarantine (Ragusa, 1377, 30 days; later 40 days in Venice) came after 1353, so it appears only as "what came next". Earlier, haphazard measures (Venice's ship checks, Pistoia's travel ban, Milan's boarded-up houses) are used instead. The beaked "plague doctor" mask dates from 1619 and is left out. <span class="fact-ref">ME-12 ME-14 ME-15 ME-11</span></p>
   <p><strong>Persecution.</strong> The game shows the persecution of Jewish communities because it happened, and it states plainly that the well-poisoning accusations were false and the violence unjust. Pope Clement VI condemned the accusations, but his words had little effect far from Avignon. Players can never gain anything from persecution. <span class="fact-ref">SO-07 SO-08 SO-09</span></p>
   <p class="small">Facts marked as debated in the table below: ${debated.map((f) => f.id).join(', ')}.</p>
@@ -116,7 +117,7 @@ function presentationMarkdown() {
 - "Our game asks: if you were a merchant then, would you keep trading?"
 
 ## 2. What the game is (0:30–1:15)
-- *Ports of Plague* is a board game played on one computer by ${C.players.min}–${C.players.max} players, taking turns (hot seat). It has a painted map board, ships and carts sailing the trade routes, dice, cards and house banners, all animated.
+- *Ports of Plague* is a board game for ${C.players.min}–${C.players.max} players, played in a web browser: everyone shares one computer and takes turns, or each player uses their own phone while a big screen shows the map. Computer-controlled houses can fill empty seats. It has a painted map board, ships and carts sailing the trade routes, dice, cards and house banners, all animated.
 - Each player is a merchant family based in a real trading city (${homes}). A dice roll at the start sets the turn order for the whole game.
 - ${C.rounds} rounds of half a year each (Late 1347 to Early 1353), or ${C.rounds / C.modes.quick.span} rounds of a year and a half in **Quick Play** (about ${C.timeEstimates.quick['4']} minutes for 4 players), plus optional pre-plague rounds and a ${C.turnTimer.seconds}-second turn timer. Three difficulties, from Apprentice to Great Mortality. About ${C.timeEstimates.quick['2']}–${C.timeEstimates.standard['6']} minutes.
 - **Goal:** the highest *Legacy* in 1353 = Wealth + Family + Reputation, plus your weakest category again. **Balance beats greed.**
@@ -130,20 +131,21 @@ function presentationMarkdown() {
 - Comeback rules: inheritance, weddings, loans, cheaper charity, and Guild's Favor (an extra action for a house far behind). No one is ever eliminated.
 
 ## 4. The history inside the game (2:15–3:45)
-- **Real timeline and trade routes:** the plague reaches each of the ${DATA.cities.length} cities in the half-year it really did (Messina Oct 1347, Florence 1348, London Aug 1348, Bergen July 1349, Moscow 1353). [TR-06, TL-08, TR-09, TR-10]
-- **Social responses:** flight to the countryside (Boccaccio), the flagellants, and Pope Clement VI banning them in 1349. [SO-04, SO-02, SO-03]
+- **Real timeline and trade routes:** the plague reaches each of the ${DATA.cities.length} cities, from Dublin to Damascus, in the half-year it really did (Messina Oct 1347, Damascus July 1348, London Aug 1348, Bergen July 1349, Gibraltar 1350, Moscow 1353). [TR-06, CI-14, TL-08, TR-09, CI-19, TR-10]
+- **Before the plague:** optional pre-plague rounds in 1346–47 let houses build their trade while only Caffa and Tana on the Black Sea are stricken. [TR-02, TR-12]
+- **Social responses:** flight to the countryside (Boccaccio), the flagellants, and Pope Clement VI banning them in 1349. In Damascus, Muslims, Jews and Christians walked out together to pray for the plague to end. [SO-04, SO-02, SO-03, CI-14]
 - **Persecution, handled seriously:** the Strasbourg massacre of February 1349 happened before the plague even arrived. The game states that the accusations were false, and players can only lose money by trying to protect the community, never gain. [SO-09, SO-07, SO-08]
 - **Economy:** labor shortages raised wages and prices; England's Ordinance (1349) and Statute of Labourers (1351) tried to freeze wages and failed. [EC-03, EC-05, EC-06, EC-07]
-- **Medicine:** the Paris Medical Faculty blamed the planets and "corrupt air"; physicians admitted they were helpless. The physician action shows real remedies such as bloodletting and figs and onions, and admits they did nothing. [ME-04, ME-06, ME-08]
+- **Medicine:** the Paris Medical Faculty blamed the planets and "corrupt air"; physicians admitted they were helpless. The physician action shows real remedies such as bloodletting and figs and onions, and admits they did nothing. In Granada, Ibn al-Khatib argued that the disease spread from person to person. [ME-04, ME-06, ME-08, ME-16]
 - **The Church:** a quarter of the pope's court died; so many priests died that a bishop let the dying confess to laypeople, "even to a woman". [CH-02, CH-05]
 
 ## 5. Accuracy and research (3:45–4:30)
-- ${DATA.facts.length} facts from ${DATA.sources.length} sources (Britannica, peer-reviewed journals such as *Nature* and *PNAS*, university sites, and primary sources like Boccaccio and Guy de Chauliac). Every fact in the game is tied to a source.
-- We show where historians disagree: the death toll, rats versus human fleas, and conflicting dates. [DB-01, ME-10, TL-04]
+- ${DATA.facts.length} facts from ${DATA.sources.length} sources (Britannica, peer-reviewed journals such as *Nature* and *PNAS*, university sites, and primary sources like Boccaccio, Guy de Chauliac and Ibn Battuta). Every fact in the game is tied to a source.
+- We show where historians disagree: the death toll, rats versus human fleas, how hard Spain was hit, and conflicting dates. [DB-01, ME-10, CI-18, TL-04]
 - We avoided anachronisms: no beaked plague-doctor masks (invented 1619), and quarantine appears only as "what came next" (Ragusa, 1377). [ME-11, ME-14]
 
 ## 6. Balance and testing (4:30–4:50)
-- We tested the rules with thousands of computer-played games. Every home city wins about its fair share, and a balanced strategy beats pure greed. Full results are in \`docs/simulation-report.md\`.
+- We tested the rules with thousands of computer-played games. Every home city wins about its fair share, and a balanced strategy beats pure greed. The same games time the rounds: Quick Play takes about ${C.timeEstimates.quick['4']} minutes for 4 players. Full results are in the simulation report (\`docs/simulation-report.md\`).
 
 ## 7. Close (4:50–5:00)
 - "In *Ports of Plague* you can't stop the Black Death. You can only decide what kind of family you'll be when it comes. That was true in 1348, too."
