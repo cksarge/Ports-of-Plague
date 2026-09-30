@@ -62,9 +62,12 @@ export function showCredits() {
       <li><strong>History:</strong> ${DATA.facts.length} facts from ${DATA.sources.length} sources (see the Historian's Journal and the Research Sheet).</li>
       <li><strong>Map:</strong> coastlines, rivers and lakes from Natural Earth (public domain).</li>
       <li><strong>Fonts:</strong> EB Garamond, Cinzel and UnifrakturMaguntia, all under the SIL Open Font License.</li>
-      <li><strong>Sound and music:</strong> original, generated live in your browser; no recordings are used.</li>
+      <li><strong>Sound effects:</strong> original, generated live in your browser; no recordings are used.</li>
       <li><strong>Playing on several devices:</strong> the big screen and the players' phones, tablets or computers talk through Supabase Realtime (supabase.com), using the open-source libraries <em>@supabase/realtime-js</em> (© 2020 Supabase) and <em>@supabase/phoenix</em> (© 2014 Chris McCord), both under the MIT License. Only house names, home cities and game moves are sent; nothing is stored and there are no accounts.</li>
     </ul>
+    <h3>Music</h3>
+    <ul class="music-credits">${DATA.music.map((t) => `<li><strong>“${esc(t.title)}”</strong> <small>— ${esc(t.plays.charAt(0).toLowerCase() + t.plays.slice(1))}</small><br>${esc(t.author)} (<a href="${esc(t.siteUrl)}" target="_blank" rel="noopener">${esc(t.site)}</a>) · Licensed under <a href="${esc(t.licenseUrl)}" target="_blank" rel="noopener">${esc(t.license)}</a></li>`).join('')}</ul>
+    <p style="font-size:0.9rem">If the music files cannot be loaded, the game plays its own music, generated live in your browser.</p>
     <p>Content note: the game deals with mass death and with the persecution of Jewish communities. It treats these seriously and without graphic detail, and it states plainly that the accusations against Jews were false and the violence unjust.</p>
     <h3>License</h3>
     <p>This work is <a href="https://github.com/cksarge/Ports-of-Plague" target="_blank" rel="noopener">open source</a> and protected under the <a href="https://github.com/cksarge/Ports-of-Plague/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>. Copyright © 2026 Carter K, Landon S, Valen H, and John-Paul T.</p>

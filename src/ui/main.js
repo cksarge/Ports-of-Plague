@@ -70,7 +70,7 @@ function play(state, ui, room = null) {
 }
 
 // Test hook: lets automated browser tests inspect and drive the game.
-window.__portsOfPlague = { app };
+window.__portsOfPlague = { app, music };
 // Music starts after the first click or key press (a browser rule).
 music.enableOnFirstGesture();
 // A soft click for every button press.

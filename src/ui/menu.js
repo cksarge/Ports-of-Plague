@@ -99,6 +99,7 @@ const DEFAULT_HOMES = ['genoa', 'bruges', 'venice', 'london', 'florence', 'lubec
 
 export function renderSetup(app, { onStart, onBack }) {
   app.onkeydown = null;
+  music.setMood('menu');
   const setup = {
     where: 'here', // 'here': one shared device · 'devices': each player on their own device
     count: 2,

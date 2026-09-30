@@ -105,8 +105,9 @@ tools/                 build, docs, simulation, audit, map and dev-server script
 research/notes.md      raw research notes with the quotations used to verify each fact
 research/facts-review.md  easy-to-read list of all facts and sources
 docs/                  printable documents and reports
-assets/fonts/          fonts (SIL Open Font License) with their licenses
-assets/licenses/       MIT licenses of the Supabase realtime client used for multi-device play
+assets/fonts/          fonts (SIL Open Font License)
+assets/music/          background music (Kevin MacLeod, CC BY 4.0; list in data/music.json)
+assets/licenses/       every third-party license: fonts (SIL OFL), Supabase realtime client (MIT), music credits
 ```
 
 **Why the printed and in-game rules always match:** both are made by the same function (`src/render/rulebook.js`) from `data/rulebook.json`, and every number in the text is filled in from `data/config.json`. That is the same file the game engine uses. The audit also checks the numbers written directly into the rules and cards.
@@ -128,14 +129,15 @@ The site is served straight from the `main` branch (Settings → Pages → Deplo
 
 ## Credits
 
-- **History:** see the Research Sheet for all 37 sources (Britannica, *Nature*, *PNAS*, *Emerging Infectious Diseases*, *The Economic History Review*, university sites, and primary sources such as Boccaccio, Guy de Chauliac and Jean de Venette).
+- **History:** see the Research Sheet for all 45 sources (Britannica, *Nature*, *PNAS*, *Emerging Infectious Diseases*, *The Economic History Review*, university sites, and primary sources such as Boccaccio, Guy de Chauliac and Jean de Venette).
 - **Map:** coastlines, rivers and lakes from [Natural Earth](https://www.naturalearthdata.com/) (public domain).
-- **Fonts:** EB Garamond, Cinzel and UnifrakturMaguntia, all under the SIL Open Font License (see `assets/fonts/`).
-- **Sound and music:** original, generated live in the browser with the Web Audio API (a lute-like melody in the medieval Dorian mode, drone and frame drum, plus sound effects); no recordings are used.
+- **Fonts:** EB Garamond, Cinzel and UnifrakturMaguntia, all under the SIL Open Font License (see `assets/licenses/`).
+- **Music:** by Kevin MacLeod ([incompetech.com](https://incompetech.com)), licensed under [Creative Commons: By Attribution 4.0](http://creativecommons.org/licenses/by/4.0/): "The Britons" (title screen), "Lord of the Land", "Ancient Rite" and "The Pyre" (trading, early to late years), "Rites" (plague phases) and "Teller of the Tales" (final scores). See `assets/licenses/music-credits.txt`. If the music files cannot be loaded, the game plays its own music, generated live in the browser.
+- **Sound effects:** original, generated live in the browser with the Web Audio API; no recordings are used.
 - **Playing on several devices:** messages between devices go through [Supabase Realtime](https://supabase.com/), using the open-source libraries `@supabase/realtime-js` (© 2020 Supabase) and `@supabase/phoenix` (© 2014 Chris McCord), both under the MIT License (see `assets/licenses/`; the texts are also at the top of the game's script). Only house names, home cities and game moves are sent; nothing is stored and there are no accounts.
 
 *Content note:* the game deals with mass death and with the persecution of Jewish communities. It treats both seriously and without graphic detail, and it states plainly that the accusations against Jews were false and the violence unjust.
 
 ## License
 
-The game's code and content are released under the MIT License (see `LICENSE`). The bundled fonts keep their own SIL Open Font License (see `assets/fonts/`), the bundled Supabase realtime client libraries keep their own MIT License (see `assets/licenses/`), and the Natural Earth map data is in the public domain.
+The game's code and content are released under the MIT License (see `LICENSE`). The bundled fonts keep their own SIL Open Font License, the bundled Supabase realtime client libraries keep their own MIT License, and the music keeps its Creative Commons Attribution 4.0 license (all in `assets/licenses/`). The Natural Earth map data is in the public domain.

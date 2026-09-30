@@ -102,7 +102,7 @@ function researchSheet() {
 
   <h2>Works Cited</h2>
   <div class="works-cited">${works}</div>
-  <p class="small">All web sources were accessed on ${esc(DATA.accessed)}. Map data: Natural Earth (public domain). Fonts: EB Garamond, Cinzel, UnifrakturMaguntia (SIL Open Font License).</p>`);
+  <p class="small">All web sources were accessed on ${esc(DATA.accessed)}. Map data: Natural Earth (public domain). Fonts: EB Garamond, Cinzel, UnifrakturMaguntia (SIL Open Font License). Music: ${DATA.music.map((t) => `“${esc(t.title)}”`).join(', ')} by ${esc(DATA.music[0].author)} (${esc(DATA.music[0].site)}), licensed under ${esc(DATA.music[0].license)} (${esc(DATA.music[0].licenseUrl)}).</p>`);
 }
 
 // ---------- Presentation outline ----------

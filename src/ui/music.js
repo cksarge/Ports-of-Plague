@@ -1,7 +1,11 @@
-// Background music, composed for this game and played live by the Web
-// Audio API (no recordings): a lute-like melody in the medieval Dorian
-// mode over a drone, with a soft frame drum. During plague phases the music
-// slows and darkens.
+// Background music. The game plays the recorded tracks listed in
+// data/music.json (files in assets/music/), crossfading between them as the
+// mood changes. If a file cannot be loaded (for example when the game file
+// was copied without its assets folder), it falls back to music composed for
+// this game and played live by the Web Audio API: a lute-like melody in the
+// medieval Dorian mode over a drone, with a soft frame drum, which slows and
+// darkens during plague phases.
+import { DATA } from '../data.js';
 import { audioContext, isMusicOn, onAudioSettings } from './sound.js';
 
 const midi = (n) => 440 * Math.pow(2, (n - 69) / 12);
@@ -23,6 +27,8 @@ const MOODS = {
   calm: { tempo: 84, transpose: 0, drum: 0.7, melody: 0.1, dark: false },
   plague: { tempo: 62, transpose: -12, drum: 0.35, melody: 0.09, dark: true },
 };
+// Which generated mood stands in for each recorded track.
+const FALLBACK = { menu: 'menu', 'trade-1': 'calm', 'trade-2': 'calm', 'trade-3': 'calm', plague: 'plague', ending: 'menu' };
 
 let state = null; // running sequencer
 let mood = 'menu';
@@ -133,7 +139,7 @@ function stop() {
 function schedule() {
   const s = state;
   if (!s) return;
-  const m = MOODS[mood];
+  const m = MOODS[FALLBACK[mood] ?? mood] ?? MOODS.menu;
   const beatLen = 60 / m.tempo;
   while (s.next < s.a.currentTime + 0.35) {
     const phraseIdx = s.order[s.phrase % s.order.length];
@@ -174,14 +180,117 @@ function schedule() {
   }
 }
 
+// ---------- Recorded tracks ----------
+const TRACKS = Object.fromEntries(DATA.music.map((t) => [t.id, t]));
+const VOLUME = 0.5;     // recorded music sits under the sound effects
+const FADE_MS = 1500;
+const players = {};     // track id → <audio>, kept so a track resumes where it paused
+const failed = new Set();
+let current = null;     // id of the recorded track playing now
+let unlocked = false;   // the browser allows sound once the player has clicked or pressed a key
+
+// On a web server the tracks go through the Web Audio graph, so fades work
+// everywhere (iPhones ignore an <audio> element's volume). A page opened
+// straight from a file cannot do that, so it fades the element itself.
+const useGraph = typeof location !== 'undefined' && /^https?:$/.test(location.protocol);
+
+function player(id) {
+  if (players[id]) return players[id];
+  const el = new Audio();
+  el.loop = true;
+  el.preload = 'metadata';
+  el.volume = useGraph ? 1 : 0;
+  el.addEventListener('error', () => { failed.add(id); if (current === id) { current = null; apply(); } });
+  el.src = TRACKS[id].file;
+  if (useGraph) {
+    const au = audioContext();
+    if (au) {
+      el._gain = au.ctx.createGain();
+      el._gain.gain.value = 0;
+      au.ctx.createMediaElementSource(el).connect(el._gain).connect(au.buses.master);
+    }
+  }
+  players[id] = el;
+  return el;
+}
+
+// Moves a track's volume smoothly to `to`, then calls done (unless another fade replaced it).
+function fade(el, to, done) {
+  clearInterval(el._fade);
+  clearTimeout(el._fadeEnd);
+  if (el._gain) {
+    const g = el._gain.gain, t = el._gain.context.currentTime;
+    g.cancelScheduledValues(t);
+    g.setValueAtTime(g.value, t);
+    g.linearRampToValueAtTime(to, t + FADE_MS / 1000);
+    el._fadeEnd = setTimeout(() => done?.(), FADE_MS + 50);
+    return;
+  }
+  const from = el.volume, t0 = performance.now();
+  el._fade = setInterval(() => {
+    const k = Math.min(1, (performance.now() - t0) / FADE_MS);
+    el.volume = Math.max(0, Math.min(1, from + (to - from) * k));
+    if (k >= 1) { clearInterval(el._fade); done?.(); }
+  }, 50);
+}
+function fadeOut(id) {
+  const el = players[id];
+  if (el) fade(el, 0, () => el.pause());
+}
+
+// Plays the track for the current mood (or the generated music instead).
+function apply() {
+  if (!unlocked) return;
+  const on = isMusicOn();
+  const id = TRACKS[mood] && !failed.has(mood) ? mood : null;
+  if (!on || !id) {
+    if (current) fadeOut(current);
+    current = null;
+    if (on) { start(); } else stop();
+    return;
+  }
+  stop(); // the generated music is not needed while a recording plays
+  if (current === id) return;
+  if (current) fadeOut(current);
+  current = id;
+  const el = player(id);
+  el.play().then(() => fade(el, VOLUME)).catch(() => { /* not allowed yet, or failed: the error event handles failures */ });
+}
+
+// Mood names: menu, trade-1, trade-2, trade-3, plague, ending.
 export const music = {
-  setMood(m) { if (MOODS[m]) mood = m; },
+  setMood(m) {
+    if (!TRACKS[m] && !MOODS[m]) return;
+    mood = m;
+    apply();
+  },
   // Browsers only allow sound after the player interacts with the page.
   enableOnFirstGesture() {
-    const go = () => { if (isMusicOn()) start(); };
+    const go = () => {
+      unlocked = true;
+      // Starting each track once during this click lets it play later
+      // (Safari only allows sound that starts from a tap or key press).
+      if (isMusicOn()) {
+        for (const t of DATA.music) {
+          const el = player(t.id);
+          el.play().then(() => { if (current !== t.id) el.pause(); }).catch(() => {});
+        }
+      }
+      apply();
+    };
     window.addEventListener('pointerdown', go, { once: true });
     window.addEventListener('keydown', go, { once: true });
   },
-  sync() { if (isMusicOn()) start(); else stop(); },
+  sync() { apply(); },
+  // For tests: which recording is playing (null = none or the generated music).
+  status() {
+    const el = current && players[current];
+    return { mood, track: current, playing: !!el && !el.paused, time: el ? Math.round(el.currentTime) : 0, failed: [...failed], generated: !!state };
+  },
 };
+
+// The trading music darkens as the years go by (round = half-year number).
+export function tradeMood(round) {
+  return round <= 3 ? 'trade-1' : round <= 7 ? 'trade-2' : 'trade-3';
+}
 onAudioSettings(() => music.sync());
