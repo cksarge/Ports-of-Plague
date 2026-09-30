@@ -1,9 +1,10 @@
 {
-  "note": "Background music. The same list drives the music player (src/ui/music.js) and the credits (About screen, Research Sheet). Credits copied from assets/licenses/music-credits.txt.",
+  "note": "Background music. The same list drives the music player (src/ui/music.js) and the credits (About screen, Research Sheet). Credits copied from assets/licenses/music-credits.txt. file = full quality (computers); mobileFile = small version for phones and tablets, made by `npm run music`.",
   "tracks": [
     {
       "id": "menu",
       "file": "assets/music/menu.mp3",
+      "mobileFile": "assets/music/mobile/menu.m4a",
       "title": "The Britons",
       "author": "Kevin MacLeod",
       "site": "incompetech.com",
@@ -15,6 +16,7 @@
     {
       "id": "trade-1",
       "file": "assets/music/trade-1.mp3",
+      "mobileFile": "assets/music/mobile/trade-1.m4a",
       "title": "Lord of the Land",
       "author": "Kevin MacLeod",
       "site": "incompetech.com",
@@ -26,6 +28,7 @@
     {
       "id": "trade-2",
       "file": "assets/music/trade-2.mp3",
+      "mobileFile": "assets/music/mobile/trade-2.m4a",
       "title": "Ancient Rite",
       "author": "Kevin MacLeod",
       "site": "incompetech.com",
@@ -37,6 +40,7 @@
     {
       "id": "trade-3",
       "file": "assets/music/trade-3.mp3",
+      "mobileFile": "assets/music/mobile/trade-3.m4a",
       "title": "The Pyre",
       "author": "Kevin MacLeod",
       "site": "incompetech.com",
@@ -48,6 +52,7 @@
     {
       "id": "plague",
       "file": "assets/music/plague.mp3",
+      "mobileFile": "assets/music/mobile/plague.m4a",
       "title": "Rites",
       "author": "Kevin MacLeod",
       "site": "incompetech.com",
@@ -59,6 +64,7 @@
     {
       "id": "ending",
       "file": "assets/music/ending.mp3",
+      "mobileFile": "assets/music/mobile/ending.m4a",
       "title": "Teller of the Tales",
       "author": "Kevin MacLeod",
       "site": "incompetech.com",

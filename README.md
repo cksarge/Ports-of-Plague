@@ -74,6 +74,7 @@ npm install
 | `npm run audit` | Checks every historical reference and rule number; writes `docs/audit-report.md` |
 | `npm run all` | Audit, tests, build and documents in one go |
 | `npm run map` | Rebuilds the map from the Natural Earth files in `tools/map-source/` (rarely needed) |
+| `npm run music` | Makes the small phone copies of the music in `assets/music/mobile/` (run after changing a song; macOS only, uses `afconvert`) |
 
 ## Where everything is
 
@@ -106,7 +107,7 @@ research/notes.md      raw research notes with the quotations used to verify eac
 research/facts-review.md  easy-to-read list of all facts and sources
 docs/                  printable documents and reports
 assets/fonts/          fonts (SIL Open Font License)
-assets/music/          background music (Kevin MacLeod, CC BY 4.0; list in data/music.json)
+assets/music/          background music (Kevin MacLeod, CC BY 4.0; list in data/music.json); mobile/ holds the small copies for phones
 assets/licenses/       every third-party license: fonts (SIL OFL), Supabase realtime client (MIT), music credits
 ```
 
@@ -132,7 +133,7 @@ The site is served straight from the `main` branch (Settings → Pages → Deplo
 - **History:** see the Research Sheet for all 45 sources (Britannica, *Nature*, *PNAS*, *Emerging Infectious Diseases*, *The Economic History Review*, university sites, and primary sources such as Boccaccio, Guy de Chauliac and Jean de Venette).
 - **Map:** coastlines, rivers and lakes from [Natural Earth](https://www.naturalearthdata.com/) (public domain).
 - **Fonts:** EB Garamond, Cinzel and UnifrakturMaguntia, all under the SIL Open Font License (see `assets/licenses/`).
-- **Music:** by Kevin MacLeod ([incompetech.com](https://incompetech.com)), licensed under [Creative Commons: By Attribution 4.0](http://creativecommons.org/licenses/by/4.0/): "The Britons" (title screen), "Lord of the Land", "Ancient Rite" and "The Pyre" (trading, early to late years), "Rites" (plague phases) and "Teller of the Tales" (final scores). See `assets/licenses/music-credits.txt`. If the music files cannot be loaded, the game plays its own music, generated live in the browser.
+- **Music:** by Kevin MacLeod ([incompetech.com](https://incompetech.com)), licensed under [Creative Commons: By Attribution 4.0](http://creativecommons.org/licenses/by/4.0/): "The Britons" (title screen), "Lord of the Land", "Ancient Rite" and "The Pyre" (trading, early to late years), "Rites" (plague phases) and "Teller of the Tales" (final scores). See `assets/licenses/music-credits.txt`. Computers play the full-quality files in `assets/music/`; phones and tablets play smaller copies (AAC, 96 kbps) from `assets/music/mobile/`, made with `npm run music` (macOS). If the music files cannot be loaded, the game plays its own music, generated live in the browser.
 - **Sound effects:** original, generated live in the browser with the Web Audio API; no recordings are used.
 - **Playing on several devices:** messages between devices go through [Supabase Realtime](https://supabase.com/), using the open-source libraries `@supabase/realtime-js` (© 2020 Supabase) and `@supabase/phoenix` (© 2014 Chris McCord), both under the MIT License (see `assets/licenses/`; the texts are also at the top of the game's script). Only house names, home cities and game moves are sent; nothing is stored and there are no accounts.
 

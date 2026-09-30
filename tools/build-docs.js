@@ -46,7 +46,7 @@ function ruleBook() {
   const body = renderRulebook(DATA.rulebook, C, { factRef: (id) => `<sup class="fact-ref">${id}</sup>`, level: 2 });
   return page('Ports of Plague — Rule Book', 'Rule Book', `
   <header class="doc-head"><h1 class="doc-title">Ports of Plague</h1>
-  <p class="doc-sub">${esc(DATA.rulebook.subtitle)} · Rule Book · ${C.players.min}–${C.players.max} players · about ${C.timeEstimates.quick['2']}–${C.timeEstimates.standard['6']} minutes · ages 14+</p></header>
+  <p class="doc-sub">${esc(DATA.rulebook.subtitle)} · Rule Book · ${C.bots.minHumans}–${C.players.max} players (bots can fill the other houses) · about ${C.timeEstimates.quick['2']}–${C.timeEstimates.standard['6']} minutes · ages 14+</p></header>
   <div class="two-col">${body}
   <p class="small"><em>Small grey codes such as <span class="fact-ref">TR-02</span> point to the sourced facts listed in the Historical Research Sheet. The in-game Rules screen shows exactly this text; both are generated from <code>data/rulebook.json</code> and <code>data/config.json</code>.</em></p></div>`);
 }
@@ -117,7 +117,7 @@ function presentationMarkdown() {
 - "Our game asks: if you were a merchant then, would you keep trading?"
 
 ## 2. What the game is (0:30–1:15)
-- *Ports of Plague* is a board game for ${C.players.min}–${C.players.max} players, played in a web browser: everyone shares one computer and takes turns, or each player uses their own phone while a big screen shows the map. Computer-controlled houses can fill empty seats. It has a painted map board, ships and carts sailing the trade routes, dice, cards and house banners, all animated.
+- *Ports of Plague* is a board game for ${C.bots.minHumans}–${C.players.max} players, played in a web browser: everyone shares one computer and takes turns, or each player uses their own phone while a big screen shows the map. Computer-controlled houses (Easy, Medium or Hard) can fill the other seats, so even one person can play. It has a painted map board, ships and carts sailing the trade routes, dice, cards and house banners, all animated.
 - Each player is a merchant family based in a real trading city (${homes}). A dice roll at the start sets the turn order for the whole game.
 - ${C.rounds} rounds of half a year each (Late 1347 to Early 1353), or ${C.rounds / C.modes.quick.span} rounds of a year and a half in **Quick Play** (about ${C.timeEstimates.quick['4']} minutes for 4 players), plus optional pre-plague rounds and a ${C.turnTimer.seconds}-second turn timer. Three difficulties, from Apprentice to Great Mortality. About ${C.timeEstimates.quick['2']}–${C.timeEstimates.standard['6']} minutes.
 - **Goal:** the highest *Legacy* in 1353 = Wealth + Family + Reputation, plus your weakest category again. **Balance beats greed.**

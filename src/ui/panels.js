@@ -55,21 +55,26 @@ export function showFacts(title, factIds) {
 }
 
 export function showCredits() {
+  const REPO = 'https://github.com/cksarge/Ports-of-Plague';
+  const link = (href, text) => `<a href="${esc(href)}" target="_blank" rel="noopener">${text}</a>`;
   return openDialog(`<div class="frame">
     <h2>About Ports of Plague</h2>
-    <p>An original educational game about the spread and effects of the Black Death, 1347–1353, made for a high-school history class.</p>
+    <p>An original educational game about the spread and effects of the Black Death, 1347–1353, made by Carter K, Landon S, Valen H and John-Paul T for a high-school history class.</p>
+    <h3>Credits</h3>
     <ul>
       <li><strong>History:</strong> ${DATA.facts.length} facts from ${DATA.sources.length} sources (see the Historian's Journal and the Research Sheet).</li>
-      <li><strong>Map:</strong> coastlines, rivers and lakes from Natural Earth (public domain).</li>
-      <li><strong>Fonts:</strong> EB Garamond, Cinzel and UnifrakturMaguntia, all under the SIL Open Font License.</li>
+      <li><strong>Map:</strong> coastlines, rivers and lakes from ${link('https://www.naturalearthdata.com/', 'Natural Earth')} (public domain).</li>
+      <li><strong>Fonts:</strong> EB Garamond, Cinzel and UnifrakturMaguntia, all under the ${link('https://openfontlicense.org/', 'SIL Open Font License')}.</li>
       <li><strong>Sound effects:</strong> original, generated live in your browser; no recordings are used.</li>
-      <li><strong>Playing on several devices:</strong> the big screen and the players' phones, tablets or computers talk through Supabase Realtime (supabase.com), using the open-source libraries <em>@supabase/realtime-js</em> (© 2020 Supabase) and <em>@supabase/phoenix</em> (© 2014 Chris McCord), both under the MIT License. Only house names, home cities and game moves are sent; nothing is stored and there are no accounts.</li>
+      <li><strong>Playing on several devices:</strong> the big screen and the players' phones, tablets or computers talk through ${link('https://supabase.com/', 'Supabase Realtime')}, using the open-source libraries <em>@supabase/realtime-js</em> (© 2020 Supabase) and <em>@supabase/phoenix</em> (© 2014 Chris McCord), both under the MIT License. Only house names, home cities and game moves are sent; nothing is stored and there are no accounts.</li>
     </ul>
     <h3>Music</h3>
-    <ul class="music-credits">${DATA.music.map((t) => `<li><strong>“${esc(t.title)}”</strong> <small>— ${esc(t.plays.charAt(0).toLowerCase() + t.plays.slice(1))}</small><br>${esc(t.author)} (<a href="${esc(t.siteUrl)}" target="_blank" rel="noopener">${esc(t.site)}</a>) · Licensed under <a href="${esc(t.licenseUrl)}" target="_blank" rel="noopener">${esc(t.license)}</a></li>`).join('')}</ul>
-    <p style="font-size:0.9rem">If the music files cannot be loaded, the game plays its own music, generated live in your browser.</p>
-    <p>Content note: the game deals with mass death and with the persecution of Jewish communities. It treats these seriously and without graphic detail, and it states plainly that the accusations against Jews were false and the violence unjust.</p>
+    <ul class="music-credits">${DATA.music.map((t) => `<li><strong>“${esc(t.title)}”</strong> <small>— ${esc(t.plays.charAt(0).toLowerCase() + t.plays.slice(1))}</small><br>${esc(t.author)} (${link(t.siteUrl, esc(t.site))}) · Licensed under ${link(t.licenseUrl, esc(t.license))}</li>`).join('')}</ul>
+    <p style="font-size:0.9rem">Phones and tablets play smaller copies of the same recordings to save data. If the music files cannot be loaded, the game plays its own music, generated live in your browser.</p>
+    <p style="font-size:0.9rem">The full text of every license above is in the game's ${link(`${REPO}/tree/main/assets/licenses`, 'licenses folder')}.</p>
+    <h3>Content note</h3>
+    <p>The game deals with mass death and with the persecution of Jewish communities. It treats these seriously and without graphic detail, and it states plainly that the accusations against Jews were false and the violence unjust.</p>
     <h3>License</h3>
-    <p>This work is <a href="https://github.com/cksarge/Ports-of-Plague" target="_blank" rel="noopener">open source</a> and protected under the <a href="https://github.com/cksarge/Ports-of-Plague/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>. Copyright © 2026 Carter K, Landon S, Valen H, and John-Paul T.</p>
+    <p>This work is ${link(REPO, 'open source')} and protected under the ${link(`${REPO}/blob/main/LICENSE`, 'MIT License')}. Copyright © 2026 Carter K, Landon S, Valen H, and John-Paul T.</p>
     <div class="dialog-actions"><button class="btn primary" data-value="close" autofocus>Close</button></div></div>`, { label: 'About' });
 }
