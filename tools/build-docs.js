@@ -19,6 +19,9 @@ mkdirSync(docs, { recursive: true });
 const pdfDir = new URL('Printable%20Documents%20(PDF)/', root);
 mkdirSync(pdfDir, { recursive: true });
 const C = DATA.config;
+// Playing time, to the nearest 5 minutes (shortest Quick Play game to longest standard game).
+const five = (n) => Math.round(n / 5) * 5;
+const TIME_RANGE = `${five(C.timeEstimates.quick['2'])}–${five(C.timeEstimates.standard['6'])}`;
 
 function fontFaces() {
   const f = (family, file, weight = 400, style = 'normal') =>
@@ -46,7 +49,7 @@ function ruleBook() {
   const body = renderRulebook(DATA.rulebook, C, { factRef: (id) => `<sup class="fact-ref">${id}</sup>`, level: 2 });
   return page('Ports of Plague — Rule Book', 'Rule Book', `
   <header class="doc-head"><h1 class="doc-title">Ports of Plague</h1>
-  <p class="doc-sub">${esc(DATA.rulebook.subtitle)} · Rule Book · ${C.bots.minHumans}–${C.players.max} players (bots can fill the other houses) · about ${C.timeEstimates.quick['2']}–${C.timeEstimates.standard['6']} minutes · ages 14+</p></header>
+  <p class="doc-sub">${esc(DATA.rulebook.subtitle)} · Rule Book · ${C.bots.minHumans}–${C.players.max} players (bots can fill the other houses) · about ${TIME_RANGE} minutes · ages 14+</p></header>
   <div class="two-col">${body}
   <p class="small"><em>Small grey codes such as <span class="fact-ref">TR-02</span> point to the sourced facts listed in the Historical Research Sheet. The in-game Rules screen shows exactly this text; both are generated from <code>data/rulebook.json</code> and <code>data/config.json</code>.</em></p></div>`);
 }
@@ -91,6 +94,7 @@ function researchSheet() {
   <p><strong>The siege of Caffa.</strong> The story that attackers threw plague corpses over the walls comes from one writer, Gabriele de' Mussi. A modern analysis finds it plausible, but concludes the siege was only one of several routes out of the Black Sea. <span class="fact-ref">TR-03</span></p>
   <p><strong>Dates and places.</strong> Sources disagree by weeks or months on when the plague reached some cities (Genoa: November 1347 or January 1348; Melcombe Regis: June or August 1348). Old maps also wrongly showed regions like the Low Countries as "spared" because of gaps in the evidence. <span class="fact-ref">TL-04 TR-08 CI-12</span></p>
   <p><strong>How hard was Spain hit?</strong> Britannica calls Aragon and Catalonia very hard-hit, but a 2020 study by economic historians estimates that Spain's population fell by only about 18 percent overall, and the city of Valencia even grew after 1348. <span class="fact-ref">CI-18 CI-06</span></p>
+  <p><strong>A poem read as a map.</strong> The poet Ibn al-Wardi of Aleppo wrote a rhyming tale in 1348/9 in which the plague travels from China through India and Persia to Syria. For centuries it was read as a factual route. A 2025 study argues it was literature, so the game uses it only for what he says about Aleppo itself. <span class="fact-ref">CI-21</span></p>
   <p><strong>Chroniclers' numbers.</strong> Medieval writers often exaggerated. For Florence alone they give 60,000 or 100,000 deaths, or three in five people; Ibn Battuta wrote that 24,000 died in a single day in Cairo. Numbers like these are treated as rough impressions, not counts. <span class="fact-ref">CI-02 CI-15</span></p>
   <p><strong>Anachronisms the game avoids.</strong> Formal quarantine (Ragusa, 1377, 30 days; later 40 days in Venice) came after 1353, so it appears only as "what came next". Earlier, haphazard measures (Venice's ship checks, Pistoia's travel ban, Milan's boarded-up houses) are used instead. The beaked "plague doctor" mask dates from 1619 and is left out. <span class="fact-ref">ME-12 ME-14 ME-15 ME-11</span></p>
   <p><strong>Persecution.</strong> The game shows the persecution of Jewish communities because it happened, and it states plainly that the well-poisoning accusations were false and the violence unjust. Pope Clement VI condemned the accusations, but his words had little effect far from Avignon. Players can never gain anything from persecution. <span class="fact-ref">SO-07 SO-08 SO-09</span></p>
@@ -102,7 +106,7 @@ function researchSheet() {
 
   <h2>Works Cited</h2>
   <div class="works-cited">${works}</div>
-  <p class="small">All web sources were accessed on ${esc(DATA.accessed)}. Map data: Natural Earth (public domain). Fonts: EB Garamond, Cinzel, UnifrakturMaguntia (SIL Open Font License). Music: ${DATA.music.map((t) => `“${esc(t.title)}”`).join(', ')} by ${esc(DATA.music[0].author)} (${esc(DATA.music[0].site)}), licensed under ${esc(DATA.music[0].license)} (${esc(DATA.music[0].licenseUrl)}).</p>`);
+  <p class="small">The date each web source was read is given at the end of its citation. Map data: Natural Earth (public domain). Fonts: EB Garamond, Cinzel, UnifrakturMaguntia (SIL Open Font License). Music: ${DATA.music.map((t) => `“${esc(t.title)}”`).join(', ')} by ${esc(DATA.music[0].author)} (${esc(DATA.music[0].site)}), licensed under ${esc(DATA.music[0].license)} (${esc(DATA.music[0].licenseUrl)}).</p>`);
 }
 
 // ---------- Presentation outline ----------
@@ -119,7 +123,7 @@ function presentationMarkdown() {
 ## 2. What the game is (0:30–1:15)
 - *Ports of Plague* is a board game for ${C.bots.minHumans}–${C.players.max} players, played in a web browser: everyone shares one computer and takes turns, or each player uses their own phone while a big screen shows the map. Computer-controlled houses (Easy, Medium or Hard) can fill the other seats, so even one person can play. It has a painted map board, ships and carts sailing the trade routes, dice, cards and house banners, all animated.
 - Each player is a merchant family based in a real trading city (${homes}). A dice roll at the start sets the turn order for the whole game.
-- ${C.rounds} rounds of half a year each (Late 1347 to Early 1353), or ${C.rounds / C.modes.quick.span} rounds of a year and a half in **Quick Play** (about ${C.timeEstimates.quick['4']} minutes for 4 players), plus optional pre-plague rounds and a ${C.turnTimer.seconds}-second turn timer. Three difficulties, from Apprentice to Great Mortality. About ${C.timeEstimates.quick['2']}–${C.timeEstimates.standard['6']} minutes.
+- ${C.rounds} rounds of half a year each (Late 1347 to Early 1353), or ${C.rounds / C.modes.quick.span} rounds of a year and a half in **Quick Play** (about ${C.timeEstimates.quick['4']} minutes for 4 players), plus optional pre-plague rounds and a ${C.turnTimer.seconds}-second turn timer. Three difficulties, from Apprentice to Great Mortality. A game takes about ${TIME_RANGE} minutes.
 - **Goal:** the highest *Legacy* in 1353 = Wealth + Family + Reputation, plus your weakest category again. **Balance beats greed.**
 
 ## 3. How it plays: strategy and chance (1:15–2:15)
@@ -131,7 +135,7 @@ function presentationMarkdown() {
 - Comeback rules: inheritance, weddings, loans, cheaper charity, and Guild's Favor (an extra action for a house far behind). No one is ever eliminated.
 
 ## 4. The history inside the game (2:15–3:45)
-- **Real timeline and trade routes:** the plague reaches each of the ${DATA.cities.length} cities, from Dublin to Damascus, in the half-year it really did (Messina Oct 1347, Damascus July 1348, London Aug 1348, Bergen July 1349, Gibraltar 1350, Moscow 1353). [TR-06, CI-14, TL-08, TR-09, CI-19, TR-10]
+- **Real timeline and trade routes:** the plague reaches each of the ${DATA.cities.length} cities, from Lisbon to Trebizond and from Oslo to Cairo, in the half-year it really did (Messina Oct 1347, Damascus July 1348, London Aug 1348, Bergen July 1349, Gibraltar 1350, Moscow 1353). [TR-06, CI-14, TL-08, TR-09, CI-19, TR-10]
 - **Before the plague:** optional pre-plague rounds in 1346–47 let houses build their trade while only Caffa and Tana on the Black Sea are stricken. [TR-02, TR-12]
 - **Social responses:** flight to the countryside (Boccaccio), the flagellants, and Pope Clement VI banning them in 1349. In Damascus, Muslims, Jews and Christians walked out together to pray for the plague to end. [SO-04, SO-02, SO-03, CI-14]
 - **Persecution, handled seriously:** the Strasbourg massacre of February 1349 happened before the plague even arrived. The game states that the accusations were false, and players can only lose money by trying to protect the community, never gain. [SO-09, SO-07, SO-08]
@@ -141,11 +145,11 @@ function presentationMarkdown() {
 
 ## 5. Accuracy and research (3:45–4:30)
 - ${DATA.facts.length} facts from ${DATA.sources.length} sources (Britannica, peer-reviewed journals such as *Nature* and *PNAS*, university sites, and primary sources like Boccaccio, Guy de Chauliac and Ibn Battuta). Every fact in the game is tied to a source.
-- We show where historians disagree: the death toll, rats versus human fleas, how hard Spain was hit, and conflicting dates. [DB-01, ME-10, CI-18, TL-04]
+- We show where historians disagree: the death toll, rats versus human fleas, how hard Spain was hit, conflicting dates, and a famous poem from Aleppo that was long mistaken for a factual record of the plague's route. [DB-01, ME-10, CI-18, TL-04, CI-21]
 - We avoided anachronisms: no beaked plague-doctor masks (invented 1619), and quarantine appears only as "what came next" (Ragusa, 1377). [ME-11, ME-14]
 
 ## 6. Balance and testing (4:30–4:50)
-- We tested the rules with thousands of computer-played games. Every home city wins about its fair share, and a balanced strategy beats pure greed. The same games time the rounds: Quick Play takes about ${C.timeEstimates.quick['4']} minutes for 4 players. Full results are in the simulation report (\`docs/simulation-report.md\`).
+- We tested the rules with thousands of computer-played games. Home cities start with different amounts of money so that none of them dominates, and a balanced strategy beats pure greed. The same games time the rounds: Quick Play takes about ${C.timeEstimates.quick['4']} minutes for 4 players. Full results are in the simulation report (\`docs/simulation-report.md\`).
 
 ## 7. Close (4:50–5:00)
 - "In *Ports of Plague* you can't stop the Black Death. You can only decide what kind of family you'll be when it comes. That was true in 1348, too."

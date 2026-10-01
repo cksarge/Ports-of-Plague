@@ -224,3 +224,32 @@ Read in a browser on 29 Sept. 2026. Quotes copied from the pages.
 - "In 1343 the Mongols under Janibeg ... besieged Caffa and the Italian enclave at Tana, following a brawl between Italians and Muslims in Tana. The Italian merchants in Tana fled to Caffa"; "in 1347 the Italians were allowed to reestablish their colony in Tana."
 
 Not found with a usable source (so not added): Lisbon/Portugal, Palma de Mallorca, Seville, Trebizond, Cyprus arrival dates.
+
+## Added 2026-10-01 (ten more cities: eastern Europe, Greece, Portugal, the Middle East, the north)
+Read in a browser on 1 Oct. 2026. Quotes copied from the pages.
+
+## S-BENED (again) — Benedictow, History Today
+- "The plague must have arrived in Oslo in the autumn of 1348, and must have come with a ship from south-eastern England"; "The outbreak in Oslo was soon stopped by the advent of winter weather, but it broke out again in the early spring."
+- "Hanseatic ships fleeing homewards from their trading station in Oslo"; "The outbreak of the Black Death in the Prussian town of Elbing (today the Polish town of Elblag) on August 24th, 1349"
+- "It entered the territory of the city state of Novgorod in the late autumn of 1351 and reached the town of Pskov just before the winter set in and temporarily suppressed the epidemic; thus the full outbreak did not start until the early spring of 1352."
+- "Poland was invaded by epidemic forces coming both from Elbing and from the northern German plague front and, apparently, from the south by contagion coming across the border from Slovakia via Hungary."
+- "Bristol was contaminated in June, as were the coastal towns of the Pale in Ireland"; a plague ship "sailed from Bordeaux, northwards to Rouen in Normandy where it arrived at the end of April."
+
+## S-TSIAMIS — Tsiamis, Poulakou-Rebelakou, Tsakris, Petridou. "Epidemic waves of the Black Death in the Byzantine Empire (1347-1453 AD)." Le Infezioni in Medicina 19.3 (2011): 194-201. https://www.infezmed.it/media/journal/Vol_19_3_2011_10.pdf
+- "In 1347, apart from Constantinople, the plague was spread to the islands of Aegean (Limnos and Euboea), the island Crete, the second largest city of the empire Thessaloniki in Northern Greece, Trebizond in Minor Asia and the Venetian naval bases of Methone and Koroni in the Peloponnese"
+- "In 1348 ... the island Rhodes, the Venetian ports of Cyprus and the inner Peloponnese in southern Greece"
+- Kantakouzenos "describes the disease's symptoms in detail, notably the lung infection, strong chest pains, haemoptysis and intense thirst, the lethargy and death of patients; many believe this description matches the pulmonary form of the disease"
+- "standard routes to Constantinople via Aegean (Venice-Ragusa-Corfu-Methone-Koroni-Cerigo-Negroponte-Thessaloniki-Lemnos Constantinople) or the typical route of the Venetian armata to the Middle East via Cyprus (Venice-Ragusa-Corfu-Methone-Koroni-Candia-Rhodes-Famagusta)"; "it is likely that the disease was transferred from one naval base to another"
+- "Trade relations with the Empire of Trebizond carry the disease from Constantinople to the Black Sea in 1362."
+
+## S-COELHO — Coelho, Maria Helena da Cruz. "The first Portuguese parliamentary debate after the Black Death of 1348: the Lisbon Cortes of 1352." Parliaments, Estates and Representation 44.2 (2024): 109-119. https://doi.org/10.1080/02606755.2023.2292933 (abstract only)
+- "In Portugal, it was particularly felt in the second half of 1348 and in the following year, King Afonso IV promulgated laws aimed at responding to the problems of declining production, taking into account the decrease in the labour force ... A similar policy occurred in other kingdoms, notably in England, with the Ordinance of Labourers decreed by Edward III. Afonso IV summoned the cortes to Lisbon in 1352"
+
+## S-IBN-AL-WARDI — Ibn al-Wardi, "On the Advance of the Plague," 1348, in Byrne, Daily Life during the Black Death (2006), pp. 260-261; W. W. Norton coursepack PDF.
+- "The pestilence had triumphed and appeared in Aleppo."; "It brings the entire family to their graves after two or three nights."; in Damascus "the plague sat like a king on a throne ... killing daily one thousand or more"
+
+## S-EXETER-WARDI — University of Exeter, "This 14th century story fooled the world about the Black Death," ScienceDaily, 11 Nov. 2025 (on Omar and Fancy, "Mamluk Maqamas on the Black Death," Journal of Arabic and Islamic Studies 25, 2025).
+- "Written by the poet and historian Ibn al-Wardi in Aleppo in 1348/9, the piece was later mistaken for an eyewitness account of how the disease traveled across the continent."
+- Fancy: "It should not be taken literally."
+
+Buda uses the existing Britannica fact (Hungary, 1349). Not found with a usable source: Krakow, Prague, Kyiv, Jerusalem/Gaza arrival dates.

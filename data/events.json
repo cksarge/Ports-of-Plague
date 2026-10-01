@@ -177,7 +177,9 @@
         "type": "wageLaw",
         "cities": [
           "london",
-          "melcombe"
+          "melcombe",
+          "bristol",
+          "york"
         ]
       }
     },
@@ -326,7 +328,9 @@
         "type": "wageLaw",
         "cities": [
           "london",
-          "melcombe"
+          "melcombe",
+          "bristol",
+          "york"
         ]
       }
     },

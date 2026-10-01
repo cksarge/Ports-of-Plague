@@ -1225,6 +1225,92 @@
         "smith-york"
       ],
       "evidence": "Zouche: \"devout processions are to be held every Wednesday and Friday ... and that a special prayer be said in mass every day for allaying the plague and pestilence.\" Smith: \"Papal bull of Clement VI, dated at Avignon, 12 October 1349, authorising the Archbishop to hold ordinations at other than the prescribed times ... propter ministrorum ecclesiasticorum carentiam per mortalitatis pestem.\""
+    },
+    {
+      "id": "CI-20",
+      "category": "cities",
+      "title": "The Aegean and beyond, 1347",
+      "text": "In 1347, besides Constantinople, the plague spread to the Aegean islands, Crete, Thessalonica (the second largest city of the Byzantine Empire), Trebizond on the Black Sea, and the Venetian naval bases of Methone and Koroni in southern Greece. In 1348 it reached Rhodes and the ports of Cyprus.",
+      "when": "1347–1348",
+      "where": "Thessalonica, Crete, Trebizond, Cyprus",
+      "sources": [
+        "tsiamis"
+      ],
+      "evidence": "Tsiamis et al.: \"In 1347, apart from Constantinople, the plague was spread to the islands of Aegean (Limnos and Euboea), the island Crete, the second largest city of the empire Thessaloniki in Northern Greece, Trebizond in Minor Asia and the Venetian naval bases of Methone and Koroni in the Peloponnese\"; \"In 1348 ... the island Rhodes, the Venetian ports of Cyprus and the inner Peloponnese.\""
+    },
+    {
+      "id": "TR-13",
+      "category": "trade",
+      "title": "The Venetian sea roads",
+      "text": "Venetian ships followed fixed routes. One ran from Venice past Ragusa, Corfu and southern Greece to Thessalonica and Constantinople. Another ran to the Middle East by way of Candia (Crete), Rhodes and Famagusta in Cyprus. The plague moved along them from one naval base to the next, and trade with Trebizond carried it across the Black Sea.",
+      "when": "14th–15th centuries",
+      "where": "Aegean, Crete, Cyprus",
+      "sources": [
+        "tsiamis"
+      ],
+      "evidence": "Tsiamis et al.: \"standard routes to Constantinople via Aegean (Venice-Ragusa-Corfu-Methone-Koroni-Cerigo-Negroponte-Thessaloniki-Lemnos Constantinople) or the typical route of the Venetian armata to the Middle East via Cyprus (Venice-Ragusa-Corfu-Methone-Koroni-Candia-Rhodes-Famagusta)\"; \"it is likely that the disease was transferred from one naval base to another\"; \"Trade relations with the Empire of Trebizond carry the disease from Constantinople to the Black Sea.\""
+    },
+    {
+      "id": "ME-17",
+      "category": "medical",
+      "title": "An emperor describes the sickness",
+      "text": "John Kantakouzenos, the Byzantine emperor who later became a monk, described the plague of 1347 in detail: infected lungs, strong chest pains, coughing up blood, great thirst, then lethargy and death. Many think this matches the pneumonic (lung) form of plague.",
+      "when": "1347",
+      "where": "Constantinople",
+      "sources": [
+        "tsiamis"
+      ],
+      "evidence": "Tsiamis et al.: \"Kantakouzenos describes the disease's symptoms in detail, notably the lung infection, strong chest pains, haemoptysis and intense thirst, the lethargy and death of patients; many believe this description matches the pulmonary form of the disease.\""
+    },
+    {
+      "id": "CI-21",
+      "category": "cities",
+      "title": "A poet in Aleppo",
+      "text": "The poet and historian Ibn al-Wardi wrote about the plague in Aleppo in 1348/9: \"It brings the entire family to their graves after two or three nights.\" His rhyming tale shows the plague as a traveller marching from China through India and Persia to Syria. Later writers read it as a factual route. A 2025 study argues it was literature, never meant as a record of how the plague spread.",
+      "when": "1348–1349",
+      "where": "Aleppo",
+      "sources": [
+        "ibn-al-wardi",
+        "exeter-wardi"
+      ],
+      "evidence": "Ibn al-Wardi: \"The pestilence had triumphed and appeared in Aleppo\"; \"It brings the entire family to their graves after two or three nights.\" University of Exeter: \"Written by the poet and historian Ibn al-Wardi in Aleppo in 1348/9, the piece was later mistaken for an eyewitness account of how the disease traveled across the continent\"; \"It should not be taken literally.\"",
+      "debate": "Whether the plague really crossed Asia in a few years, as his tale suggests, is disputed."
+    },
+    {
+      "id": "EC-12",
+      "category": "economic",
+      "title": "Portugal answers with laws",
+      "text": "In Portugal the plague was felt most in the second half of 1348. The next year King Afonso IV made laws to deal with the shortage of workers, much as England did with its Ordinance of Labourers. In 1352 he called the cortes (the kingdom's assembly) to Lisbon to face the crisis.",
+      "when": "1348–1352",
+      "where": "Lisbon, Portugal",
+      "sources": [
+        "coelho"
+      ],
+      "evidence": "Coelho: \"In Portugal, it was particularly felt in the second half of 1348 and in the following year, King Afonso IV promulgated laws aimed at responding to the problems of declining production, taking into account the decrease in the labour force\"; \"A similar policy occurred in other kingdoms, notably in England, with the Ordinance of Labourers\"; \"Afonso IV summoned the cortes to Lisbon in 1352.\""
+    },
+    {
+      "id": "TR-14",
+      "category": "trade",
+      "title": "Oslo to the Baltic",
+      "text": "The plague reached Oslo in the autumn of 1348 on a ship from south-eastern England. Winter stopped it, but it broke out again in early spring. Hanseatic ships fleeing home from Oslo then carried it across the Baltic: it broke out in the Prussian town of Elbing (today Elbląg, Poland) on 24 August 1349.",
+      "when": "1348–1349",
+      "where": "Oslo, Elbing",
+      "sources": [
+        "benedictow"
+      ],
+      "evidence": "Benedictow: \"The plague must have arrived in Oslo in the autumn of 1348, and must have come with a ship from south-eastern England\"; \"The outbreak in Oslo was soon stopped by the advent of winter weather, but it broke out again in the early spring\"; \"Hanseatic ships fleeing homewards from their trading station in Oslo\"; \"The outbreak of the Black Death in the Prussian town of Elbing (today the Polish town of Elblag) on August 24th, 1349.\""
+    },
+    {
+      "id": "CI-22",
+      "category": "cities",
+      "title": "Pskov and Poland",
+      "text": "The plague reached the town of Pskov just before the winter of 1351; the full outbreak began in the early spring of 1352. Poland was invaded from three sides: from Elbing, from northern Germany, and from the south by way of Hungary.",
+      "when": "1349–1352",
+      "where": "Pskov, Poland",
+      "sources": [
+        "benedictow"
+      ],
+      "evidence": "Benedictow: \"reached the town of Pskov just before the winter set in and temporarily suppressed the epidemic; thus the full outbreak did not start until the early spring of 1352\"; \"Poland was invaded by epidemic forces coming both from Elbing and from the northern German plague front and, apparently, from the south by contagion coming across the border from Slovakia via Hungary.\""
     }
   ]
 }

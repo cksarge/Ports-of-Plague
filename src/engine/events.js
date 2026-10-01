@@ -12,7 +12,7 @@ export const EFFECT_TYPES = [
   'postBonus', 'multi', 'cityProfitModifier', 'onePlayer',
 ];
 
-export const ENGLISH_CITIES = ['london', 'melcombe'];
+export const ENGLISH_CITIES = ['london', 'melcombe', 'bristol', 'york'];
 
 export function cardById(id) {
   return DATA.chronicle.find((c) => c.id === id) ?? DATA.deck.find((c) => c.id === id) ?? fortuneById(id);

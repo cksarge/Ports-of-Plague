@@ -65,7 +65,7 @@ export function createMap(container, { onCity, decorative = false } = {}) {
     ...FORESTS.map(([lon, lat, n]) => `<g transform="translate(${P(lon, lat)})">${trees(n)}</g>`),
     `<g transform="translate(${P(-9.4, 49.5)}) scale(0.9)"><g class="bob">${seaMonster()}</g></g>`,
     `<g transform="translate(${P(1.5, 61.2)}) scale(0.8)"><g class="bob slow">${whale()}</g></g>`,
-    `<g transform="translate(${P(39.1, 42.4)}) scale(0.95)">${compassRose()}</g>`,
+    `<g transform="translate(${P(-8.4, 57.0)}) scale(0.8)">${compassRose()}</g>`,
     `<g transform="translate(${P(-4.6, 60.6)})">${cartouche('Europa', 'MCCCXLVII – MCCCLIII')}</g>`,
   ].join('');
   container.innerHTML = `

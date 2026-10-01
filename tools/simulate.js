@@ -182,7 +182,7 @@ writeFileSync(new URL('../docs/simulation-report.md', import.meta.url), [...head
 
 for (const s of Object.values(summary)) {
   const n = s.n;
-  console.log(`\n${s.mode} ${n} players: ~${s.avgMin.toFixed(0)} min, ${s.noTimerMin.toFixed(0)} without timer (range ${s.minMin.toFixed(0)}-${s.maxMin.toFixed(0)}), fair share ${pct(s.fair)}, comebacks ${pct(s.comeback)}`);
+  console.log(`\n${s.mode} ${n} players: ~${s.avgMin.toFixed(1)} min, ${s.noTimerMin.toFixed(0)} without timer (range ${s.minMin.toFixed(0)}-${s.maxMin.toFixed(0)}), fair share ${pct(s.fair)}, comebacks ${pct(s.comeback)}`);
   console.log('  cities:     ' + s.cityRows.map((r) => `${r.c} ${pct(r.rate)}`).join(', '));
   console.log('  ledger/game: ' + LEDGER.map((k) => `${k} ${(s.ledger[k] / GAMES).toFixed(2)}`).join(', '));
   console.log('  strategies: ' + s.stratRows.map((r) => `${r.s} ${pct(r.rate)} (L${(r.score / r.games).toFixed(0)} W${(r.wealth / r.games).toFixed(0)} F${(r.family / r.games).toFixed(0)} R${(r.rep / r.games).toFixed(0)})`).join(', '));

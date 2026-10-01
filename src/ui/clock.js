@@ -1,7 +1,7 @@
 // The turn timer. The big screen (or the one shared device) runs the clock;
 // players' own devices only show it. The clock stops while a card or the dice
 // are on screen, so reading never costs anyone time.
-import { esc, crestSvg } from './dom.js';
+import { crestSvg } from './dom.js';
 import { C } from '../engine/state.js';
 
 // A countdown that can be paused and resumed.
@@ -44,43 +44,55 @@ export function createClock({ onTick, onExpire }) {
   };
 }
 
-// The clock shown to everyone: a small banner at the top of the screen, kept
-// above any open card (the browser's top layer) where popovers are supported.
-let pill = null;
-export function showClockPill(p, secondsLeft, { paused = false } = {}) {
-  if (!pill) {
-    pill = document.createElement('div');
-    pill.className = 'turn-clock';
-    pill.setAttribute('role', 'timer');
-    pill.setAttribute('aria-live', 'off');
-    if (pill.showPopover) pill.popover = 'manual';
-    document.body.appendChild(pill);
-  }
+// The clock on screen. It lives in the interface, not on top of it: in every
+// [data-clock-slot] (the top bar of the shared screen, the header of a
+// player's own device) and, while a choice is open, as a tab on the top edge
+// of that dialog so it is never hidden behind it.
+function chip(p, secondsLeft, paused) {
   const s = Math.ceil(secondsLeft);
-  const urgent = s <= C.turnTimer.warnAt;
-  pill.classList.toggle('urgent', urgent && !paused);
-  pill.classList.toggle('paused', paused);
-  pill.style.setProperty('--house', p.color);
-  pill.style.setProperty('--frac', String(Math.max(0, Math.min(1, secondsLeft / C.turnTimer.seconds))));
-  const html = `${crestSvg(p, 16)} <span class="who">${esc(p.name)}</span> <span class="secs">${paused ? '⏸' : '⏳'} ${s}s</span>`;
-  if (pill.dataset.html !== html) { pill.innerHTML = html; pill.dataset.html = html; }
-  pill.setAttribute('aria-label', `${p.name}: ${s} seconds left${paused ? ' (paused)' : ''}`);
-  raise();
+  const urgent = s <= C.turnTimer.warnAt && !paused;
+  const frac = Math.max(0, Math.min(1, secondsLeft / C.turnTimer.seconds));
+  return {
+    cls: `turn-clock${urgent ? ' urgent' : ''}${paused ? ' paused' : ''}`,
+    frac: frac.toFixed(3),
+    html: `${crestSvg(p, 16)}<span class="secs">${paused ? '⏸' : '⏳'} ${s}s</span>`,
+    label: `${p.name}: ${s} seconds left${paused ? ' (paused)' : ''}`,
+  };
+}
+function fill(el, c, extra = '') {
+  el.className = c.cls + extra;
+  el.style.setProperty('--frac', c.frac);
+  if (el.dataset.html !== c.html) { el.innerHTML = c.html; el.dataset.html = c.html; }
+  el.setAttribute('aria-label', c.label);
+}
+
+export function showClockPill(p, secondsLeft, { paused = false } = {}) {
+  const c = chip(p, secondsLeft, paused);
+  for (const slot of document.querySelectorAll('[data-clock-slot]')) {
+    let el = slot.querySelector('.turn-clock');
+    if (!el) {
+      el = document.createElement('span');
+      el.setAttribute('role', 'timer');
+      slot.appendChild(el);
+    }
+    el.style.setProperty('--house', p.color);
+    fill(el, c);
+  }
+  // A choice is open and the clock is running: show it on that dialog too.
+  const top = paused ? null : [...document.querySelectorAll('dialog[open]')].at(-1);
+  const frame = top?.querySelector(':scope > .frame');
+  for (const old of document.querySelectorAll('.turn-clock.in-dialog')) if (old.parentElement !== frame) old.remove();
+  if (frame) {
+    let el = frame.querySelector(':scope > .turn-clock.in-dialog');
+    if (!el) {
+      el = document.createElement('span');
+      el.setAttribute('role', 'timer');
+      frame.appendChild(el);
+    }
+    el.style.setProperty('--house', p.color);
+    fill(el, c, ' in-dialog');
+  }
 }
 export function hideClockPill() {
-  if (!pill) return;
-  try { pill.hidePopover?.(); } catch { /* not shown */ }
-  pill.remove();
-  pill = null;
-}
-// Cards open as modal dialogs in the top layer; showing the popover again
-// puts the clock back above the newest one.
-let raisedOver = null;
-function raise() {
-  if (!pill?.showPopover) return;
-  const top = [...document.querySelectorAll('dialog[open]')].at(-1) ?? null;
-  if (pill.matches(':popover-open') && top === raisedOver) return;
-  try { pill.hidePopover(); } catch { /* not shown yet */ }
-  try { pill.showPopover(); } catch { /* ignore */ }
-  raisedOver = top;
+  document.querySelectorAll('.turn-clock').forEach((el) => el.remove());
 }
