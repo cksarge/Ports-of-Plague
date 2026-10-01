@@ -125,7 +125,7 @@
   "timing": {
     "note": "Seconds for players at a decent pace (see tools/simulate.js).",
     "secondsPerAction": 10,
-    "secondsPerShipResult": 3,
+    "secondsPerShipResult": 2.5,
     "secondsPerDecision": 6,
     "secondsPerFortuneCard": 10,
     "secondsPerTurnChange": 5,
@@ -135,7 +135,7 @@
     "secondsPerPlagueCard": 15,
     "secondsPerQuietPlague": 2,
     "secondsSetup": 60,
-    "shipResultAutoCloseMs": 2500
+    "shipResultAutoCloseMs": 2000
   },
   "keyboard": {
     "ship": "1",
@@ -230,9 +230,9 @@
     "standard": {
       "2": 28,
       "3": 36,
-      "4": 45,
+      "4": 44,
       "5": 52,
-      "6": 60
+      "6": 59
     },
     "quick": {
       "2": 13,

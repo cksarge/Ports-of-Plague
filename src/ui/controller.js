@@ -262,6 +262,7 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
     const parts = [];
     parts.push(`<header class="ctl-bar" style="--house:${p.color}">${crestSvg(p, 28)}
       <span class="ctl-name"><strong>${esc(p.name)}</strong><small>${info ? `${esc(info.label)} · Round ${roundNumber(state)} of ${totalRounds(state)}` : 'Prologue'}</small></span>
+      <span class="clock-slot" data-clock-slot></span>
       <span class="ctl-room">Room ${esc(conn.code)}</span></header>
       <nav class="ctl-tools" aria-label="Look things up">
         <button class="btn small" id="ctl-rules">Rules</button>
@@ -280,6 +281,7 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
         <div class="dialog-actions"><button class="btn primary" id="ctl-leave">Back to the menu</button></div></section>
         <section class="panel"><h2>What Really Happened</h2>${noteHtml(DATA.timeline.epilogue.factIds, 'The real history')}</section>`);
       app.innerHTML = `<div class="controller">${parts.join('')}</div>`;
+    tickClock(); // the header was redrawn: put the turn clock back at once
       bindTools();
       $('#ctl-leave', app).onclick = leave;
       return;
@@ -319,6 +321,7 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
 
     const focused = document.activeElement?.id;
     app.innerHTML = `<div class="controller">${parts.join('')}</div>`;
+    tickClock(); // the header was redrawn: put the turn clock back at once
     bindTools();
     placeWaitMap(state);
     $('#ctl-next', app)?.addEventListener('click', pressNext);

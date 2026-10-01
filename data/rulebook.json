@@ -34,7 +34,7 @@
         {
           "type": "list",
           "items": [
-            "**The map**: 35 real cities, from Dublin and Edinburgh to Gibraltar, Cairo, Damascus and Tana, joined by sea routes (solid lines) and land routes (dashed lines). Each route shows its base value.",
+            "**The map**: 45 real cities, from Lisbon, Dublin and Oslo to Cairo, Aleppo, Trebizond and Pskov, joined by sea routes (solid lines) and land routes (dashed lines). Each route shows its base value.",
             "**City markers**: *Safe* (plain). *Safe* cities can also be *Threatened* (dashed orange ring: a neighbouring city is Stricken). *Stricken* cities have a red ring, a hatched centre and 1–3 severity pips; *Aftermath* cities have a grey ring and a ❦ mark.",
             "**House crests**: each player has a color and a shape (circle, square, triangle, diamond, hexagon or star). A banner by a city is a trading post; the number on it shows how many family members live there.",
             "**Dice**: turn-order, profit, contagion, severity and mortality dice, all rolled by the computer with animation.",
@@ -203,8 +203,8 @@
             "**Event cards** are drawn one per round from a shuffled deck of 34 (none in the pre-plague rounds), so each game is different. Some affect every house; some fall on one house chosen at random.",
             "**Fortune cards** are personal. You draw one whenever you roll a {{fortune.drawOnProfitDie}} on the profit die or open a new trading post: spice cargoes, extra action points, free posts, warnings of where the plague goes next, but also demanding workers, illness and nervous creditors.",
             "**Offers** (\"Buy a Book of Hours?\") are accepted or declined at the start of your turn (Fortune offers at once). Some offers are traps from history: the remedy seller's cure does nothing.",
-            "**Wage laws.** If you own a post in London or Melcombe Regis, choose: **Obey** (+{{wageLaw.obeyReputation}} reputation, but your English posts cannot ship this round, because workers refuse the old wages) or **Pay market wages** (roll a die: on 1–{{wageLaw.fineMaxRoll}} you are fined {{wageLaw.fine}}ƒ). The real laws failed to hold wages down {{fact:EC-07}}.",
-            "**Persecution.** The game shows the persecution of Jewish communities because it really happened, and because the accusations were **false** and the violence **unjust** {{fact:SO-07}} {{fact:SO-09}}. When it appears, any house may **Protect the Community** for {{costs.protectCommunity}}ƒ and 1 AP at the start of its turn, gaining {{gains.protectReputation}} reputation. No house can ever gain anything from persecution. Whatever players choose, the city suffers unrest: shipments to or from it earn {{penalties.unrestProfit}} less for {{penalties.unrestRounds}} rounds. Pope Clement VI condemned the accusations, but his words had little effect far from Avignon {{fact:SO-08}}."
+            "**Wage laws.** If you own a post in England (London, Melcombe Regis, Bristol or York), choose: **Obey** (+{{wageLaw.obeyReputation}} reputation, but your English posts cannot ship this round, because workers refuse the old wages) or **Pay market wages** (roll a die: on 1–{{wageLaw.fineMaxRoll}} you are fined {{wageLaw.fine}}ƒ). The real laws failed to hold wages down {{fact:EC-07}}.",
+            "**Persecution.** The game shows the persecution of Jewish communities because it really happened, and because the accusations were **false** and the violence **unjust** {{fact:SO-07}} {{fact:SO-09}}. When it appears, any house may **Protect the Community** for {{costs.protectCommunity}}ƒ and 1 AP at the start of its turn, gaining {{gains.protectReputation}} reputation. No house can ever gain anything from persecution. Whatever players choose, the city suffers unrest: shipments to or from it earn {{penalties.unrestProfit}} less for {{penalties.unrestRounds}} half-years. Pope Clement VI condemned the accusations, but his words had little effect far from Avignon {{fact:SO-08}}."
           ]
         }
       ]
@@ -244,7 +244,7 @@
         },
         {
           "type": "p",
-          "text": "**Comebacks.** From round {{comeback.guildFavorFromRound}} on (counted in half-years), a house in last place that trails the leader by {{comeback.guildFavorMinGap}} or more Legacy points receives **Guild's Favor**: +{{comeback.guildFavorAP}} AP. Inheritance, the Survivors Marry chronicle, weddings, loans and cheaper charity also help houses that fall behind."
+          "text": "**Comebacks.** From Late 1349 on (half-year {{comeback.guildFavorFromRound}} of the plague years), a house in last place that trails the leader by {{comeback.guildFavorMinGap}} or more Legacy points receives **Guild's Favor**: +{{comeback.guildFavorAP}} AP. Inheritance, the Survivors Marry chronicle, weddings, loans and cheaper charity also help houses that fall behind."
         }
       ]
     },

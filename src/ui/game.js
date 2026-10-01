@@ -72,6 +72,7 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
       <div class="date-banner" id="date"></div>
       <div class="timeline" id="timeline" aria-hidden="true"></div>
       <div class="turn-indicator" id="turn" aria-live="polite"></div>
+      <div class="clock-slot ${state.turnSeconds ? 'on' : ''}" data-clock-slot></div>
       <span class="spacer"></span>
       <div class="tools">
         <button class="btn small" id="btn-rules">Rules <span class="key">R</span></button>
@@ -385,7 +386,7 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
     $('#timeline', app).innerHTML = [...pre, ...main].map(({ r, last, icon }) => {
       const cls = last.round < state.round ? 'done' : r.round <= state.round && state.round <= last.round ? 'now' : '';
       const title = last !== r ? `${r.label} – ${last.label}` : r.label;
-      return `<span class="${cls}${icon === '⚓' ? ' pre' : ''}" title="${esc(title)}">${icon}</span>`;
+      return `<span class="${cls}${icon === '⚓' ? ' pre' : ''}${icon === '⚓' && last.round === 0 ? ' pre-last' : ''}" title="${esc(title)}${icon === '⚓' ? ' (before the plague)' : ''}">${icon}</span>`;
     }).join('');
     const p = player();
     $('#turn', app).innerHTML = p ? `${crestSvg(p, 20)} ${esc(p.name)}'s turn${p.bot ? ' <small>(bot)</small>' : ''}` : esc(phaseName);

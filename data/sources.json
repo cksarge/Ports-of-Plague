@@ -276,6 +276,32 @@
       "type": "peer-reviewed article",
       "mla": "Álvarez-Nogal, Carlos, et al. \"Economic Effects of the Black Death: Spain in European Perspective.\" *Investigaciones de Historia Económica*, vol. 16, no. 4, 2020, pp. 35–48, doi.org/10.33231/j.ihe.2020.10.001. Accessed 29 Sept. 2026.",
       "url": "https://doi.org/10.33231/j.ihe.2020.10.001"
+    },
+    {
+      "id": "tsiamis",
+      "type": "peer-reviewed article",
+      "mla": "Tsiamis, Costas, et al. \"Epidemic Waves of the Black Death in the Byzantine Empire (1347–1453 AD).\" *Le Infezioni in Medicina*, vol. 19, no. 3, 2011, pp. 194–201, www.infezmed.it/media/journal/Vol_19_3_2011_10.pdf. Accessed 1 Oct. 2026.",
+      "url": "https://www.infezmed.it/media/journal/Vol_19_3_2011_10.pdf"
+    },
+    {
+      "id": "coelho",
+      "type": "peer-reviewed article",
+      "mla": "Coelho, Maria Helena da Cruz. \"The First Portuguese Parliamentary Debate after the Black Death of 1348: The Lisbon Cortes of 1352.\" *Parliaments, Estates and Representation*, vol. 44, no. 2, 2024, pp. 109–19, doi.org/10.1080/02606755.2023.2292933. Accessed 1 Oct. 2026.",
+      "url": "https://doi.org/10.1080/02606755.2023.2292933",
+      "note": "Abstract."
+    },
+    {
+      "id": "ibn-al-wardi",
+      "type": "primary source",
+      "mla": "Ibn al-Wardi. \"On the Advance of the Plague,\" 1348. In Joseph Patrick Byrne, *Daily Life during the Black Death*, Greenwood Press, 2006, pp. 260–61. W. W. Norton coursepack, d1lexza0zk46za.cloudfront.net/coursepacks/history/worlds5/docs/alwardi.pdf. Accessed 1 Oct. 2026.",
+      "url": "https://d1lexza0zk46za.cloudfront.net/coursepacks/history/worlds5/docs/alwardi.pdf"
+    },
+    {
+      "id": "exeter-wardi",
+      "type": "university publication",
+      "mla": "University of Exeter. \"This 14th Century Story Fooled the World about the Black Death.\" *ScienceDaily*, 11 Nov. 2025, www.sciencedaily.com/releases/2025/11/251111005957.htm. Accessed 1 Oct. 2026.",
+      "url": "https://www.sciencedaily.com/releases/2025/11/251111005957.htm",
+      "note": "Reports on Omar and Fancy, \"Mamluk Maqāmas on the Black Death,\" Journal of Arabic and Islamic Studies, 2025."
     }
   ]
 }

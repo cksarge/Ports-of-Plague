@@ -2,9 +2,9 @@
 
 *An educational board game about the Black Death, 1347–1353, played in a web browser by 1–6 players (computer "bots" can play any house), sharing one computer or each on their own phone, tablet or computer.*
 
-Each player leads a merchant family in a real trading city. Ship goods along historical trade routes for profit, but every ship can carry the plague. The plague reaches each of the 35 cities on the map, from Dublin and Gibraltar to Cairo, Damascus and Tana, in the half-year it really did. Protect your family, keep your good name, and face the choices people faced then. The highest **Legacy** (Wealth + Family + Reputation + your weakest one again) in 1353 wins. The map zooms with the mouse wheel, a trackpad pinch, two fingers on a touch screen or the **+ / −** buttons, and you drag to move around it.
+Each player leads a merchant family in a real trading city. Ship goods along historical trade routes for profit, but every ship can carry the plague. The plague reaches each of the 45 cities on the map, from Lisbon, Dublin and Oslo to Cairo, Aleppo, Trebizond and Pskov, in the half-year it really did. Protect your family, keep your good name, and face the choices people faced then. The highest **Legacy** (Wealth + Family + Reputation + your weakest one again) in 1353 wins. The map zooms with the mouse wheel, a trackpad pinch, two fingers on a touch screen or the **+ / −** buttons, and you drag to move around it.
 
-- **Standard** game: 12 rounds of half a year (about 28 / 36 / 45 minutes for 2 / 3 / 4 players).
+- **Standard** game: 12 rounds of half a year (about 28 / 36 / 44 minutes for 2 / 3 / 4 players).
 - **Quick Play**: 4 rounds of a year and a half (about 13 / 17 / 20 minutes for 2 / 3 / 4 players at a steady pace; recommended for 5–6 players).
 - **Pre-plague rounds** (on by default): 2 extra rounds in the standard game, 1 in Quick Play, set in 1346–47 before the plague sails west. No Event card, no plague, and trading posts cost 3ƒ less, so houses can set up their trade first.
 - **Turn timer** (on by default): 30 seconds per turn, paused while cards and dice are on screen. When it runs out, waiting cards are declined and the next house plays.
@@ -86,7 +86,7 @@ Printable Documents (PDF)/  ← Rule Book, Research Sheet, presentation outline
 data/                  ← single source of truth for the game's content
   facts.json           85 historical facts, each with sources and a supporting quote
   sources.json         37 sources with MLA citations and links
-  cities.json          35 cities: coordinates, real plague arrival dates, facts
+  cities.json          45 cities: coordinates, real plague arrival dates, facts
   routes.json          40 sea and land routes
   events.json          24 dated Chronicle cards, 34 Event cards, 22 Fortune cards
   timeline.json        the 12 rounds (half-years), 2 pre-plague half-years, prologue and epilogue
@@ -130,7 +130,7 @@ The site is served straight from the `main` branch (Settings → Pages → Deplo
 
 ## Credits
 
-- **History:** see the Research Sheet for all 45 sources (Britannica, *Nature*, *PNAS*, *Emerging Infectious Diseases*, *The Economic History Review*, university sites, and primary sources such as Boccaccio, Guy de Chauliac and Jean de Venette).
+- **History:** see the Research Sheet for all 49 sources (Britannica, *Nature*, *PNAS*, *Emerging Infectious Diseases*, *The Economic History Review*, university sites, and primary sources such as Boccaccio, Guy de Chauliac and Jean de Venette).
 - **Map:** coastlines, rivers and lakes from [Natural Earth](https://www.naturalearthdata.com/) (public domain).
 - **Fonts:** EB Garamond, Cinzel and UnifrakturMaguntia, all under the SIL Open Font License (see `assets/licenses/`).
 - **Music:** by Kevin MacLeod ([incompetech.com](https://incompetech.com)), licensed under [Creative Commons: By Attribution 4.0](http://creativecommons.org/licenses/by/4.0/): "The Britons" (title screen), "Lord of the Land", "Ancient Rite" and "The Pyre" (trading, early to late years), "Rites" (plague phases) and "Teller of the Tales" (final scores). See `assets/licenses/music-credits.txt`. Computers play the full-quality files in `assets/music/`; phones and tablets play smaller copies (AAC, 96 kbps) from `assets/music/mobile/`, made with `npm run music` (macOS). If the music files cannot be loaded, the game plays its own music, generated live in the browser.

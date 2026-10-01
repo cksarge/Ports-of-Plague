@@ -201,7 +201,7 @@
       ],
       "severityMod": 0,
       "home": {
-        "startFlorins": -12,
+        "startFlorins": -15,
         "startReputation": 0,
         "quickStartFlorins": 2
       },
@@ -284,7 +284,7 @@
       ],
       "severityMod": 1,
       "home": {
-        "startFlorins": 21,
+        "startFlorins": 23,
         "startReputation": 1,
         "quickStartFlorins": 15
       },
@@ -442,7 +442,7 @@
       "home": {
         "startFlorins": 9,
         "startReputation": 0,
-        "quickStartFlorins": 10
+        "quickStartFlorins": 13
       },
       "map": {
         "label": "above"
@@ -592,7 +592,7 @@
       ],
       "severityMod": 0,
       "home": {
-        "startFlorins": 13,
+        "startFlorins": 19,
         "startReputation": 0,
         "quickStartFlorins": 10
       },
@@ -868,6 +868,233 @@
       "map": {
         "dy": -6,
         "label": "right"
+      }
+    },
+    {
+      "id": "thessalonica",
+      "name": "Thessalonica",
+      "modern": "Thessaloniki, Greece",
+      "lat": 40.64,
+      "lon": 22.94,
+      "region": "Byzantine Empire",
+      "arrival": {
+        "round": 1,
+        "dateText": "1347",
+        "factIds": [
+          "CI-20"
+        ]
+      },
+      "factIds": [
+        "CI-20",
+        "ME-17"
+      ],
+      "severityMod": 0,
+      "map": {
+        "label": "above"
+      }
+    },
+    {
+      "id": "candia",
+      "name": "Candia",
+      "modern": "Heraklion, Crete, Greece",
+      "lat": 35.34,
+      "lon": 25.13,
+      "region": "Crete (Venetian)",
+      "arrival": {
+        "round": 1,
+        "dateText": "1347",
+        "factIds": [
+          "CI-20"
+        ]
+      },
+      "factIds": [
+        "CI-20",
+        "TR-13"
+      ],
+      "severityMod": 0,
+      "map": {
+        "label": "below"
+      }
+    },
+    {
+      "id": "trebizond",
+      "name": "Trebizond",
+      "modern": "Trabzon, Turkey",
+      "lat": 41.0,
+      "lon": 39.72,
+      "region": "Empire of Trebizond",
+      "arrival": {
+        "round": 1,
+        "dateText": "1347",
+        "factIds": [
+          "CI-20"
+        ]
+      },
+      "factIds": [
+        "CI-20",
+        "TR-13"
+      ],
+      "severityMod": 0,
+      "map": {
+        "label": "below"
+      }
+    },
+    {
+      "id": "famagusta",
+      "name": "Famagusta",
+      "modern": "Famagusta, Cyprus",
+      "lat": 35.12,
+      "lon": 33.94,
+      "region": "Kingdom of Cyprus",
+      "arrival": {
+        "round": 2,
+        "dateText": "1348 (the ports of Cyprus)",
+        "factIds": [
+          "CI-20"
+        ]
+      },
+      "factIds": [
+        "CI-20",
+        "TR-13"
+      ],
+      "severityMod": 0,
+      "map": {
+        "label": "right"
+      }
+    },
+    {
+      "id": "aleppo",
+      "name": "Aleppo",
+      "modern": "Aleppo, Syria",
+      "lat": 36.2,
+      "lon": 37.16,
+      "region": "Mamluk Sultanate (Syria)",
+      "arrival": {
+        "round": 3,
+        "dateText": "1348 (Ibn al-Wardi wrote of it there in 1348/9)",
+        "factIds": [
+          "CI-21"
+        ]
+      },
+      "factIds": [
+        "CI-21"
+      ],
+      "severityMod": 0,
+      "map": {
+        "label": "right"
+      }
+    },
+    {
+      "id": "lisbon",
+      "name": "Lisbon",
+      "modern": "Lisbon, Portugal",
+      "lat": 38.72,
+      "lon": -9.14,
+      "region": "Kingdom of Portugal",
+      "arrival": {
+        "round": 3,
+        "dateText": "Second half of 1348 (Portugal)",
+        "factIds": [
+          "EC-12"
+        ]
+      },
+      "factIds": [
+        "EC-12"
+      ],
+      "severityMod": 0,
+      "map": {
+        "label": "right"
+      }
+    },
+    {
+      "id": "oslo",
+      "name": "Oslo",
+      "modern": "Oslo, Norway",
+      "lat": 59.91,
+      "lon": 10.75,
+      "region": "Norway",
+      "arrival": {
+        "round": 3,
+        "dateText": "Autumn 1348",
+        "factIds": [
+          "TR-14"
+        ]
+      },
+      "factIds": [
+        "TR-14"
+      ],
+      "severityMod": 0,
+      "map": {
+        "label": "right"
+      }
+    },
+    {
+      "id": "buda",
+      "name": "Buda",
+      "modern": "Budapest, Hungary",
+      "lat": 47.5,
+      "lon": 19.04,
+      "region": "Kingdom of Hungary",
+      "arrival": {
+        "round": 4,
+        "dateText": "1349 (Hungary)",
+        "factIds": [
+          "TL-02"
+        ]
+      },
+      "factIds": [
+        "TL-02",
+        "CI-22"
+      ],
+      "severityMod": 0,
+      "map": {
+        "label": "right"
+      }
+    },
+    {
+      "id": "elbing",
+      "name": "Elbing",
+      "modern": "Elbląg, Poland",
+      "lat": 54.16,
+      "lon": 19.4,
+      "region": "Prussia",
+      "arrival": {
+        "round": 5,
+        "dateText": "24 August 1349",
+        "factIds": [
+          "TR-14"
+        ]
+      },
+      "factIds": [
+        "TR-14",
+        "CI-22"
+      ],
+      "severityMod": 0,
+      "map": {
+        "label": "right"
+      }
+    },
+    {
+      "id": "pskov",
+      "name": "Pskov",
+      "modern": "Pskov, Russia",
+      "lat": 57.82,
+      "lon": 28.33,
+      "region": "Pskov (Novgorod lands)",
+      "arrival": {
+        "round": 9,
+        "dateText": "Just before winter 1351; full outbreak spring 1352",
+        "factIds": [
+          "CI-22"
+        ]
+      },
+      "factIds": [
+        "CI-22",
+        "TR-10"
+      ],
+      "severityMod": 0,
+      "map": {
+        "label": "left"
       }
     }
   ]

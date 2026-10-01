@@ -18,7 +18,8 @@ h2 { font-size: 11.5pt; color: var(--red); margin: 0.75em 0 0.25em; border-botto
 h3 { font-size: 10pt; margin: 0.6em 0 0.2em; }
 p { margin: 0 0 0.45em; }
 ul, ol { margin: 0 0 0.45em; padding-left: 1.15em; }
-li { margin-bottom: 0.18em; }
+li { margin-bottom: 0.18em; break-inside: avoid; }
+p { orphans: 3; widows: 3; }
 table { width: 100%; border-collapse: collapse; margin: 0.3em 0 0.5em; font-size: 9.5pt; }
 th, td { border: 0.5pt solid #b99a5b; padding: 2.5pt 4pt; text-align: left; vertical-align: top; }
 thead th { background: #efe2bf; font-family: 'Cinzel', serif; font-size: 8.5pt; }

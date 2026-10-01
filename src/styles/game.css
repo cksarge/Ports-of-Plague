@@ -150,7 +150,8 @@ a { color: var(--lapis); }
 .timeline span { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--gold-bright); background: #3a0806; display: grid; place-items: center; font-size: 10px; color: var(--gold-light); }
 .timeline span.done { background: var(--gold); }
 .timeline span.now { background: var(--gold-light); color: #5c0d09; box-shadow: 0 0 10px var(--gold-light); transform: scale(1.2); }
-.timeline span.pre { border-style: dashed; }
+/* Pre-plague rounds: the same circles, set a little apart from the plague years. */
+.timeline span.pre-last { margin-right: 7px; }
 .turn-indicator { display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0.9rem; border-radius: 999px; border: 2px solid var(--gold-bright); background: rgba(255, 248, 226, 0.95); color: var(--ink); font-weight: 600; white-space: nowrap; }
 .topbar .spacer { flex: 1; }
 .topbar .tools { display: flex; gap: 0.35rem; flex-wrap: nowrap; }
@@ -422,6 +423,7 @@ button.choice:hover:not(:disabled) { border-color: var(--gold-bright); border-le
 .lobby { margin: 0.6rem 0 1rem; }
 .lobby > h3 { margin-top: 1rem; }
 .room-code-box { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6rem 1.2rem; padding: 0.8rem 1rem; border-radius: var(--radius); background: linear-gradient(#8f1a12, #5c0d09); color: #fbe9c0; border: 3px solid var(--gold-bright); }
+.room-code-box > div:first-child { font-size: clamp(1.15rem, 2.6vw, 1.9rem); line-height: 1.25; }
 .room-code-box strong { color: var(--gold-light); overflow-wrap: anywhere; }
 .room-code { font-family: var(--caps); font-weight: 800; font-size: clamp(2.6rem, 11vw, 4.6rem); letter-spacing: 0.18em; line-height: 1; color: #fff6e0; text-shadow: 0 3px 0 #3a0806; }
 .join-box { max-width: 560px; width: 100%; }
@@ -523,20 +525,25 @@ body.big-screen .plague-grid { display: grid; grid-template-columns: repeat(auto
 .option-checks .check small { display: block; color: var(--ink-soft); font-size: 0.85rem; line-height: 1.3; }
 
 /* ---------- Turn timer ---------- */
+/* A chip in the top bar (shared screen) or the header (a player's device),
+   and a tab on the top edge of an open choice. The fill drains as time runs out. */
+.clock-slot { display: flex; align-items: center; }
+.topbar .clock-slot.on { min-width: 6.8rem; }
+.topbar .turn-clock { min-height: 2.5rem; }
 .turn-clock {
-  position: fixed; inset: 5.3rem auto auto 1.2rem; margin: 0; z-index: 1000;
-  display: flex; align-items: center; gap: 0.45rem; padding: 0.3rem 0.9rem 0.35rem; border-radius: 999px;
-  border: 2px solid var(--house, var(--gold-bright)); color: var(--ink); font-weight: 600; white-space: nowrap;
-  background: linear-gradient(90deg, rgba(243, 210, 122, 0.95) calc(var(--frac, 1) * 100%), rgba(255, 248, 226, 0.97) 0);
-  box-shadow: var(--shadow); pointer-events: none; font-size: 1rem;
+  display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.75rem; border-radius: 999px;
+  border: 2px solid var(--gold-bright); color: var(--ink); font-weight: 600; white-space: nowrap; line-height: 1.2;
+  background: linear-gradient(90deg, var(--gold-light) calc(var(--frac, 1) * 100%), rgba(255, 248, 226, 0.95) 0);
 }
-.turn-clock .secs { font-family: var(--caps); font-variant-numeric: tabular-nums; min-width: 3.4em; text-align: right; }
-.turn-clock .who { max-width: 40vw; overflow: hidden; text-overflow: ellipsis; }
-.turn-clock.paused { opacity: 0.8; }
-.turn-clock.urgent { border-color: var(--vermilion); color: #fff; background: linear-gradient(90deg, var(--vermilion) calc(var(--frac, 1) * 100%), var(--crimson) 0); animation: clock-pulse 1s ease-in-out infinite; }
-@keyframes clock-pulse { 50% { transform: scale(1.06); } }
+.turn-clock .crest { flex: none; }
+.turn-clock .secs { font-family: var(--caps); font-variant-numeric: tabular-nums; min-width: 3.2em; text-align: right; }
+.turn-clock.paused { opacity: 0.75; }
+.turn-clock.urgent { border-color: var(--gold-light); color: #fff; background: linear-gradient(90deg, var(--vermilion) calc(var(--frac, 1) * 100%), #3a0806 0); animation: clock-pulse 1s ease-in-out infinite; }
+@keyframes clock-pulse { 50% { scale: 1.06; } }
 @media (prefers-reduced-motion: reduce) { .turn-clock.urgent { animation: none; } }
-.turn-clock[popover] { inset: 5.3rem auto auto 1.2rem; }
+.ctl-bar .turn-clock { font-size: 0.85rem; padding: 0.1rem 0.5rem; gap: 0.25rem; }
+.ctl-bar .turn-clock .secs { min-width: 0; }
+.turn-clock.in-dialog { position: absolute; top: 0; left: 50%; translate: -50% -55%; z-index: 3; border-color: #8a6a36; box-shadow: 0 2px 8px rgba(10, 5, 0, 0.4); }
 
 /* ---------- Several Chronicle cards on one page ---------- */
 .chronicle-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0.8rem; align-items: start; }

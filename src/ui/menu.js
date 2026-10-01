@@ -78,7 +78,7 @@ export function renderMenu(app, { onNew, onContinue, onJoin }) {
           <button class="btn small" id="menu-music" aria-pressed="${isMusicOn()}">${isMusicOn() ? '🎵 Music on' : '🎵 Music off'}</button>
         </div>
       </div>
-      <p class="menu-foot">1–${C.players.max} players (bots can play any house) on one device or each on their own · about ${C.timeEstimates.quick['2']}–${C.timeEstimates.standard['6']} minutes · touch, mouse or keyboard</p>
+      <p class="menu-foot">1–${C.players.max} players (bots can play any house) on one device or each on their own · about ${Math.round(C.timeEstimates.quick['2'] / 5) * 5}–${Math.round(C.timeEstimates.standard['6'] / 5) * 5} minutes · touch, mouse or keyboard</p>
     </div></section>`;
   stopTitle = titleBackdrop($('#title-map', app));
   music.setMood('menu');
