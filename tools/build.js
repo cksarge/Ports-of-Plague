@@ -11,8 +11,9 @@ const root = new URL('..', import.meta.url);
 const read = (p) => readFileSync(new URL(p, root), 'utf8');
 
 // The MIT licenses of the bundled libraries (the Supabase realtime client used
-// for multi-device play) travel with the code, at the top of the script.
-const notices = ['MIT-supabase-realtime-js.txt', 'MIT-supabase-phoenix.txt']
+// for multi-device play, and roll-a-die, the base of the 3D dice) travel with
+// the code, at the top of the script.
+const notices = ['MIT-supabase-realtime-js.txt', 'MIT-supabase-phoenix.txt', 'MIT-roll-a-die.txt']
   .map((f) => read(`assets/licenses/${f}`).trim()).join('\n\n---\n\n').replace(/\*\//g, '* /');
 const result = await build({
   entryPoints: [fileURLToPath(new URL('src/ui/main.js', root))],
