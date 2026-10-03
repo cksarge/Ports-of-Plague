@@ -12,11 +12,13 @@ import { createMap, updateMap, redrawStains } from './map.js';
 import { showClockPill, hideClockPill } from './clock.js';
 import { noteHtml } from './notes.js';
 import { sfx } from './sound.js';
+import { music } from './music.js';
 import { joinRoom } from '../net/client.js';
 import { netAvailable } from '../net/transport.js';
 import { isRoomCode, normalizeRoomCode, CODE_LENGTH, LOBBY, STATE, TOAST, REJECT, CLOSED, JOIN, ACT, DECIDE, END, NEXT } from '../net/protocol.js';
 
-export function renderJoin(app, { onBack, code: preset = '' }) {
+export function renderJoin(app, { onBack: toMenu, code: preset = '' }) {
+  const onBack = () => { music.setHushed(false); toMenu(); };
   app.onkeydown = null; // the title screen's R-for-Rules shortcut is not for this screen
   let conn = null;
   let screen = 'code';     // code → connecting → house → lobby → game
@@ -108,6 +110,8 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
   }
 
   function onMessage(m) {
+    // In a room, the music comes from the big screen only.
+    if (m.t === LOBBY || m.t === STATE) music.setHushed(true);
     if (m.t === LOBBY) {
       lobby = m;
       if (me() >= 0) drawLobby();

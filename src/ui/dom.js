@@ -9,25 +9,31 @@ export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 let dialogDepth = 0;
 export const dialogOpen = () => dialogDepth > 0;
 
+// Builds a <dialog> and adds it to the page, not yet shown.
+export function buildDialog(html, { wide = false, side = false, label = 'Dialog' } = {}) {
+  const d = document.createElement('dialog');
+  if (wide) d.classList.add('wide');
+  if (side) d.classList.add('side');
+  d.setAttribute('aria-label', label);
+  d.innerHTML = html;
+  // Keep the decorated border fixed: the content scrolls inside it.
+  const frame = d.querySelector(':scope > .frame');
+  if (frame) {
+    const inner = document.createElement('div');
+    inner.className = 'frame-scroll';
+    while (frame.firstChild) inner.appendChild(frame.firstChild);
+    frame.appendChild(inner);
+  }
+  document.body.appendChild(d);
+  return d;
+}
+
 // Opens a modal <dialog>. Any element with [data-value] closes it and
 // resolves the promise with that value. Returns a promise.
 // options: { wide, dismissable (Esc/backdrop allowed), label, onMount(dialog, close) }
-export function openDialog(html, { wide = false, side = false, dismissable = true, label = 'Dialog', onMount } = {}) {
+export function openDialog(html, { dismissable = true, onMount, ...look } = {}) {
   return new Promise((resolve) => {
-    const d = document.createElement('dialog');
-    if (wide) d.classList.add('wide');
-    if (side) d.classList.add('side');
-    d.setAttribute('aria-label', label);
-    d.innerHTML = html;
-    // Keep the decorated border fixed: the content scrolls inside it.
-    const frame = d.querySelector(':scope > .frame');
-    if (frame) {
-      const inner = document.createElement('div');
-      inner.className = 'frame-scroll';
-      while (frame.firstChild) inner.appendChild(frame.firstChild);
-      frame.appendChild(inner);
-    }
-    document.body.appendChild(d);
+    const d = buildDialog(html, look);
     dialogDepth++;
     let done = false;
     const close = (value) => {

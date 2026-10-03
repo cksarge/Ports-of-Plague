@@ -9,7 +9,7 @@
 // body: the card without its buttons · button: the big screen's button label
 // opts: openDialog options · mount: the dice animation (big screen only)
 // still: draw the finished dice straight away (a device reading the card).
-import { DATA, CITIES } from '../data.js';
+import { DATA, CITIES, FACTS } from '../data.js';
 import { C, cardById, fortuneById, severityName, roundInfo, roundNumber, totalRounds, modeOf, difficultyOf, halfInfo } from '../engine/index.js';
 import { esc, crestSvg } from './dom.js';
 import { dieHtml, rollDice, holdDice } from './dice.js';
@@ -31,6 +31,67 @@ export function chroniclePages(groups, per = 4) {
   return Array.from({ length: pages }, (_, i) => ({ groups: groups.slice(i * size, (i + 1) * size), page: i + 1, pages }));
 }
 
+// Deals `items` out in order over n pages of about equal size.
+export function share(items, n) {
+  const out = [];
+  for (let i = 0; i < n; i++) out.push(items.slice(Math.round((i * items.length) / n), Math.round(((i + 1) * items.length) / n)));
+  return out.filter((part) => part.length);
+}
+const numbered = (pages) => pages.map((page, i) => ({ ...page, page: i + 1, pages: pages.length }));
+const pageOf = (page, pages) => (pages > 1 ? ` <small>(${page} of ${pages})</small>` : '');
+const knownFacts = (ids) => [...new Set(ids ?? [])].filter((id) => FACTS[id]);
+const factUnits = (ids) => knownFacts(ids).map((fact) => ({ fact }));
+const factsIn = (part) => part.filter((u) => u.fact).map((u) => u.fact);
+
+// Long cards can be dealt out over several cards (the big screen does this
+// when a card would otherwise have to shrink: see game.js). Returns
+//   { units, make(parts), fallback }
+// units: the pieces of the card, in order (rows, dice trays, historical
+// facts) · make: the card data for pages holding the given lists of units ·
+// fallback: the pages where cards can scroll. Null for a card that is always
+// one card.
+export function splitStory(kind, data, { hints } = {}) {
+  if ((kind === 'prologue' && hints) || kind === 'order') {
+    const units = kind === 'order' ? ['rolls', 'result'] : ['story', 'how'];
+    return { units, make: (parts) => (parts.length < 2 ? [data] : units.map((part) => ({ ...data, part }))), fallback: [data] };
+  }
+  if (kind === 'round') {
+    const [head, ...arrivals] = data.group;
+    const units = [...arrivals.map((arrival) => ({ arrival })), ...factUnits([...head.factIds, ...arrivals.flatMap((a) => a.factIds)])];
+    return { units, make: (parts) => numbered(parts.map((part) => ({ group: [head, ...part.filter((u) => u.arrival).map((u) => u.arrival)], facts: factsIn(part) }))), fallback: [data] };
+  }
+  if (kind === 'chronicle') {
+    const fallback = chroniclePages(data.groups);
+    const units = [...data.groups.map((group) => ({ group })), ...factUnits(fallback.flatMap((p) => chronicleFacts(p.groups)))];
+    return { units, make: (parts) => numbered(parts.map((part) => ({ groups: part.filter((u) => u.group).map((u) => u.group), facts: factsIn(part) }))), fallback };
+  }
+  if (kind === 'plague') {
+    const { group } = data;
+    const whole = plagueRound(group);
+    if (whole.pre) return null;
+    // A half-year heading stays with the line that follows it.
+    const units = [];
+    let heads = [];
+    for (const e of group) {
+      if (e.type === 'plague') heads.push(e);
+      else { units.push({ lines: [...heads, e] }); heads = []; }
+    }
+    if (heads.length) { if (units.length) units.at(-1).lines.push(...heads); else units.push({ lines: heads }); }
+    units.push(...factUnits(plagueFacts(whole)));
+    return { units, make: (parts) => numbered(parts.map((part) => ({ group: part.flatMap((u) => u.lines ?? []), facts: factsIn(part), whole }))), fallback: [data] };
+  }
+  return null;
+}
+const chronicleFacts = (groups) => groups.flatMap(([e]) => cardById(e.card).factIds).slice(0, 4);
+// What every page of a round's plague results needs to know about the whole round.
+const plagueRound = (group) => ({
+  halves: group.filter((e) => e.type === 'plague').length,
+  pre: group.every((e) => e.type !== 'plague' || e.pre),
+  rolls: group.some((e) => e.type === 'mortality'),
+  deaths: group.some((e) => e.deaths > 0),
+});
+const plagueFacts = (whole) => (whole.deaths ? ['EC-10', 'DB-01'] : []);
+
 // The whole dialog: the card plus the given buttons.
 export function storyHtml(card, actions) {
   return `<div class="frame">${card.body}<div class="dialog-actions">${actions}</div></div>`;
@@ -39,25 +100,26 @@ export function storyHtml(card, actions) {
 const roll = (d) => rollDice(d);
 
 const BUILDERS = {
-  prologue(state, { e }, { hints }) {
+  prologue(state, { e, part }, { hints }) {
+    const how = hints && part !== 'story';
     return {
-      body: `${cardHtml({ theme: 'trade', kind: 'Prologue · 1346', title: 'The Siege of Caffa', body: `
+      body: `${part === 'how' ? '<h2>Before you begin</h2>' : cardHtml({ theme: 'trade', kind: 'Prologue · 1346', title: 'The Siege of Caffa', body: `
       <p class="drop-cap">${esc(e.text)} ${state.preRounds ? `The game begins in ${esc(halfInfo(state.firstHalf).label.split(' ')[1])}, before the plague sails west: use the ${state.preRounds > 1 ? `${state.preRounds} pre-plague rounds` : 'pre-plague round'} to open trading posts while the ports are safe. The plague years begin in the second half of 1347.` : 'The game begins in the second half of 1347, as Italian ships carry the sickness west.'} ${state.mode === 'quick' ? 'In Quick Play each round of the plague years is a year and a half.' : 'Each round is half a year.'} The plague will reach each city on the map when it really did, unless your ships bring it sooner.</p>
       ${noteHtml(e.factIds)}` })}
-      ${hints ? `<section class="hint" style="margin-top:1rem"><strong>How to play in one minute</strong><ol style="margin:0.3rem 0 0;padding-left:1.2rem">
+      ${how ? `<section class="hint" style="margin-top:1rem"><strong>How to play in one minute</strong><ol style="margin:0.3rem 0 0;padding-left:1.2rem">
         <li><strong>Each round</strong>, the plague reaches new cities (the dates are real), and Chronicle and Event cards are read aloud.${state.turnSeconds ? ` Each turn has a <strong>${state.turnSeconds}-second timer</strong> (it stops while cards are shown).` : ''}</li>
         <li><strong>On your turn</strong> you have ${modeOf(state).actionPoints} action points. Most actions take 1; opening a trading post or moving family takes ${C.actionPointCosts.post}. Press <span class="key">1</span> Ship Goods to earn florins; sea routes pay more, but cargo from a Stricken city may be infected.</li>
         <li><strong>Fortune cards:</strong> roll a ${C.fortune.drawOnProfitDie} when shipping, or open a new trading post, and you draw a personal Fortune card.</li>
         <li><strong>Protect your family:</strong> family in a Stricken city rolls for survival at the end of the round. Move them away (<span class="key">3</span>) or prepare your household (<span class="key">4</span>).</li>
         <li><strong>Win</strong> with the highest Legacy in 1353: Wealth + Family + Reputation, plus your weakest one again. Balance beats greed.</li>
       </ol></section>` : ''}`,
-      button: 'Roll for turn order',
-      opts: { label: 'Prologue' },
+      button: part === 'story' ? 'How to play' : 'Roll for turn order',
+      opts: { label: part === 'how' ? 'How to play' : 'Prologue' },
     };
   },
 
   // Each house rolls a die; the highest goes first (ties roll again).
-  order(state, { e }, { still }) {
+  order(state, { e, part }, { still }) {
     const players = state.players;
     const rows = e.rolls.map((round, r) => `<div style="margin-top:0.6rem"><div class="card-kind" style="color:var(--gold)">${r === 0 ? 'Every house rolls' : 'Tie! These houses roll again'}</div>
       <div class="dice-tray"><div class="dice-row">${round.map((x) => `<div class="die-wrap" style="color:#fbe9c0">${dieHtml(x.die, { gold: true })}<div>${crestSvg(players[x.player], 16)} ${esc(players[x.player].name)}</div></div>`).join('')}</div></div></div>`).join('');
@@ -66,19 +128,20 @@ const BUILDERS = {
     return {
       body: `<h2 style="text-align:center">Rolling for Turn Order</h2>
       <p style="text-align:center">The highest roll goes first; tied houses roll again. <strong>This order stays the same for the whole game.</strong></p>
-      <div id="order-rolls">${rows}</div>
-      <div class="order-grid" id="order-result" style="visibility:${still ? 'visible' : 'hidden'}">${order}</div>`,
-      button: state.preRounds ? `Begin the year ${halfInfo(state.firstHalf).label.split(' ')[1]}` : 'Begin the year 1347',
+      ${part === 'result' ? '' : `<div id="order-rolls">${rows}</div>`}
+      ${part === 'rolls' ? '' : `<div class="order-grid" id="order-result" style="visibility:${still || part ? 'visible' : 'hidden'}">${order}</div>`}`,
+      button: part === 'rolls' ? 'See the turn order' : state.preRounds ? `Begin the year ${halfInfo(state.firstHalf).label.split(' ')[1]}` : 'Begin the year 1347',
       opts: { wide: true, label: 'Turn order' },
       mount: async (d) => {
         holdDice(d);
         for (const tray of d.querySelectorAll('.dice-tray')) await rollDice(tray);
-        d.querySelector('#order-result').style.visibility = 'visible';
+        const result = d.querySelector('#order-result');
+        if (result) result.style.visibility = 'visible';
       },
     };
   },
 
-  round(state, { group }, { big }) {
+  round(state, { group, facts, page = 1, pages = 1 }, { big }) {
     const [head, ...arrivals] = group;
     const info = roundInfo(state);
     const half = halfInfo(state.round);
@@ -86,17 +149,19 @@ const BUILDERS = {
     const arrHtml = info.pre
       ? `<p><strong>Before the plague.</strong> Only Caffa and Tana on the Black Sea are Stricken. No Event card and no survival rolls this round, and trading posts cost ${C.prePlague.postDiscount}ƒ less: set up your trade while the ports are safe.</p>`
       : arrivals.length
-      ? `<h3>The plague arrives</h3>
+      ? page > 1 ? arrivals.length === 0 ? '' : `<div class="dice-tray"><div class="choice-list" style="margin:0">${arrivals.map((a, i) => arrivalRow(state, a, i)).join('')}</div></div>`
+      : `<h3>The plague arrives${pageOf(page, pages)}</h3>
         <p class="sev-explain">🎲 Each newly struck city rolls the red <strong>severity die</strong> to see how badly the plague hits it: ${severityBands()}.${severityModsText(state)}</p>
         <div class="dice-tray"><div class="choice-list" style="margin:0">${arrivals.map((a, i) => arrivalRow(state, a, i)).join('')}</div></div>`
-      : '<p>No new cities are struck this time.</p>';
+      : page > 1 ? '' : '<p>No new cities are struck this time.</p>';
     return {
-      body: `<div class="round-banner"><div class="card-kind" style="color:var(--gold)">${info.pre ? 'Before the plague · ' : ''}Round ${roundNumber(state)} of ${totalRounds(state)}</div>
+      body: `${page > 1 ? `<h2>${esc(years)}: the plague arrives${pageOf(page, pages)}</h2>` : `<div class="round-banner"><div class="card-kind" style="color:var(--gold)">${info.pre ? 'Before the plague · ' : ''}Round ${roundNumber(state)} of ${totalRounds(state)}</div>
         <div class="year">${esc(years)}</div><div><em>${esc(info.months)}</em> <span class="season" aria-hidden="true">${half.season === 'warm' ? '☀' : '❄'}</span></div>
-        <p>${esc(info.headline)}</p></div>
+        <p>${esc(info.headline)}</p></div>`}
       ${arrHtml}
-      ${noteHtml([...head.factIds, ...arrivals.flatMap((a) => a.factIds)])}`,
-      opts: { wide: big && arrivals.length > 4, label: info.label },
+      ${noteHtml(facts ?? [...head.factIds, ...arrivals.flatMap((a) => a.factIds)])}`,
+      button: page < pages ? 'More cities' : 'Continue',
+      opts: { wide: big && arrivals.length > 4, label: `${info.label}${pages > 1 ? ` (${page} of ${pages})` : ''}` },
       mount: roll,
     };
   },
@@ -116,7 +181,7 @@ const BUILDERS = {
   },
 
   // Several Chronicle cards of the same round, side by side on one page.
-  chronicle(state, { groups, page = 1, pages = 1 }) {
+  chronicle(state, { groups, facts, page = 1, pages = 1 }) {
     const cards = groups.map(([e, ...effects]) => {
       const card = cardById(e.card);
       const effectTxt = effects.map((x) => `<li>${esc(x.text)}</li>`).join('');
@@ -124,11 +189,10 @@ const BUILDERS = {
       return cardHtml({ theme: card.theme, kind: `Chronicle · ${esc(halfInfo(card.round).label)}`, title: card.title, body: `
         <p>${esc(card.text)}</p>${effectTxt ? `<ul>${effectTxt}</ul>` : ''}${decisionHint}` });
     });
-    const facts = groups.flatMap(([e]) => cardById(e.card).factIds);
     return {
       body: `<h2>The Chronicle${pages > 1 ? ` <small>(${page} of ${pages})</small>` : ''}</h2>
-        <div class="chronicle-grid n${cards.length}">${cards.join('')}</div>
-        ${noteHtml(facts.slice(0, 4))}`,
+        ${cards.length ? `<div class="chronicle-grid n${cards.length}">${cards.join('')}</div>` : ''}
+        ${noteHtml(facts ?? chronicleFacts(groups))}`,
       button: page < pages ? 'More of the chronicle' : 'Continue',
       opts: { wide: true, label: `Chronicle${pages > 1 ? ` ${page} of ${pages}` : ''}` },
     };
@@ -149,9 +213,9 @@ const BUILDERS = {
     };
   },
 
-  plague(state, { group }) {
+  plague(state, { group, facts, page = 1, pages = 1, whole = plagueRound(group) }) {
+    const last = page === pages;
     let body = '';
-    let anyDeaths = false;
     // Runs of dice trays and of Aftermath lines are grouped, so the big screen
     // can show them side by side.
     let trays = [];
@@ -165,13 +229,12 @@ const BUILDERS = {
     group.forEach((e, i) => {
       if (e.type !== 'mortality' && e.type !== 'aftermath') flush();
       if (e.type === 'plague') {
-        if (group.filter((x) => x.type === 'plague').length > 1) body += `<h3 style="margin-top:0.8rem">${esc(halfInfo(e.half).label)}</h3>`;
+        if (whole.halves > 1) body += `<h3 style="margin-top:0.8rem">${esc(halfInfo(e.half).label)}</h3>`;
         if (e.pre) body += `<p style="margin:0.3rem 0">${esc(e.text)}</p>`;
         return;
       }
       if (e.type === 'aftermath') { after.push(`<p style="margin:0.3rem 0">❦ ${esc(e.text)}</p>`); return; }
       if (e.type !== 'mortality') { body += `<p style="margin:0.3rem 0">📜 ${esc(e.text)}</p>`; return; }
-      anyDeaths ||= e.deaths > 0;
       const p = state.players[e.player];
       const bonus = e.prepared ? C.plague.prepareBonus : 0;
       const dice = e.rolls.map((r, j) => {
@@ -183,15 +246,15 @@ const BUILDERS = {
         <div class="dice-row" style="justify-content:flex-start;margin-top:0.4rem">${dice}</div><div style="color:#fbe9c0;margin-top:0.3rem">${esc(e.text)}</div></div>`);
     });
     flush();
-    const pre = group.every((e) => e.type !== 'plague' || e.pre);
-    if (!pre && !group.some((e) => e.type === 'mortality')) body += '<p>No family members were in Stricken cities this round.</p>';
+    const { pre } = whole;
+    if (!pre && !whole.rolls && last) body += '<p>No family members were in Stricken cities this round.</p>';
     return {
-      body: pre ? `<h2>The Year Turns: ${esc(roundInfo(state)?.label ?? '')}</h2><p>No plague yet: only upkeep is paid.</p>` : `<h2>The Plague Takes Its Toll: ${esc(roundInfo(state).label)}</h2>
-      <p>Every family member in a Stricken city rolls the mortality die.</p>
+      body: pre ? `<h2>The Year Turns: ${esc(roundInfo(state)?.label ?? '')}</h2><p>No plague yet: only upkeep is paid.</p>` : `<h2>The Plague Takes Its Toll: ${esc(roundInfo(state).label)}${pageOf(page, pages)}</h2>
+      ${page === 1 ? '<p>Every family member in a Stricken city rolls the mortality die.</p>' : ''}
       ${body}
-      ${anyDeaths ? noteHtml(['EC-10', 'DB-01'], 'Historical Note') : ''}`,
-      button: state.roundEnd >= C.rounds ? 'Final scoring' : 'Begin the next round',
-      opts: { wide: true, label: pre ? 'End of the round' : 'Plague results' },
+      ${noteHtml(facts ?? plagueFacts(whole), 'Historical Note')}`,
+      button: !last ? 'Continue' : state.roundEnd >= C.rounds ? 'Final scoring' : 'Begin the next round',
+      opts: { wide: true, label: `${pre ? 'End of the round' : 'Plague results'}${pages > 1 ? ` (${page} of ${pages})` : ''}` },
       mount: roll,
     };
   },
