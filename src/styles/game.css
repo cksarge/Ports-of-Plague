@@ -331,11 +331,13 @@ button.choice:hover:not(:disabled) { border-color: var(--gold-bright); border-le
 .dice-tray { background: radial-gradient(ellipse at center, #2f6b3f, #173d22); border: 4px solid #5a3920; border-radius: 14px; box-shadow: inset 0 4px 14px rgba(0,0,0,0.55); padding: 0.8rem; margin: 0.6rem 0; color: #f3e6c4; overflow: hidden; }
 .dice-row { display: flex; flex-wrap: wrap; gap: 0.9rem; align-items: flex-end; justify-content: center; }
 .die-wrap { text-align: center; font-size: 0.85rem; }
-/* Each die is a 3D cube (see src/ui/dice.js): six faces around a dark core
-   that fills the rounded corners. --s is its size, --face/--edge/--line/--pip its colours. */
+/* Each die is a 3D cube (see src/ui/dice.js): six faces around a slightly
+   smaller dark cube that fills their rounded corners. --s is its size, --face/--edge/--line/--pip its colours. */
 .die {
   --s: 60px; --face: radial-gradient(circle at 30% 25%, #fffef6, #efe3c2 60%, #d8c79c); --edge: #b3a073; --line: #5a4524; --pip: #26190a;
-  position: relative; width: var(--s); height: var(--s); margin: 4px auto 0.5rem; perspective: 520px;
+  position: relative; width: var(--s); height: var(--s); margin: 4px auto 0.5rem;
+  /* Seen from the near side of the table, so a flat die still shows a sliver of its front. */
+  perspective: 520px; perspective-origin: 50% 230%;
 }
 .die.red { --face: radial-gradient(circle at 30% 25%, #e0574b, #a1241a 60%, #6d130c); --edge: #5a0f08; --line: #3d0703; --pip: #fff4e4; }
 .die.gold { --face: radial-gradient(circle at 30% 25%, #fff3c4, #e3b340 60%, #a67a12); --edge: #8a6410; --line: #5c4108; }
@@ -345,21 +347,19 @@ button.choice:hover:not(:disabled) { border-color: var(--gold-bright); border-le
 .die-body, .die-cube { position: absolute; inset: 0; transform-style: preserve-3d; }
 /* The cube turns about its own centre, then sits on the felt. */
 .die-cube { translate: 0 0 calc(var(--s) / -2); }
-.die-face, .die-core { position: absolute; inset: 0; border-radius: 18%; }
+.die-face, .die-core { position: absolute; inset: 0; transform: var(--side) translateZ(calc(var(--s) / 2)); }
 .die-face {
-  display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 14%; box-sizing: border-box;
+  display: grid; grid-template: repeat(3, 1fr) / repeat(3, 1fr); padding: 14%; box-sizing: border-box; border-radius: 18%;
   background: var(--face); border: 1.5px solid var(--line); backface-visibility: hidden;
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.3), inset -2px -3px 5px rgba(0,0,0,0.2);
 }
-.die-core { inset: 3%; background: var(--edge); border-radius: 0; }
-.die-core.y { transform: rotateY(90deg); }
-.die-core.x { transform: rotateX(90deg); }
-.die-face.f1 { transform: translateZ(calc(var(--s) / 2)); }
-.die-face.f6 { transform: rotateY(180deg) translateZ(calc(var(--s) / 2)); }
-.die-face.f2 { transform: rotateY(90deg) translateZ(calc(var(--s) / 2)); }
-.die-face.f5 { transform: rotateY(-90deg) translateZ(calc(var(--s) / 2)); }
-.die-face.f3 { transform: rotateX(90deg) translateZ(calc(var(--s) / 2)); }
-.die-face.f4 { transform: rotateX(-90deg) translateZ(calc(var(--s) / 2)); }
+.die-core { inset: 2px; background: var(--edge); transform: var(--side) translateZ(calc(var(--s) / 2 - 2px)); }
+.die .f1 { --side: rotateY(0deg); }
+.die .f6 { --side: rotateY(180deg); }
+.die .f2 { --side: rotateY(90deg); }
+.die .f5 { --side: rotateY(-90deg); }
+.die .f3 { --side: rotateX(90deg); }
+.die .f4 { --side: rotateX(-90deg); }
 .pipdot { width: calc(var(--s) * 0.17); height: calc(var(--s) * 0.17); border-radius: 50%; background: var(--pip); align-self: center; justify-self: center; box-shadow: inset 0 2px 2px rgba(0,0,0,0.5); }
 .die-math { font-size: 0.82rem; line-height: 1.2; }
 .outcome-dead { color: #ff9a8a; font-weight: 700; }
