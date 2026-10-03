@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DATA } from '../src/data.js';
 import { playBotGame } from '../src/engine/sim.js';
-import { storyCard, storyHtml, chroniclePages } from '../src/ui/stories.js';
+import { storyCard, storyHtml, chroniclePages, splitStory, share } from '../src/ui/stories.js';
 
 const homes = ['venice', 'london', 'lubeck', 'genoa', 'bruges', 'florence'];
 const game = (n, mode, seed) => playBotGame({ players: homes.slice(0, n).map((home, i) => ({ name: `House ${i + 1}`, home })), mode, seed }).state;
@@ -49,6 +49,40 @@ test('stories: every card of whole games can be drawn from its data alone (as a 
     }
   }
   for (const k of ['prologue', 'order', 'round', 'chronicle', 'card', 'plague', 'fortune', 'ship']) assert.ok(kinds.has(k), `tested a ${k} card`);
+});
+
+test('stories: a long card deals out over any number of pages without losing or repeating a line', () => {
+  const split = new Set();
+  for (const [n, mode, seed] of [[6, 'standard', 3], [4, 'quick', 2]]) {
+    const state = game(n, mode, seed);
+    const whole = [];
+    for (const [kind, data] of storiesOf(state)) {
+      // The big screen splits a round's Chronicle cards itself, from all of them.
+      if (kind === 'chronicle') { if (data.page === 1) whole.push([kind, { groups: [] }]); whole.at(-1)[1].groups.push(...data.groups); } else whole.push([kind, data]);
+    }
+    for (const [kind, data] of whole) {
+      const s = splitStory(kind, data, { hints: true });
+      if (!s) continue;
+      split.add(kind);
+      assert.ok(s.fallback.length >= 1);
+      for (let k = 1; k <= s.units.length; k++) {
+        const pages = JSON.parse(JSON.stringify(s.make(share(s.units, k))));
+        assert.equal(pages.length, k, `${kind} over ${k} pages`);
+        const lines = (d) => d.groups ?? d.group ?? [];
+        if (kind === 'round') assert.deepEqual(pages.flatMap((p) => p.group.slice(1)), data.group.slice(1));
+        else if (kind === 'chronicle' || kind === 'plague') assert.deepEqual(pages.flatMap(lines), lines(data));
+        if (pages[0].facts) assert.equal(new Set(pages.flatMap((p) => p.facts)).size, pages.flatMap((p) => p.facts).length, 'no fact twice');
+        pages.forEach((page, i) => {
+          const card = storyCard(state, kind, page, { still: true, hints: true });
+          assert.ok(card.body.length > 40, `${kind} page ${i + 1} of ${k} has content`);
+          assert.doesNotMatch(storyHtml(card, ''), /undefined|NaN|\[object Object\]/);
+          if (i < k - 1) assert.notEqual(card.button, 'Final scoring');
+          if (k > 1 && page.pages) assert.match(card.opts.label, new RegExp(`${i + 1} of ${k}`));
+        });
+      }
+    }
+  }
+  for (const k of ['prologue', 'order', 'round', 'chronicle', 'plague']) assert.ok(split.has(k), `split a ${k} card`);
 });
 
 test('stories: a device shows the turn order result straight away; unknown kinds are ignored', () => {

@@ -7,19 +7,19 @@ import {
   scorePlayer, familyTotal, cardById,
   roundInfo, totalRounds, roundNumber, fortuneById, botMove,
 } from '../engine/index.js';
-import { $, $$, esc, openDialog, dialogOpen, closeAllDialogs, toast, announce, crestSvg, isTyping, warnBeforeLeaving, sleep } from './dom.js';
+import { $, $$, esc, openDialog, buildDialog, dialogOpen, closeAllDialogs, toast, announce, crestSvg, isTyping, warnBeforeLeaving, sleep } from './dom.js';
 import { createMap, updateMap, animateShipment, animateStrike, redrawStains, startAmbient, floatText } from './map.js';
 import { noteHtml } from './notes.js';
 import { showRules, showJournal, showCity } from './panels.js';
 import { sfx, isMuted, setMuted, isMusicOn, setMusicOn } from './sound.js';
-import { music, tradeMood } from './music.js';
+import { music, gameSong } from './music.js';
 import { saveGame } from './save.js';
 import { heraldicBanner } from './art.js';
 import { housePanelHtml, actionsPanelHtml, hintFor, quickBlock, actionPrompt, decisionPrompt, endTurnPrompt } from './prompts.js';
 import { validateIntent, sitOutChoice, ACT, DECIDE, END, NEXT } from '../net/protocol.js';
 import { JOIN_ADDRESS } from '../net/config.js';
 import { zoomToFit, fitsHeight, fitsWidth } from './fit.js';
-import { storyCard, storyHtml, chroniclePages } from './stories.js';
+import { storyCard, storyHtml, splitStory, share } from './stories.js';
 import { createClock, showClockPill, hideClockPill } from './clock.js';
 
 // Keeps the big screen from going dark during a multi-device game (where the
@@ -95,7 +95,7 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
   $('#btn-journal', app).onclick = () => showJournal(state.journal);
   $('#btn-mute', app).onclick = toggleMute;
   $('#btn-music', app).onclick = toggleMusic;
-  music.setMood(state.round >= (state.firstHalf ?? 1) ? tradeMood(state.round) : 'menu');
+  music.setMood(gameSong(state));
   $('#btn-menu', app).onclick = () => { save(); cleanup(); onExit(); };
 
   function toggleMute() {
@@ -165,10 +165,46 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
   // A story card (see stories.js). On multiple devices, Next on any player's
   // device closes it too, and every device can open the same card to read it.
   // The turn timer stops while it is open.
-  function story(kind, data, options) {
+  async function story(kind, data, options) {
     storyDepth++;
     syncClock();
-    return showStory(kind, data, options).finally(() => { storyDepth--; syncClock(); });
+    try {
+      const pages = storyPages(kind, data);
+      for (const [i, page] of pages.entries()) await showStory(kind, page, i === pages.length - 1 ? options : {});
+    } finally {
+      storyDepth--;
+      syncClock();
+    }
+  }
+  // A long card is dealt out over several cards. Nobody can scroll the big
+  // screen, so there each card takes only as much as stays easy to read: no
+  // card shrinks below READABLE while it holds more than one piece.
+  const READABLE = 0.8;
+  function storyPages(kind, data) {
+    const split = splitStory(kind, data, { hints: !!ui.hints });
+    if (!split) return [data];
+    if (!remote) return split.fallback;
+    const fits = (page) => zoomNeeded(kind, page) >= READABLE;
+    const parts = [[]];
+    for (const unit of split.units) {
+      const fuller = [...parts.at(-1), unit];
+      if (parts.at(-1).length && !fits(split.make([...parts.slice(0, -1), fuller]).at(-1))) parts.push([unit]);
+      else parts[parts.length - 1] = fuller;
+    }
+    // The same number of cards, evenly filled, when that is readable too.
+    const even = split.make(share(split.units, parts.length));
+    return even.every(fits) ? even : split.make(parts);
+  }
+  // How far the big screen would have to shrink this card to show all of it.
+  function zoomNeeded(kind, data) {
+    const card = storyCard(state, kind, data, { hints: !!ui.hints, big: true });
+    const d = buildDialog(storyHtml(card, `<button class="btn primary">${esc(card.button)}</button>`), card.opts);
+    d.style.visibility = 'hidden';
+    d.showModal();
+    const zoom = fitDialog(d)();
+    d.close();
+    d.remove();
+    return zoom;
   }
   function showStory(kind, data, { after } = {}) {
     const card = storyCard(state, kind, data, { hints: !!ui.hints, big: remote });
@@ -211,8 +247,9 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
     // Measured with animations off: a card's opening flip makes it look taller.
     const fit = () => {
       d.classList.add('measuring');
-      zoomToFit(inner, fitsHeight(scroll), 0.45);
+      const zoom = zoomToFit(inner, fitsHeight(scroll), 0.45);
       d.classList.remove('measuring');
+      return zoom;
     };
     fit();
     return fit;
@@ -510,7 +547,7 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
 
   async function showRoundStart(group) {
     const [head, ...arrivals] = group;
-    music.setMood(tradeMood(state.round)); // the music darkens as the years pass
+    music.setMood(gameSong(state)); // the round's trading song (darker as the years pass)
     refresh();
     sfx.bell();
     setTimeout(() => sfx.stamp(), 250);
@@ -524,7 +561,7 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
   async function showChronicle(groups) {
     const cards = groups.map((g) => cardById(g[0].card));
     if (cards.some((c) => c.theme === 'persecution')) sfx.knell(); else sfx.page();
-    for (const page of chroniclePages(groups)) await story('chronicle', page);
+    await story('chronicle', { groups });
     setNote(cards.flatMap((c) => c.factIds));
     refresh();
   }
@@ -556,10 +593,14 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
   async function showPlague(group) {
     refresh();
     const pre = group.every((e) => e.type !== 'plague' || e.pre);
+    // The plague song plays only while these results are on screen.
     if (!pre) music.setMood('plague');
     if (group.some((e) => e.deaths > 0)) setTimeout(() => sfx.knell(), 1000); else sfx.low();
-    await story('plague', { group });
-    if (state.roundEnd < C.rounds) music.setMood(tradeMood(state.round));
+    try {
+      await story('plague', { group });
+    } finally {
+      music.setMood(gameSong(state));
+    }
     redrawStains(svg, state);
     refresh();
   }
@@ -805,7 +846,7 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
           continue;
         case 'ended':
           if (remote) { clearTimeout(pushTimer); room.pushState(state, view()); }
-          music.setMood('ending');
+          music.setMood(gameSong(state));
           cleanup();
           onEnd(state);
           return;

@@ -5,6 +5,18 @@
 // this game and played live by the Web Audio API: a lute-like melody in the
 // medieval Dorian mode over a drone, with a soft frame drum, which slows and
 // darkens during plague phases.
+//
+// When each song starts and ends (the same in Quick Play and Standard):
+//   menu     title screen, setup, lobby, and the prologue and turn order;
+//            ends when the first round's opening card appears
+//   trade-1  starts with a round's opening card, plays through its cards and
+//   trade-2  turns, and ends when that round's plague results appear
+//   trade-3  (which of the three depends on the year: see tradeMood)
+//   plague   only while a round's plague results are on screen: starts when
+//            they open and ends when the last of them is closed
+//   ending   starts when the game is over and plays through the final scores;
+//            ends on returning to the menu or setup
+// Only one song sounds at a time: choosing a mood fades out every other one.
 import { DATA } from '../data.js';
 import { audioContext, isMusicOn, onAudioSettings } from './sound.js';
 
@@ -188,6 +200,8 @@ const players = {};     // track id → <audio>, kept so a track resumes where i
 const failed = new Set();
 let current = null;     // id of the recorded track playing now
 let unlocked = false;   // the browser allows sound once the player has clicked or pressed a key
+let hushed = false;     // a player's own device in a multi-device game: the big screen plays the music
+let primed = false;     // every track has been started once during a click or key press
 
 // On a web server the tracks go through the Web Audio graph, so fades work
 // everywhere (iPhones ignore an <audio> element's volume). A page opened
@@ -215,7 +229,7 @@ function player(id) {
   // If the small file will not load, try the full one; if that fails too,
   // the generated music takes over.
   el.addEventListener('error', () => {
-    if (el.src.endsWith(TRACKS[id].mobileFile)) { el.src = TRACKS[id].file; if (current === id) el.play().catch(() => {}); return; }
+    if (el.src.endsWith(TRACKS[id].mobileFile)) { el.src = TRACKS[id].file; if (current === id) el.play().then(() => { if (current === id) fade(el, VOLUME); else fadeOut(id); }).catch(() => {}); return; }
     failed.add(id);
     if (current === id) { current = null; apply(); }
   });
@@ -255,24 +269,41 @@ function fadeOut(id) {
   const el = players[id];
   if (el) fade(el, 0, () => el.pause());
 }
+// Fades out every recording that is still sounding, except `keep`.
+function fadeOutOthers(keep) {
+  for (const id of Object.keys(players)) if (id !== keep && (id === current || !players[id].paused)) fadeOut(id);
+}
 
 // Plays the track for the current mood (or the generated music instead).
 function apply() {
   if (!unlocked) return;
-  const on = isMusicOn();
+  const on = isMusicOn() && !hushed;
   const id = TRACKS[mood] && !failed.has(mood) ? mood : null;
   if (!on || !id) {
-    if (current) fadeOut(current);
+    fadeOutOthers(null);
     current = null;
     if (on) { start(); } else stop();
     return;
   }
   stop(); // the generated music is not needed while a recording plays
   if (current === id) return;
-  if (current) fadeOut(current);
+  fadeOutOthers(id);
   current = id;
   const el = player(id);
-  el.play().then(() => fade(el, VOLUME)).catch(() => { /* not allowed yet, or failed: the error event handles failures */ });
+  // The mood may have moved on before the track started: then it must not fade in
+  // (that would cancel its fade-out and leave it playing under the next track).
+  el.play().then(() => { if (current === id) fade(el, VOLUME); else fadeOut(id); }).catch(() => { /* not allowed yet, or failed: the error event handles failures */ });
+}
+
+// Starting each track once during a click lets it play later (Safari only
+// allows sound that starts from a tap or key press).
+function prime() {
+  if (primed || hushed || !isMusicOn()) return;
+  primed = true;
+  for (const t of DATA.music) {
+    const el = player(t.id);
+    el.play().then(() => { if (current !== t.id) el.pause(); }).catch(() => {});
+  }
 }
 
 // Mood names: menu, trade-1, trade-2, trade-3, plague, ending.
@@ -286,29 +317,37 @@ export const music = {
   enableOnFirstGesture() {
     const go = () => {
       unlocked = true;
-      // Starting each track once during this click lets it play later
-      // (Safari only allows sound that starts from a tap or key press).
-      if (isMusicOn()) {
-        for (const t of DATA.music) {
-          const el = player(t.id);
-          el.play().then(() => { if (current !== t.id) el.pause(); }).catch(() => {});
-        }
-      }
+      prime();
       apply();
     };
     window.addEventListener('pointerdown', go, { once: true });
     window.addEventListener('keydown', go, { once: true });
   },
   sync() { apply(); },
+  // In a multi-device game only the big screen plays music: a player's own
+  // device goes quiet while it is in a room (its sound effects still play).
+  setHushed(v) {
+    if (hushed === !!v) return;
+    hushed = !!v;
+    if (!hushed && unlocked) prime();
+    apply();
+  },
   // For tests: which recording is playing (null = none or the generated music).
   status() {
     const el = current && players[current];
-    return { mood, track: current, playing: !!el && !el.paused, time: el ? Math.round(el.currentTime) : 0, file: el ? el.src.split('/').slice(-2).join('/') : null, small, failed: [...failed], generated: !!state };
+    const sounding = Object.keys(players).filter((id) => !players[id].paused && (players[id]._gain ? players[id]._gain.gain.value : players[id].volume) > 0.001);
+    return { mood, hushed, sounding, track: current, playing: !!el && !el.paused, time: el ? Math.round(el.currentTime) : 0, file: el ? el.src.split('/').slice(-2).join('/') : null, small, failed: [...failed], generated: !!state };
   },
 };
 
 // The trading music darkens as the years go by (round = half-year number).
 export function tradeMood(round) {
   return round <= 3 ? 'trade-1' : round <= 7 ? 'trade-2' : 'trade-3';
+}
+// The song for the game as it stands (the plague song is the one exception:
+// the game switches to it while a round's plague results are shown).
+export function gameSong(state) {
+  if (state.phase === 'ended') return 'ending';
+  return state.round >= (state.firstHalf ?? 1) ? tradeMood(state.round) : 'menu';
 }
 onAudioSettings(() => music.sync());
