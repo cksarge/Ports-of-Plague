@@ -108,7 +108,7 @@ research/facts-review.md  easy-to-read list of all facts and sources
 docs/                  printable documents and reports
 assets/fonts/          fonts (SIL Open Font License)
 assets/music/          background music (Kevin MacLeod, CC BY 4.0; list in data/music.json); mobile/ holds the small copies for phones
-assets/licenses/       every third-party license: fonts (SIL OFL), Supabase realtime client (MIT), music credits
+assets/licenses/       every third-party license: fonts (SIL OFL), Supabase realtime client (MIT), roll-a-die dice (MIT), music credits
 ```
 
 **Why the printed and in-game rules always match:** both are made by the same function (`src/render/rulebook.js`) from `data/rulebook.json`, and every number in the text is filled in from `data/config.json`. That is the same file the game engine uses. The audit also checks the numbers written directly into the rules and cards.
@@ -135,10 +135,11 @@ The site is served straight from the `main` branch (Settings → Pages → Deplo
 - **Fonts:** EB Garamond, Cinzel and UnifrakturMaguntia, all under the SIL Open Font License (see `assets/licenses/`).
 - **Music:** by Kevin MacLeod ([incompetech.com](https://incompetech.com)), licensed under [Creative Commons: By Attribution 4.0](http://creativecommons.org/licenses/by/4.0/): "The Britons" (title screen), "Lord of the Land", "Ancient Rite" and "The Pyre" (trading, early to late years), "Rites" (plague phases) and "Teller of the Tales" (final scores). See `assets/licenses/music-credits.txt`. Computers play the full-quality files in `assets/music/`; phones and tablets play smaller copies (AAC, 96 kbps) from `assets/music/mobile/`, made with `npm run music` (macOS). If the music files cannot be loaded, the game plays its own music, generated live in the browser.
 - **Sound effects:** original, generated live in the browser with the Web Audio API; no recordings are used.
+- **Dice:** the 3D dice are adapted from [roll-a-die](https://github.com/chukwumaijem/roll-a-die) (© 2015 ukatama), under the MIT License (see `assets/licenses/MIT-roll-a-die.txt`; the text is also at the top of the game's script). The game rolls first with its own seeded dice; the animation only shows that result.
 - **Playing on several devices:** messages between devices go through [Supabase Realtime](https://supabase.com/), using the open-source libraries `@supabase/realtime-js` (© 2020 Supabase) and `@supabase/phoenix` (© 2014 Chris McCord), both under the MIT License (see `assets/licenses/`; the texts are also at the top of the game's script). Only house names, home cities and game moves are sent; nothing is stored and there are no accounts.
 
 *Content note:* the game deals with mass death and with the persecution of Jewish communities. It treats both seriously and without graphic detail, and it states plainly that the accusations against Jews were false and the violence unjust.
 
 ## License
 
-The game's code and content are released under the MIT License (see `LICENSE`). The bundled fonts keep their own SIL Open Font License, the bundled Supabase realtime client libraries keep their own MIT License, and the music keeps its Creative Commons Attribution 4.0 license (all in `assets/licenses/`). The Natural Earth map data is in the public domain.
+The game's code and content are released under the MIT License (see `LICENSE`). The bundled fonts keep their own SIL Open Font License, the bundled Supabase realtime client libraries and the roll-a-die dice code keep their own MIT License, and the music keeps its Creative Commons Attribution 4.0 license (all in `assets/licenses/`). The Natural Earth map data is in the public domain.
