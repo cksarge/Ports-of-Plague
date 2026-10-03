@@ -16,7 +16,7 @@ Each player leads a merchant family in a real trading city. Ship goods along his
 
 ## How to play (no installation needed)
 
-**Play online:** https://cksarge.github.io/Ports-of-Plague/
+**Play online:** https://portsofplague.carterscoding.com/
 
 **Or offline:** download the repository and double-click `Ports-of-Plague.html`. It opens in any modern browser (Chrome, Edge, Firefox or Safari) and works completely offline, with no accounts and no internet.
 
@@ -29,7 +29,7 @@ Each player leads a merchant family in a real trading city. Ship goods along his
 ### Playing on several devices (Jackbox style)
 
 1. On the big screen (a laptop or a projector), choose **New game → Play on: Everyone on their own device**. A **room code** of 4 letters and numbers appears (like `B7KX`).
-2. Each player opens https://cksarge.github.io/Ports-of-Plague/ on their own phone, tablet or computer, chooses **Join a game**, types the code, and picks a house name and home city.
+2. Each player opens https://portsofplague.carterscoding.com/ on their own phone, tablet or computer, chooses **Join a game**, types the code, and picks a house name and home city.
 3. To fill empty seats, press **Add a bot** in the lobby and choose its skill. Bots play on the big screen.
 4. When everyone is in, press **Roll for turn order** on the big screen.
 
