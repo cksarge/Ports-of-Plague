@@ -33,6 +33,7 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
   let lastTurnKey = null;
   let reader = null;       // the story card this device is reading: { id, close }
   let error = '';
+  let showScores = false;  // the final scores stay hidden while the big screen plays the finale
   let form = { name: '', home: null };
 
   const me = () => {
@@ -273,17 +274,23 @@ export function renderJoin(app, { onBack, code: preset = '' }) {
       </nav>`);
 
     if (state.phase === 'ended') {
-      parts.push(`<section class="panel"><h2>Anno Domini 1353</h2><p>The game is over. Final Legacy scores:</p>
-        <div class="houses">${(state.finalScores ?? []).map((r) => {
+      parts.push(showScores ? `<section class="panel"><h2>Anno Domini 1353</h2><p>The game is over. Final Legacy scores:</p>
+        <div class="houses">${(state.finalScores ?? []).map((r, i) => {
           const h = state.players[r.id];
-          return `<div class="house-row ${h.id === p.id ? 'current' : ''}" style="--house:${h.color}">${crestSvg(h, 20)}<span><strong>${r.place}. ${esc(h.name)}</strong><br><small>Wealth ${r.wealth} + Family ${r.family} + Reputation ${r.reputation} + Balance ${r.balance}</small></span><span><strong>${r.total}</strong></span></div>`;
+          return `<div class="house-row rise ${h.id === p.id ? 'current' : ''}" style="--house:${h.color};--at:${(i * 0.12).toFixed(2)}s">${crestSvg(h, 20)}<span><strong>${r.place}. ${esc(h.name)}</strong><br><small>Wealth ${r.wealth} + Family ${r.family} + Reputation ${r.reputation} + Balance ${r.balance}</small></span><span><strong>${r.total}</strong></span></div>`;
         }).join('')}</div>
-        <div class="dialog-actions"><button class="btn primary" id="ctl-leave">Back to the menu</button></div></section>
+        <div class="dialog-actions"><button class="btn primary" id="ctl-leave">Back to the menu</button></div></section>`
+        : `<section class="panel finale-wait"><h2>Anno Domini 1353</h2><p class="finale-wait-icon" aria-hidden="true">👑</p>
+        <p>The game is over! <strong>Watch the big screen</strong>: the final reckoning is being revealed there.</p>
+        <div class="dialog-actions"><button class="btn" id="ctl-scores">Show the final scores here</button><button class="btn primary" id="ctl-leave">Back to the menu</button></div></section>`);
+      parts.push(`
         <section class="panel"><h2>What Really Happened</h2>${noteHtml(DATA.timeline.epilogue.factIds, 'The real history')}</section>`);
       app.innerHTML = `<div class="controller">${parts.join('')}</div>`;
     tickClock(); // the header was redrawn: put the turn clock back at once
       bindTools();
       $('#ctl-leave', app).onclick = leave;
+      const scores = $('#ctl-scores', app);
+      if (scores) scores.onclick = () => { showScores = true; drawGame(); };
       return;
     }
 

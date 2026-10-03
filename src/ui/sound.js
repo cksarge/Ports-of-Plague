@@ -208,6 +208,20 @@ export const sfx = {
     [[392, 0.2], [523, 0.2], [659, 0.2], [784, 0.5], [659, 0.18], [784, 0.9]].reduce((tt, [f, d]) => { horn(s.a, s.out, tt, f, d + 0.1); return tt + d; }, t);
     bellStrike(s.a, s.out, t + 1.5, 392, 0.12, 3);
   },
+  // A timpani roll that swells, then one deep hit (before the winner is named).
+  drumroll(dur = 2.2) {
+    const s = fx(); if (!s) return;
+    const t = s.a.currentTime;
+    const hits = Math.floor(dur * 20);
+    for (let i = 0; i < hits; i++) {
+      const at = t + (i * dur) / hits;
+      const g = 0.03 + 0.13 * (i / hits);
+      noise(s.a, s.out, at, 0.08, { freq: 220, type: 'lowpass', gain: g });
+      tone(s.a, s.out, at, 72, 0.09, g * 0.6, 'sine');
+    }
+    tone(s.a, s.out, t + dur, 55, 1.2, 0.4, 'sine');
+    noise(s.a, s.out, t + dur, 0.35, { freq: 320, type: 'lowpass', gain: 0.4 });
+  },
   stamp() {
     const s = fx(); if (!s) return;
     const t = s.a.currentTime;
