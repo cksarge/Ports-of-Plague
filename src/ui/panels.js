@@ -66,6 +66,7 @@ export function showCredits() {
       <li><strong>Map:</strong> coastlines, rivers and lakes from ${link('https://www.naturalearthdata.com/', 'Natural Earth')} (public domain).</li>
       <li><strong>Fonts:</strong> EB Garamond, Cinzel and UnifrakturMaguntia, all under the ${link('https://openfontlicense.org/', 'SIL Open Font License')}.</li>
       <li><strong>Sound effects:</strong> original, generated live in your browser; no recordings are used.</li>
+      <li><strong>Dice:</strong> the 3D dice are adapted from ${link('https://github.com/chukwumaijem/roll-a-die', 'roll-a-die')} (© 2015 ukatama), under the MIT License.</li>
       <li><strong>Playing on several devices:</strong> the big screen and the players' phones, tablets or computers talk through ${link('https://supabase.com/', 'Supabase Realtime')}, using the open-source libraries <em>@supabase/realtime-js</em> (© 2020 Supabase) and <em>@supabase/phoenix</em> (© 2014 Chris McCord), both under the MIT License. Only house names, home cities and game moves are sent; nothing is stored and there are no accounts.</li>
     </ul>
     <h3>Music</h3>

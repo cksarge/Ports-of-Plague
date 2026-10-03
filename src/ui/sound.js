@@ -135,11 +135,13 @@ export const sfx = {
     const s = fx(); if (!s) return;
     noise(s.a, s.out, s.a.currentTime, 0.04, { freq: 2600, q: 3, gain: 0.12 });
   },
-  dice() {
+  // Timed to the dice animation (ms long): a knock at each bounce, then a rattle.
+  dice(ms = 1200) {
     const s = fx(); if (!s) return;
     const t = s.a.currentTime;
-    for (let i = 0; i < 9; i++) noise(s.a, s.out, t + i * 0.065 + Math.random() * 0.03, 0.045, { freq: 1500 + Math.random() * 2000, q: 4, gain: 0.35 });
-    noise(s.a, s.out, t + 0.62, 0.08, { freq: 500, q: 2, gain: 0.3 });
+    const d = ms / 1000;
+    [[0.36, 0.34], [0.76, 0.22], [0.92, 0.12]].forEach(([at, gain]) => noise(s.a, s.out, t + at * d, 0.08, { freq: 500, q: 2, gain }));
+    for (let i = 0; i < 7; i++) noise(s.a, s.out, t + (0.38 + i * 0.07 + Math.random() * 0.03) * d, 0.045, { freq: 1500 + Math.random() * 2000, q: 4, gain: 0.3 - i * 0.03 });
   },
   bell() {
     const s = fx(); if (!s) return;

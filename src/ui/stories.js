@@ -12,7 +12,7 @@
 import { DATA, CITIES } from '../data.js';
 import { C, cardById, fortuneById, severityName, roundInfo, roundNumber, totalRounds, modeOf, difficultyOf, halfInfo } from '../engine/index.js';
 import { esc, crestSvg } from './dom.js';
-import { dieHtml, rollDice } from './dice.js';
+import { dieHtml, rollDice, holdDice } from './dice.js';
 import { noteHtml } from './notes.js';
 import { THEME_COLORS, coinIcon, heraldicBanner } from './art.js';
 import { cardHtml, cityName } from './prompts.js';
@@ -36,7 +36,7 @@ export function storyHtml(card, actions) {
   return `<div class="frame">${card.body}<div class="dialog-actions">${actions}</div></div>`;
 }
 
-const roll = (ms) => (d) => rollDice(d, ms);
+const roll = (d) => rollDice(d);
 
 const BUILDERS = {
   prologue(state, { e }, { hints }) {
@@ -71,7 +71,8 @@ const BUILDERS = {
       button: state.preRounds ? `Begin the year ${halfInfo(state.firstHalf).label.split(' ')[1]}` : 'Begin the year 1347',
       opts: { wide: true, label: 'Turn order' },
       mount: async (d) => {
-        for (const tray of d.querySelectorAll('.dice-tray')) await rollDice(tray, 700);
+        holdDice(d);
+        for (const tray of d.querySelectorAll('.dice-tray')) await rollDice(tray);
         d.querySelector('#order-result').style.visibility = 'visible';
       },
     };
@@ -96,7 +97,7 @@ const BUILDERS = {
       ${arrHtml}
       ${noteHtml([...head.factIds, ...arrivals.flatMap((a) => a.factIds)])}`,
       opts: { wide: big && arrivals.length > 4, label: info.label },
-      mount: roll(600),
+      mount: roll,
     };
   },
 
@@ -144,7 +145,7 @@ const BUILDERS = {
       body: cardHtml({ theme: 'fortune', extraClass: 'fortune', kind: `Fortune card · ${esc(p.name)} ${esc(e.reason)} · <span class="tone">${tone}</span>`, title: card.title, body: `
         <p>${esc(card.text)}</p>${e.result ? `<p><strong>${esc(e.result)}</strong></p>` : ''}${extra}${card.effect.type === 'offer' ? '<p><em>You will choose next.</em></p>' : ''}${noteHtml(card.factIds)}` }),
       opts: { label: `Fortune card: ${card.title}` },
-      mount: roll(500),
+      mount: roll,
     };
   },
 
@@ -191,7 +192,7 @@ const BUILDERS = {
       ${anyDeaths ? noteHtml(['EC-10', 'DB-01'], 'Historical Note') : ''}`,
       button: state.roundEnd >= C.rounds ? 'Final scoring' : 'Begin the next round',
       opts: { wide: true, label: pre ? 'End of the round' : 'Plague results' },
-      mount: roll(600),
+      mount: roll,
     };
   },
 
@@ -210,7 +211,7 @@ const BUILDERS = {
         ${e.infected || e.offshore ? noteHtml(e.factIds) : ''}`,
       // A clean, ordinary shipment closes by itself once the dice have landed.
       opts: { dismissable: true, label: 'Shipment result', autoClose: e.infected || e.offshore || e.spread === 'early' ? 0 : C.timing.shipResultAutoCloseMs },
-      mount: roll(500),
+      mount: roll,
     };
   },
 
@@ -236,7 +237,7 @@ const BUILDERS = {
     return {
       body: `<h2>Wage inspection</h2><div class="dice-tray"><div class="dice-row">${dieHtml(entry.die, { label: 'Inspection die' })}</div></div><p>${esc(entry.text)}</p>`,
       opts: { dismissable: true, label: 'Wage inspection' },
-      mount: (d) => rollDice(d),
+      mount: roll,
     };
   },
 
