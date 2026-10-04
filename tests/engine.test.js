@@ -358,6 +358,36 @@ test('fortune: free post costs nothing and gives no AP cost; clean hold skips co
   assert.equal(r.entry.infected, false);
 });
 
+test('fortune: a next-shipment bonus or penalty changes one shipment\'s profit, then is used up', () => {
+  for (const [id, change] of [['FO-galley', 3], ['FO-held', -2]]) {
+    assert.equal(DATA.fortune.find((c) => c.id === id).effect.profit, change);
+    const s = toActions(createGame({ players: four(), seed: 12 }));
+    const p = clearPending(s);
+    const { from, route } = legalShipments(s, p)[0];
+    const plain = shipQuote(s, p, route, from);
+    p.nextShip = { profit: change, safe: false };
+    const q = shipQuote(s, p, route, from);
+    assert.equal(q.fixed, plain.fixed + change);
+    assert.deepEqual(q.parts.at(-1), { label: 'Fortune card', value: change });
+    const r = performAction(s, { type: 'ship', from, route });
+    assert.equal(r.entry.profit, Math.max(0, plain.fixed + change + r.entry.profitDie));
+    assert.equal(p.nextShip, null);
+    assert.equal(shipQuote(s, p, route, from).fixed, plain.fixed);
+  }
+});
+
+test('charity: the refusal names the real limit, in Standard and in Quick Play', () => {
+  for (const [mode, limit, text] of [['standard', 1, /already given charity this turn/], ['quick', 3, /already given charity 3 times this turn/]]) {
+    const s = toActions(createGame({ players: four(), mode, seed: 12 }));
+    const p = clearPending(s);
+    assert.equal(C.limits.charityPerTurn * s.span, limit);
+    p.charityThisTurn = limit - 1;
+    assert.doesNotMatch(String(checkAction(s, { type: 'charity', kind: 'church' })), /already given/);
+    p.charityThisTurn = limit;
+    assert.match(checkAction(s, { type: 'charity', kind: 'church' }), text);
+  }
+});
+
 test('persecution: protecting costs money and a turn action; nobody can profit', () => {
   const s = createGame({ players: four(), seed: 9 });
   while (s.round < 4 || s.phase !== 'event') advance(s), s.phase === 'actions' && [0, 1, 2, 3].forEach(() => { clearPending(s); endTurn(s); });
