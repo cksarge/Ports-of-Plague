@@ -47,6 +47,7 @@ export function shipQuote(state, p, routeId, from, { offshore = false } = {}) {
     }
   }
   if (bonus) parts.push({ label: 'This round’s event', value: bonus });
+  if (p.nextShip?.profit) parts.push({ label: 'Fortune card', value: p.nextShip.profit });
   const fixed = parts.reduce((a, b) => a + b.value, 0);
   const safe = !!p.nextShip?.safe;
   const contagionRisk = isStricken(state, from) && !safe
@@ -253,7 +254,8 @@ export function checkCharity(state, p, { kind }) {
   const why = baseChecks(state, p);
   if (why) return why;
   if (!CHARITY_KINDS[kind]) return 'Choose where to give.';
-  if (p.charityThisTurn >= C.limits.charityPerTurn * (state.span ?? 1)) return state.span > 1 ? 'You have already given charity twice this turn (once per half-year).' : 'You have already given charity this turn.';
+  const gifts = C.limits.charityPerTurn * (state.span ?? 1);
+  if (p.charityThisTurn >= gifts) return gifts > 1 ? `You have already given charity ${gifts} times this turn (once per half-year).` : 'You have already given charity this turn.';
   const price = charityCost(state, p);
   if (p.florins < price) return `Charity costs ${price}ƒ; you have ${p.florins}ƒ.`;
   if (p.reputation >= C.limits.maxReputation) return `Your reputation is already at the maximum (${C.limits.maxReputation}).`;

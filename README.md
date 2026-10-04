@@ -84,11 +84,11 @@ index.html             ← an identical copy, used as the front page on GitHub P
 dev.html               ← development page that loads the source files (use with npm start)
 Printable Documents (PDF)/  ← Rule Book, Research Sheet, presentation outline
 data/                  ← single source of truth for the game's content
-  facts.json           85 historical facts, each with sources and a supporting quote
-  sources.json         37 sources with MLA citations and links
+  facts.json           103 historical facts, each with sources and a supporting quote
+  sources.json         49 sources with MLA citations and links
   cities.json          45 cities: coordinates, real plague arrival dates, facts
-  routes.json          40 sea and land routes
-  events.json          24 dated Chronicle cards, 34 Event cards, 22 Fortune cards
+  routes.json          73 sea and land routes
+  events.json          27 dated Chronicle cards, 34 Event cards, 22 Fortune cards
   timeline.json        the 12 rounds (half-years), 2 pre-plague half-years, prologue and epilogue
   actions.json         the 11 actions and the medieval remedies
   config.json          every rule number (costs, dice, scoring); used by the game AND the rule books
