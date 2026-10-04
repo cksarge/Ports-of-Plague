@@ -72,6 +72,7 @@ export function renderMenu(app, { onNew, onContinue, onJoin }) {
         <button class="btn ${saved ? '' : 'primary'}" id="new">New game</button>
         <button class="btn" id="join">Join a game <small style="font-family:var(--serif);font-weight:400">(room code)</small></button>
         <button class="btn" id="rules">Rules <span class="key">R</span></button>
+        <a class="btn" id="play-3d" href="https://github.com/cksarge/Ports-of-Plague-3D" target="_blank" rel="noopener">Play the 3D version</a>
         <button class="btn" id="about">About &amp; credits</button>
         <div style="display:flex;gap:0.6rem;justify-content:center">
           <button class="btn small" id="menu-sound" aria-pressed="${!isMuted()}">${isMuted() ? '🔇 Sound off' : '🔊 Sound on'}</button>
