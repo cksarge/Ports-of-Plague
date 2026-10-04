@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { DATA } from '../src/data.js';
 import { playBotGame } from '../src/engine/sim.js';
 import { storyCard, storyHtml, chroniclePages, splitStory, share } from '../src/ui/stories.js';
+import { housePanelHtml } from '../src/ui/prompts.js';
+import { C, createGame, advance, currentPlayer, endTurn, performAction, decide, legalPosts } from '../src/engine/index.js';
 
 const homes = ['venice', 'london', 'lubeck', 'genoa', 'bruges', 'florence'];
 const game = (n, mode, seed) => playBotGame({ players: homes.slice(0, n).map((home, i) => ({ name: `House ${i + 1}`, home })), mode, seed }).state;
@@ -110,5 +112,36 @@ test('stories: all twelve kinds of card render, including rare ones', () => {
     assert.ok(data, `found data for ${kind}`);
     const card = storyCard(state, kind, JSON.parse(JSON.stringify(data)), { still: true });
     assert.doesNotMatch(storyHtml(card, ''), /undefined|NaN|\[object Object\]/, kind);
+  }
+});
+
+test('house panel: a partnership or closed gates agreed in the final round still draws (it lasts to the end of the game)', () => {
+  for (const mode of ['standard', 'quick']) {
+    const state = createGame({ players: homes.slice(0, 3).map((home, i) => ({ name: `House ${i + 1}`, home })), mode, seed: 7 });
+    // Play on to the first turn of the final round, declining every card.
+    for (let guard = 0; guard < 2000 && !(state.phase === 'actions' && state.roundEnd >= C.rounds); guard++) {
+      if (state.phase !== 'actions') { advance(state); continue; }
+      const p = currentPlayer(state);
+      while (p.pending.length) decide(state, p.pending[0].kind === 'wageLaw' ? 'obey' : false);
+      endTurn(state);
+    }
+    assert.equal(state.phase, 'actions');
+    const a = currentPlayer(state);
+    while (a.pending.length) decide(state, a.pending[0].kind === 'wageLaw' ? 'obey' : false);
+    const b = state.players[state.order[1]];
+    assert.ok(performAction(state, { type: 'deal', partner: b.id }).ok);
+    a.reputation = C.limits.maxReputation;
+    assert.ok(performAction(state, { type: 'gates', city: a.home }).ok, 'gates closed');
+    endTurn(state);
+    while (b.pending[0]?.kind !== 'deal') decide(state, b.pending[0].kind === 'wageLaw' ? 'obey' : false);
+    assert.ok(decide(state, true).ok, 'partnership accepted');
+    for (const p of [a, b]) {
+      // A device draws from the JSON copy it was sent.
+      const copy = JSON.parse(JSON.stringify(state));
+      const html = housePanelHtml(copy, copy.players[p.id]);
+      assert.match(html, /Partner: .* until the end of the game/);
+      assert.doesNotMatch(html, /undefined/);
+    }
+    assert.match(housePanelHtml(state, a), /Gates closed: .* until the end of the game/);
   }
 });
