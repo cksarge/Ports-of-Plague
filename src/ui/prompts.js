@@ -66,13 +66,17 @@ function freeNotes(p) {
   return notes.length ? `<div style="margin-top:0.35rem;font-size:0.88rem">🎡 <strong>Fortune:</strong> ${notes.map(esc).join(' · ')}</div>` : '';
 }
 
+// A half-year by name. Something agreed in the final round lasts "until the
+// end of next round", which is past the last half-year: the end of the game.
+const untilLabel = (h) => halfInfo(h)?.label ?? 'the end of the game';
+
 // Land, debt, partnership and closed gates: the Merchant's Ledger at a glance.
 function ledgerNotes(state, p) {
   const notes = [];
   if (p.land.length) notes.push(`🌾 Land: ${p.land.map((c) => esc(CITIES[c].name)).join(', ')} (+${p.land.length * C.scoring.pointsPerLand} Wealth, ${p.land.length * C.costs.landWage}ƒ wages each half-year)`);
-  if (p.loan) notes.push(`📜 Debt: ${p.loan.owed}ƒ due ${esc(halfInfo(p.loan.due).label)}`);
-  if (p.deal) notes.push(`🤝 Partner: ${esc(dealPartner(state, p).name)} until ${esc(halfInfo(p.deal.until).label)}`);
-  if (p.gates) notes.push(`⛨ Gates closed: ${esc(CITIES[p.gates.city].name)} until ${esc(halfInfo(p.gates.until).label)}`);
+  if (p.loan) notes.push(`📜 Debt: ${p.loan.owed}ƒ due ${esc(untilLabel(p.loan.due))}`);
+  if (p.deal) notes.push(`🤝 Partner: ${esc(dealPartner(state, p).name)} until ${esc(untilLabel(p.deal.until))}`);
+  if (p.gates) notes.push(`⛨ Gates closed: ${esc(CITIES[p.gates.city].name)} until ${esc(untilLabel(p.gates.until))}`);
   return notes.length ? `<div class="ledger-status">${notes.join('<br>')}</div>` : '';
 }
 
