@@ -2,6 +2,8 @@
 
 *An educational board game about the Black Death, 1347–1353, played in a web browser by 1–6 players (computer "bots" can play any house), sharing one computer or each on their own phone, tablet or computer.*
 
+### Play the 3D version of Ports of Plague (mac-only) here: https://github.com/cksarge/Ports-of-Plague-3D
+
 Each player leads a merchant family in a real trading city. Ship goods along historical trade routes for profit, but every ship can carry the plague. The plague reaches each of the 45 cities on the map, from Lisbon, Dublin and Oslo to Cairo, Aleppo, Trebizond and Pskov, in the half-year it really did. Protect your family, keep your good name, and face the choices people faced then. The highest **Legacy** (Wealth + Family + Reputation + your weakest one again) in 1353 wins. The map zooms with the mouse wheel, a trackpad pinch, two fingers on a touch screen or the **+ / −** buttons, and you drag to move around it.
 
 - **Standard** game: 12 rounds of half a year (about 28 / 36 / 44 minutes for 2 / 3 / 4 players).
