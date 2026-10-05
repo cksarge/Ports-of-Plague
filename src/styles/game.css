@@ -93,7 +93,12 @@ a.btn { color: buttontext; text-decoration: none; }
 }
 .frame::before { top: 3px; left: 6px; }
 .frame::after { bottom: 3px; right: 6px; transform: rotate(180deg); }
-.frame-scroll { overflow-y: auto; max-height: calc(90vh - 3.4rem); padding: 0 0.4rem 0.2rem 0.2rem; margin: 0 -0.4rem 0 -0.2rem; }
+/* dvh: on a phone the browser's own bars cover part of the screen, and vh
+   ignores them, which would hide the bottom of a long card behind them. */
+.frame-scroll { overflow-y: auto; max-height: calc(90vh - 3.4rem); max-height: calc(90dvh - 3.4rem); padding: 0 0.4rem 0.2rem 0.2rem; margin: 0 -0.4rem 0 -0.2rem; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+/* While a card is open, the page behind it must not scroll: on a phone a
+   swipe on the card would otherwise move the page instead of the card's text. */
+html:has(dialog[open]), html:has(dialog[open]) body { overflow: hidden; }
 .drop-cap::first-letter { float: left; font-family: var(--caps); font-weight: 800; font-size: 2.9em; line-height: 0.9; margin: 0.05em 0.12em 0 0; color: var(--vermilion); text-shadow: 1px 1px 0 var(--gold-light); }
 
 /* ---------- Screens ---------- */
@@ -277,7 +282,7 @@ a.btn { color: buttontext; text-decoration: none; }
 .sidebar .note h3 { font-size: 0.85rem; }
 
 /* ---------- Dialogs ---------- */
-dialog { border: none; padding: 0; background: transparent; max-width: min(780px, 94vw); width: 100%; max-height: 92vh; overflow: visible; }
+dialog { border: none; padding: 0; background: transparent; max-width: min(780px, 94vw); width: 100%; max-height: 92vh; max-height: 92dvh; overflow: visible; }
 dialog::backdrop { background: radial-gradient(ellipse at center, rgba(30, 18, 6, 0.6), rgba(10, 5, 0, 0.82)); }
 dialog[open] { animation: rise 0.28s ease-out; }
 @keyframes rise { from { transform: translateY(16px) scale(0.98); opacity: 0; } }
@@ -285,7 +290,7 @@ dialog.wide { max-width: min(1000px, 96vw); }
 dialog.side { margin: 1rem 1rem 1rem auto; max-width: min(560px, 96vw); max-height: calc(100vh - 2rem); }
 dialog.side::backdrop { background: rgba(10, 5, 0, 0.25); }
 @media (max-width: 980px) { dialog.side { margin: auto; } }
-dialog .frame { max-height: 90vh; }
+dialog .frame { max-height: 90vh; max-height: 90dvh; }
 .dialog-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; justify-content: flex-end; margin-top: 1rem; }
 .choice-list { display: grid; gap: 0.7rem; margin: 0.6rem 0; }
 .choice { display: grid; grid-template-columns: 1fr auto; gap: 0.6rem; align-items: center; text-align: left; padding: 0.55rem 0.75rem; min-height: 52px; border: 2px solid var(--parchment-3); border-left: 6px solid var(--lapis); border-radius: var(--radius); background: #fffdf6; cursor: pointer; transition: transform 0.08s, border-color 0.2s; }
