@@ -48,10 +48,11 @@ export function createClock({ onTick, onExpire }) {
 // [data-clock-slot] (the top bar of the shared screen, the header of a
 // player's own device) and, while a choice is open, as a tab on the top edge
 // of that dialog so it is never hidden behind it.
-function chip(p, secondsLeft, paused) {
+// total: the length of a turn in this game (a host may set its own).
+function chip(p, secondsLeft, paused, total) {
   const s = Math.ceil(secondsLeft);
   const urgent = s <= C.turnTimer.warnAt && !paused;
-  const frac = Math.max(0, Math.min(1, secondsLeft / C.turnTimer.seconds));
+  const frac = Math.max(0, Math.min(1, secondsLeft / (total || C.turnTimer.seconds)));
   return {
     cls: `turn-clock${urgent ? ' urgent' : ''}${paused ? ' paused' : ''}`,
     frac: frac.toFixed(3),
@@ -66,8 +67,8 @@ function fill(el, c, extra = '') {
   el.setAttribute('aria-label', c.label);
 }
 
-export function showClockPill(p, secondsLeft, { paused = false } = {}) {
-  const c = chip(p, secondsLeft, paused);
+export function showClockPill(p, secondsLeft, { paused = false, total = 0 } = {}) {
+  const c = chip(p, secondsLeft, paused, total);
   for (const slot of document.querySelectorAll('[data-clock-slot]')) {
     let el = slot.querySelector('.turn-clock');
     if (!el) {

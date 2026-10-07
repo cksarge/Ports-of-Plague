@@ -58,7 +58,7 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
   let botPlaying = false; // a computer house is taking its turn
   let expiring = false;
   const clock = createClock({
-    onTick: (l) => { const p = player(); if (turnOn && p) showClockPill(p, l, { paused: !clock.running }); },
+    onTick: (l) => { const p = player(); if (turnOn && p) showClockPill(p, l, { paused: !clock.running, total: state.turnSeconds }); },
     onExpire: () => { expireTurn(); },
   });
 
@@ -385,7 +385,7 @@ export function startGame(app, state, ui, { onExit, onEnd, room = null }) {
     if (!turnOn || left || !p) return;
     const hold = storyDepth > 0 || resolving || passing || hasLeft(p);
     if (hold) clock.pause(); else clock.resume();
-    showClockPill(p, clock.left, { paused: hold });
+    showClockPill(p, clock.left, { paused: hold, total: state.turnSeconds });
     push();
   }
   // Time is up: close any choice still open, answer waiting cards with their

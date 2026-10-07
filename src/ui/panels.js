@@ -4,16 +4,17 @@ import { renderRulebook } from '../render/rulebook.js';
 import { routesFrom, otherEnd, familyAt, isThreatened, halfInfo } from '../engine/state.js';
 import { severityName } from '../engine/plague.js';
 import { openDialog, esc, crestSvg } from './dom.js';
-import { factHtml, journalHtml, noteHtml } from './notes.js';
+import { factHtml, journalHtml, noteHtml, historyShown } from './notes.js';
 
 export function showRules() {
-  const body = renderRulebook(DATA.rulebook, DATA.config, {
+  // With History Mode off, the fact codes go (and the space before each).
+  const body = historyShown() ? renderRulebook(DATA.rulebook, DATA.config, {
     factRef: (id) => `<sup class="fact-ref" title="${esc(FACTS[id]?.text ?? id)}">[${id}]</sup>`,
-  });
+  }) : renderRulebook(DATA.rulebook, DATA.config, { factRef: () => '\u0001' }).replace(/ ?\u0001/g, '');
   return openDialog(`<div class="frame rules">
       <h1 class="title" style="font-size:2.6rem">${esc(DATA.rulebook.title)}</h1>
       <p class="subtitle">${esc(DATA.rulebook.subtitle)} — Rule Book</p>
-      <p class="rules-note">These are the same rules as the printable Rule Book (both are generated from one file). Numbers in brackets like [TR-02] are historical facts; hover to read them, or open the Historian's Journal.</p>
+      <p class="rules-note">These are the same rules as the printable Rule Book (both are generated from one file).${historyShown() ? ' Numbers in brackets like [TR-02] are historical facts; hover to read them, or open the Historian\'s Journal.' : ''}</p>
       ${body}
       <div class="dialog-actions"><button class="btn primary" data-value="close" autofocus>Close rules <span class="key">Esc</span></button></div>
     </div>`, { wide: true, label: 'Rule Book' });

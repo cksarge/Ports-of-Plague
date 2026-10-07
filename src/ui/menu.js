@@ -63,6 +63,11 @@ export function renderMenu(app, { onNew, onContinue, onJoin }) {
   const saved = loadGame();
   app.innerHTML = `<section class="screen title-screen">
     <div class="title-map" id="title-map" aria-hidden="true"></div>
+    <aside class="site-notice" role="note" aria-label="Notice about this website">
+      <strong>Coming soon: this website will be for joining games only.</strong>
+      <span>Starting and hosting games is moving to the 3D version. Joining a game with a room code will keep working here.</span>
+      <a href="https://github.com/cksarge/Ports-of-Plague-3D" target="_blank" rel="noopener">See the 3D version →</a>
+    </aside>
     <div class="menu frame">
       <h1 class="title">${esc(C.title)}</h1>
       <p class="subtitle">Trade, survival and conscience in the years of the Black Death, 1347–1353</p>

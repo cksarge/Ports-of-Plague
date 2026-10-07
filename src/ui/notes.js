@@ -21,7 +21,15 @@ export function factHtml(id, { showId = true } = {}) {
     `<span class="cite">Source: ${cites}</span></div>`;
 }
 
+// History Mode. A host can switch it off for a game ("view.history: false" in
+// what it sends a player's device): the historical notes and extras are then
+// left out, and only the game itself is shown. Card stories stay.
+let history = true;
+export const historyShown = () => history;
+export function showHistory(on) { history = on !== false; }
+
 export function noteHtml(factIds, title = 'Historical Note') {
+  if (!history) return '';
   const ids = [...new Set(factIds ?? [])].filter((id) => FACTS[id]);
   if (!ids.length) return '';
   return `<aside class="note" aria-label="${esc(title)}"><h3>📜 ${esc(title)}</h3>${ids.map((id) => factHtml(id)).join('')}</aside>`;

@@ -110,6 +110,16 @@ html:has(dialog[open]), html:has(dialog[open]) body { overflow: hidden; }
 .title-map svg { width: 100%; height: 100%; }
 .title-screen::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(20, 10, 2, 0.05), rgba(20, 10, 2, 0.78)); pointer-events: none; }
 .menu { text-align: center; max-width: 740px; width: 100%; z-index: 2; }
+/* The notice across the top of the title screen; the menu stays centred in the space below it. */
+.screen.title-screen { flex-direction: column; padding-top: 0; }
+.title-screen > .menu { margin-block: auto; }
+.site-notice {
+  position: relative; z-index: 2; align-self: stretch; margin: 0 -2rem 1.2rem; padding: 0.8rem 2.5rem;
+  display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 0.2rem 0.8rem; text-align: center;
+  color: #fff6e0; background: linear-gradient(#c93a2c, #8a1a10); border-bottom: 4px solid var(--gold-bright); box-shadow: 0 4px 16px rgba(10, 5, 0, 0.55);
+}
+.site-notice strong { font-family: var(--caps); font-size: 1.15rem; letter-spacing: 0.04em; }
+.site-notice a { color: var(--gold-light); font-weight: 600; white-space: nowrap; }
 .title {
   font-family: var(--black); font-weight: 400; font-size: clamp(3.2rem, 8vw, 5.8rem); margin: 0; letter-spacing: 0;
   /* One seamless tile: starts and ends crimson, with a gold glint in the middle. */
