@@ -145,3 +145,27 @@ test('house panel: a partnership or closed gates agreed in the final round still
     assert.match(housePanelHtml(state, a), /Gates closed: .* until the end of the game/);
   }
 });
+
+test('History Mode off: notes, fact codes and history hints are left out; card stories stay', async () => {
+  const { showHistory, noteHtml } = await import('../src/ui/notes.js');
+  const { hintFor } = await import('../src/ui/prompts.js');
+  const state = game(3, 'quick', 5);
+  const cards = storiesOf(state);
+  try {
+    showHistory(false);
+    assert.equal(noteHtml(['TR-02']), '');
+    for (const [kind, data] of cards) {
+      const card = storyCard(state, kind, JSON.parse(JSON.stringify(data)), { still: true, hints: true });
+      assert.doesNotMatch(card.body, /class="note"|class="fact"|Historical Note/, `${kind} shows no note`);
+      assert.ok(card.body.length > 40, `${kind} still has its story`);
+    }
+    // The last hint no longer points at city history.
+    const p = { ...state.players[0], pending: [], ap: 1, shipped: ['x'], posts: ['a', 'b'], florins: 0 };
+    const hint = hintFor({ ...state, round: 1, roundEnd: 1, difficulty: 'apprentice' }, p, true);
+    if (hint?.startsWith('Tip:')) assert.doesNotMatch(hint, /history/);
+  } finally {
+    showHistory(true);
+  }
+  assert.match(noteHtml(['TR-02']), /class="note"/);
+  assert.match(storyCard(state, ...cards.find(([k]) => k === 'prologue'), { hints: true }).body, /class="note"/);
+});

@@ -10,7 +10,7 @@ import { showRules, showJournal, showCity } from './panels.js';
 import { storyCard, storyHtml } from './stories.js';
 import { createMap, updateMap, redrawStains } from './map.js';
 import { showClockPill, hideClockPill } from './clock.js';
-import { noteHtml } from './notes.js';
+import { noteHtml, showHistory, historyShown } from './notes.js';
 import { sfx } from './sound.js';
 import { music } from './music.js';
 import { joinRoom } from '../net/client.js';
@@ -18,7 +18,7 @@ import { netAvailable } from '../net/transport.js';
 import { isRoomCode, normalizeRoomCode, CODE_LENGTH, LOBBY, STATE, TOAST, REJECT, CLOSED, JOIN, ACT, DECIDE, END, NEXT } from '../net/protocol.js';
 
 export function renderJoin(app, { onBack: toMenu, code: preset = '' }) {
-  const onBack = () => { music.setHushed(false); toMenu(); };
+  const onBack = () => { music.setHushed(false); showHistory(true); toMenu(); };
   app.onkeydown = null; // the title screen's R-for-Rules shortcut is not for this screen
   let conn = null;
   let screen = 'code';     // code → connecting → house → lobby → game
@@ -51,7 +51,7 @@ export function renderJoin(app, { onBack: toMenu, code: preset = '' }) {
     const cur = game && currentPlayer(game.state);
     if (!clockView || !cur || hostGone) { hideClockPill(); return; }
     const left = clockView.running ? clockView.left - (performance.now() - clockView.at) / 1000 : clockView.left;
-    showClockPill(cur, Math.max(0, left), { paused: !clockView.running });
+    showClockPill(cur, Math.max(0, left), { paused: !clockView.running, total: game.state.turnSeconds });
   }
   function setClock(timer) {
     clockView = timer ? { ...timer, at: performance.now() } : null;
@@ -120,6 +120,8 @@ export function renderJoin(app, { onBack: toMenu, code: preset = '' }) {
     } else if (m.t === STATE) {
       const firstState = !game || screen !== 'game';
       game = m;
+      // The host may have History Mode off for this game (missing = on).
+      showHistory(m.view?.history !== false);
       if (waiting && (m.seats[me()]?.rid ?? 0) >= waiting) stopWaiting();
       if (nextSent !== null && m.view?.next?.id !== nextSent) nextSent = null;
       if (reader && reader.id !== m.view?.next?.id) reader.close?.();
@@ -215,10 +217,12 @@ export function renderJoin(app, { onBack: toMenu, code: preset = '' }) {
     form = { name: '', home: null };
     const seats = lobby?.seats ?? [];
     const o = lobby?.options ?? {};
+    // A host may set its own turn length (timerSeconds; null = no timer).
+    const turnSecs = o.timerSeconds !== undefined ? Math.round(Number(o.timerSeconds)) || null : o.timer ? C.turnTimer.seconds : null;
     app.innerHTML = `<section class="screen"><div class="frame join-box">
       <h1>Room ${esc(conn.code)}</h1>
       <p><strong>You are in!</strong> Waiting for the big screen to start the game…</p>
-      ${o.mode ? `<p class="home-info">${esc(C.modes[o.mode]?.label ?? '')} · ${esc(C.difficulty[o.difficulty]?.label ?? '')}${o.prePlague ? ' · pre-plague rounds' : ''}${o.timer ? ` · ${C.turnTimer.seconds}-second turns` : ''}</p>` : ''}
+      ${o.mode ? `<p class="home-info">${esc(C.modes[o.mode]?.label ?? '')} · ${esc(C.difficulty[o.difficulty]?.label ?? '')}${o.prePlague ? ' · pre-plague rounds' : ''}${turnSecs ? ` · ${turnSecs}-second turns` : ''}</p>` : ''}
       <div class="houses">${seats.map((s, i) => houseRow({ ...PLAYER_STYLES[i], name: s.name }, `${esc(CITIES[s.home].name)}${s.cid === conn.cid ? ' · you' : ''}${s.bot ? ` · bot (${esc(C.bots.skills[s.skill]?.label ?? '')})` : ''}`, s.online)).join('')}</div>
       <div class="setup-actions"><button class="btn ghost" id="back">Leave</button><button class="btn" id="edit">Change my house</button></div>
     </div></section>`;
@@ -271,7 +275,7 @@ export function renderJoin(app, { onBack: toMenu, code: preset = '' }) {
       <span class="ctl-room">Room ${esc(conn.code)}</span></header>
       <nav class="ctl-tools" aria-label="Look things up">
         <button class="btn small" id="ctl-rules">Rules</button>
-        <button class="btn small" id="ctl-journal" aria-label="Historian's Journal, ${state.journal?.length ?? 0} facts">Journal <span class="count">${state.journal?.length ?? 0}</span></button>
+        ${historyShown() ? `<button class="btn small" id="ctl-journal" aria-label="Historian's Journal, ${state.journal?.length ?? 0} facts">Journal <span class="count">${state.journal?.length ?? 0}</span></button>` : ''}
         <button class="btn small" id="ctl-chronicle">Chronicle</button>
         <button class="btn small" id="ctl-map">Map</button>
         ${state.phase === 'ended' ? '' : '<button class="btn small ghost" id="ctl-quit">Leave game</button>'}
@@ -287,7 +291,7 @@ export function renderJoin(app, { onBack: toMenu, code: preset = '' }) {
         : `<section class="panel finale-wait"><h2>Anno Domini 1353</h2><p class="finale-wait-icon" aria-hidden="true">👑</p>
         <p>The game is over! <strong>Watch the big screen</strong>: the final reckoning is being revealed there.</p>
         <div class="dialog-actions"><button class="btn" id="ctl-scores">Show the final scores here</button><button class="btn primary" id="ctl-leave">Back to the menu</button></div></section>`);
-      parts.push(`
+      if (historyShown()) parts.push(`
         <section class="panel"><h2>What Really Happened</h2>${noteHtml(DATA.timeline.epilogue.factIds, 'The real history')}</section>`);
       app.innerHTML = `<div class="controller">${parts.join('')}</div>`;
     tickClock(); // the header was redrawn: put the turn clock back at once
@@ -351,7 +355,8 @@ export function renderJoin(app, { onBack: toMenu, code: preset = '' }) {
   function bindTools() {
     const reopen = (shown) => shown.then(() => { if (screen === 'game' && game) drawGame(); });
     $('#ctl-rules', app).onclick = () => reopen(showRules());
-    $('#ctl-journal', app).onclick = () => reopen(showJournal(game.state.journal ?? []));
+    const journal = $('#ctl-journal', app);
+    if (journal) journal.onclick = () => reopen(showJournal(game.state.journal ?? []));
     $('#ctl-chronicle', app).onclick = () => reopen(showChronicle());
     $('#ctl-map', app).onclick = () => reopen(showMap());
     const quit = $('#ctl-quit', app);
@@ -427,7 +432,7 @@ export function renderJoin(app, { onBack: toMenu, code: preset = '' }) {
       return cs.state === 'stricken' ? `Stricken (${cs.severity})` : cs.state === 'aftermath' ? 'Aftermath' : state.players.some((x) => x.posts.includes(id)) ? 'Safe · trading post' : 'Safe';
     };
     const cities = [...DATA.cities].sort((a, b) => a.name.localeCompare(b.name));
-    return openDialog(`<div class="frame"><h2>The Map</h2><p class="home-info">Tap a city for its history.</p>
+    return openDialog(`<div class="frame"><h2>The Map</h2><p class="home-info">${historyShown() ? 'Tap a city for its history.' : 'Tap a city for its status and routes.'}</p>
       <div class="map-frame phone-map" id="phone-map"></div>
       <div class="city-list">${cities.map((c) => `<button class="btn small" data-city="${c.id}">${esc(c.name)} <small>${esc(status(c.id))}</small></button>`).join('')}</div>
       <div class="dialog-actions"><button class="btn primary" data-value="close" autofocus>Close</button></div></div>`,

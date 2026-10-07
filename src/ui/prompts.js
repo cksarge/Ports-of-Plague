@@ -10,7 +10,7 @@ import {
   lastPlaceId, legalPosts, isAftermath, untilRound, dealPartner, apCost, halfInfo, roundNumber,
 } from '../engine/index.js';
 import { esc, crestSvg } from './dom.js';
-import { noteHtml } from './notes.js';
+import { noteHtml, historyShown } from './notes.js';
 import { THEME_COLORS, themeIllustration, coinIcon, laurelIcon, familyIcon, candleIcon } from './art.js';
 
 export const ACTION_ICONS = { ship: '⚓', post: '🏛', move: '🐎', prepare: '🚪', physician: '⚕', charity: '✝', marry: '💍', land: '🌾', loan: '📜', deal: '🤝', gates: '⛨' };
@@ -151,7 +151,8 @@ export function hintFor(state, p, hintsOn) {
   if (p.posts.length < 2 && p.florins >= cost(state, 'openPost', p) && p.ap >= apCost('post')) return `A second trading post (<span class="key">2</span>, ${cost(state, 'openPost', p)}ƒ and ${apCost('post')} AP) lets you ship from two places, and opening it draws a Fortune card.`;
   const after = p.posts.find((c) => isAftermath(state, c));
   if (after && !p.land.length && familyTotal(p) < C.start.family) return `${esc(CITIES[after].name)} is in Aftermath: you can now <span class="key">7</span> Arrange a Marriage or <span class="key">8</span> Buy Abandoned Land there.`;
-  return 'Tip: click any city on the map to read its history. Your weakest Legacy category counts twice, so keep all three healthy.';
+  return historyShown() ? 'Tip: click any city on the map to read its history. Your weakest Legacy category counts twice, so keep all three healthy.'
+    : 'Tip: your weakest Legacy category counts twice, so keep all three healthy.';
 }
 
 // ---------- Choosing an action ----------
